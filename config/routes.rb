@@ -53,7 +53,7 @@ Rails.application.routes.draw do
 	#     # (app/controllers/admin/products_controller.rb)
 	#     resources :products
 	#   end
-	scope :path => ":api" do
-		resources :localization, controller: 'localization', method: 'get'
+	scope :path => ':api' do
+		get '/localization' => 'localization#get'
 	end
 end
