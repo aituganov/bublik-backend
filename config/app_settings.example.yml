@@ -1,13 +1,15 @@
 defaults: &defaults
-  localization_dir: lib/locales/
-  default_locale: ru
+  localization:
+    directory: lib/locales/
+    default_locale: ru
 
 development:
   <<: *defaults
 
 test:
   <<: *defaults
-  default_locale: en
+  localization:
+    default_locale: en
 
 production:
   <<: *defaults
