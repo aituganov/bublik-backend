@@ -4,7 +4,7 @@ module UserHelper
 		{
 			anonymous: true,
 			menuItems: get_fake_menu,
-			companies: {items: get_fake_company, hasMore: true},
+			widgets: [topCompanies: {preview: get_fake_company, hasMore: true}],
 			canSearching: true
 		}
 	end
