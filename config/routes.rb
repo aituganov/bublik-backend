@@ -53,8 +53,9 @@ Rails.application.routes.draw do
 	#     # (app/controllers/admin/products_controller.rb)
 	#     resources :products
 	#   end
-	scope :path => ':api' do
+	scope :path => 'api' do
 		get '/localization' => 'localization#get'
 		get '/user' => 'user#anonymous'
+		get '/company/:id' => 'company#get'
 	end
 end
