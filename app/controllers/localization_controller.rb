@@ -24,7 +24,7 @@ class LocalizationController < ApplicationController
 	end
 
 	def make_localization_path
-		"#{AppSettings.localization.directory}/#{@lang}.yml"
+		"#{AppSettings.localization.directory}#{@lang}.yml"
 	end
 
 end
