@@ -1,29 +1,18 @@
-# README #
+# Bublik BackEnd API #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+request prefix: /api
 
-### What is this repository for? ###
+supported requests:
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+* Get localization
 
-### How do I get set up? ###
+/localization
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+* Get anonymous user info
 
-### Contribution guidelines ###
+/user
 
-* Writing tests
-* Code review
-* Other guidelines
+* Get company info
 
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+/company/:id
+where :id - identificator of requested company
