@@ -6,13 +6,13 @@ supported requests:
 
 * Get localization
 
-/localization
+	/localization
 
 * Get anonymous user info
 
-/user
+	/user
 
 * Get company info
 
-/company/:id
-where :id - identificator of requested company
+	/company/:id
+	where :id - identificator of requested company
