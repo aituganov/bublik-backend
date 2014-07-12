@@ -22,7 +22,13 @@ class LocalizationController < ApplicationController
 	end
 
 	def get_localization_contain
-		YAML::load(File.open(AppSettings.get_path_to_locale(@lang)))
+		from_cache = Rails.cache.read("locale_#{@lang}")
+		if (from_cache.nil?)
+			from_cache = YAML::load(File.open(AppSettings.get_path_to_locale(@lang)))
+			Rails.cache.write("locale_#{@lang}", from_cache)
+		end
+
+		from_cache
 	end
 
 end
