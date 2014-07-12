@@ -11,6 +11,8 @@ set :env, fetch(:env, "production")
 
 set :use_sudo, true
 
+set :port, 3111
+
 # Default branch is :master
 # ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call
 
@@ -41,6 +43,8 @@ set :log_level, :debug
 # Default value for keep_releases is 5
 # set :keep_releases, 5
 
+set :rails_env, "production"
+
 namespace :deploy do
 
   desc 'Restart application'
@@ -54,12 +58,20 @@ namespace :deploy do
   after :publishing, :restart
 
   after :restart, :clear_cache do
-    on roles(:web), in: :groups, limit: 3, wait: 10 do
+    on roles(:app), in: :groups, limit: 3, wait: 10 do
       # Here we can do anything such as:
-      within release_path do
-        execute :rake, 'cache:clear'
-      end
-      "restart #{application}"
+      #within release_path do
+      #  execute :rake, 'cache:clear'
+      #end
+      #"restart #{application}"
+    end
+  end
+
+  namespace :rake do
+    desc "Invoke rake task"
+    task :invoke do
+      run "cd #{deploy_to}/current"
+      run "bundle exec rake #{ENV['task']} RAILS_ENV=#{rails_env}"
     end
   end
 
