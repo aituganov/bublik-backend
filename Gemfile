@@ -40,3 +40,6 @@ gem 'spring',        group: :development
 
 # Use cool settings
 gem 'settingslogic'
+
+# Use log4r
+gem 'log4r'
