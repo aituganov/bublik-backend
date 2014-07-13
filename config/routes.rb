@@ -54,14 +54,11 @@ Rails.application.routes.draw do
 	#     resources :products
 	#   end
 	scope :path => 'api' do
-		get '/localization' => 'localization#get'
-		resource :user do
-			get '/' => :anonymous
-		end
-		resource :company do
-			get '/:id' => :get
-		end
-
-		get '*path', :to => 'application#page_not_found'
+		get 'localization' => 'localization#get'
+		get 'widget/:id' => 'widgets#get'
+		get 'user' => 'users#anonymous'
+		get 'company/:id' => 'companies#get'
 	end
+
+	get '*path', :to => 'application#page_not_found'
 end
