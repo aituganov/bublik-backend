@@ -39,7 +39,13 @@ gem 'spring',        group: :development
 # gem 'debugger', group: [:development, :test]
 
 # Use cool settings
-gem 'settingslogic'
+gem 'settingslogic', '2.0.9'
 
 # Use log4r
-gem 'log4r'
+gem 'log4r', '1.1.10'
+
+# Use rspec for testing
+group :development, :test do
+	gem 'minitest', '5.4.0'
+	gem 'rspec-rails', '2.13.1'
+end
