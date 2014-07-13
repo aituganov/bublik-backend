@@ -24,12 +24,12 @@ log4r_config:
     dirname: "#{RAILS_ROOT}/log"
     filename: "bublik_backend_#{RAILS_ENV}.log"
     formatter:
-      date_pattern: '%H:%M:%S'
+      date_pattern: '%T.%L,'
       pattern     : '%d %l: %m '
       type        : PatternFormatter
   - type: StdoutOutputter
     name: console
     formatter:
-      date_pattern: '%H:%M:%S'
+      date_pattern: '%T.%L,'
       pattern     : '%d %l: %m'
       type        : PatternFormatter
