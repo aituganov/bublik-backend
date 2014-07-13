@@ -1,7 +1,7 @@
 defaults: &defaults
   localization:
     directory: lib/locales/
-    default_locale: ru
+    default: ru
   widgets:
     def_limit: 10
 
