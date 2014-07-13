@@ -5,7 +5,7 @@ describe LocalizationController do
 	describe 'GET localization' do
 		it 'has a 200 status code' do
 			get :get
-			expect(response.status).to eq(200)
+			response.status.should eq 200
 		end
 
 		it 'has default localization' do
