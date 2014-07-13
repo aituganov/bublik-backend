@@ -1,6 +1,6 @@
-class CompanyController < ApplicationController
+class CompaniesController < ApplicationController
 
-	include CompanyHelper
+	include CompaniesHelper
 
 	def get
 		id = params[:id]

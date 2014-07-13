@@ -55,7 +55,11 @@ Rails.application.routes.draw do
 	#   end
 	scope :path => 'api' do
 		get '/localization' => 'localization#get'
-		get '/user' => 'user#anonymous'
-		get '/company/:id' => 'company#get'
+		resource :user do
+			get '/' => :anonymous
+		end
+		resource :company do
+			get '/:id' => :get
+		end
 	end
 end

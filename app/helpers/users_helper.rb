@@ -1,10 +1,10 @@
-module UserHelper
+module UsersHelper
 
 	def get_fake_anonymous_data
 		{
 			anonymous: true,
 			menuItems: get_fake_menu,
-			widgets: [topCompanies: {preview: get_fake_company, hasMore: true}],
+			widgets: ['topCompanies'],
 			canSearching: true
 		}
 	end
@@ -13,7 +13,7 @@ module UserHelper
 		['register', 'login', 'aboutUs']
 	end
 
-	def get_fake_company
+	def get_fake_companies
 		[{
 			id: 1,
 			title: 'McDonald’s',

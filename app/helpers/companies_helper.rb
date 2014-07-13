@@ -1,4 +1,4 @@
-module CompanyHelper
+module CompaniesHelper
 
 	def get_fake_company(id)
 		{
