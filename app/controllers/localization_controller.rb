@@ -24,8 +24,11 @@ class LocalizationController < ApplicationController
 	def get_localization_contain
 		from_cache = Rails.cache.read("locale_#{@lang}")
 		if (from_cache.nil?)
+			logger.info 'Locale isn\'t found in cache, take from file...'
 			from_cache = YAML::load(File.open(AppSettings.get_path_to_locale(@lang)))
 			Rails.cache.write("locale_#{@lang}", from_cache)
+		else
+			logger.info 'Take locale from cache'
 		end
 
 		from_cache
