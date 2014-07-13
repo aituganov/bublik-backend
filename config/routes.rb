@@ -61,5 +61,7 @@ Rails.application.routes.draw do
 		resource :company do
 			get '/:id' => :get
 		end
+
+		get '*path', :to => 'application#page_not_found'
 	end
 end
