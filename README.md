@@ -4,6 +4,10 @@ request prefix: /api
 
 supported requests:
 
+* Get backend version
+
+	/version
+
 * Get localization
 
 	/localization
@@ -16,3 +20,8 @@ supported requests:
 
 	/company/:id
 	where :id - identificator of requested company
+
+* Get widget data
+
+	/widget/:name?level=:level&limit=:limit&offset=:offset
+	where :name - widget name 
