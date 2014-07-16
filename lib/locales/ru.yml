@@ -1,12 +1,12 @@
-"topMenu": {
-	"aboutUs":"О нас",
-	"registration":"Регистрация",
-	"login":"Войти"
-},
-"rigthMenu": {
-	"myProfile":"Моя страница",
-	"friends": "Друзья",
-	"stores":"Магазины",
-	"top":"ТОП",
-	"news":"Новости"
-}
+mainpage:
+  topMenu:
+    aboutUs: О нас
+    registration: Регистрация
+    login: Войти
+user:
+  page:
+    myProfile: Моя страница
+    friends: Друзья
+    stores: Магазины
+    top: ТОП
+    news: Новости
