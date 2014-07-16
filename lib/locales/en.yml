@@ -1,1 +1,12 @@
-hello: "Hello mother fucka"
+"topMenu": {
+	"aboutUs":"About Us",
+	"registration":"Registration",
+	"login":"Login"
+},
+"rigthMenu": {
+	"myProfile":"My Profile",
+	"friends": "Friends",
+	"stores":"Stores",
+	"top":"TOP",
+	"news":"News"
+}
