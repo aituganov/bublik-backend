@@ -2,8 +2,10 @@ defaults: &defaults
   localization:
     directory: lib/locales/
     default: ru
-  widgets:
-    def_limit: 10
+  offset_default: 0
+    widgets:
+      level_default: city
+      limit_default: 10
 
 development:
   <<: *defaults
