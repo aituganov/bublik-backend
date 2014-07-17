@@ -3,9 +3,9 @@ defaults: &defaults
     directory: lib/locales/
     default: ru
   offset_default: 0
-    widgets:
-      level_default: city
-      limit_default: 10
+  widgets:
+    level_default: city
+    limit_default: 10
 
 development:
   <<: *defaults
