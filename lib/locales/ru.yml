@@ -4,9 +4,10 @@ mainpage:
     registration: Регистрация
     login: Войти
 user:
-  page:
-    myProfile: Моя страница
-    friends: Друзья
-    stores: Магазины
-    top: ТОП
-    news: Новости
+  pages:
+    main:
+      myProfile: Моя страница
+      friends: Друзья
+      stores: Магазины
+      top: ТОП
+      news: Новости

@@ -4,9 +4,10 @@ mainpage:
     registration: Registration
     login: Login
 user:
-  page:
-    myProfile: My Profile
-    friends: Friends
-    stores: Stores
-    top: TOP
-    news: News
+  pages:
+    main:
+      myProfile: My Profile
+      friends: Friends
+      stores: Stores
+      top: TOP
+      news: News
