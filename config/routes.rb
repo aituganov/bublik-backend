@@ -58,6 +58,7 @@ Rails.application.routes.draw do
 		get 'widget/:id' => 'widgets#get'
 		get 'user' => 'users#anonymous'
 		get 'company/:id' => 'companies#get'
+		get 'version' => 'versions#current_version'
 	end
 
 	get '*path', :to => 'application#page_not_found'
