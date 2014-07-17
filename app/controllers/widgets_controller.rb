@@ -10,11 +10,10 @@ class WidgetsController < ApplicationController
 	private
 	def validate_params
 		@id = params[:id]
-		@level = params[:level]
-		@offset = params[:offset]
-		@limit = params[:limit] || AppSettings.widgets.def_limit
+		@offset = params[:offset] || AppSettings.offset_default
+		@level = params[:level] || AppSettings.widgets.level_default
+		@limit = params[:limit] || AppSettings.widgets.limit_default
 		logger.info "Getting widget with param: wdidget_id: #{@id}, level: #{@level}, offset: #{@offset}, limit: #{@limit}"
-		head :bad_request if (@level.nil? || @limit.nil? || @offset.nil?)
 	end
 
 end
