@@ -11,3 +11,6 @@ user:
       stores: Магазины
       top: ТОП
       news: Новости
+wideget:
+  topOfCompanies:
+    mainHeader: Лучшие компании

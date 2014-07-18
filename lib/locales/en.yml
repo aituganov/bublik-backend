@@ -11,3 +11,6 @@ user:
       stores: Stores
       top: TOP
       news: News
+wideget:
+  topOfCompanies:
+    mainHeader: Top of Companies
