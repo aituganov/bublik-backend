@@ -11,6 +11,10 @@ user:
       stores: Магазины
       top: ТОП
       news: Новости
-widgeget:
+widget:
   topOfCompanies:
     mainHeader: Лучшие компании
+    topLevel:
+      city: Город
+      country: Страна
+      world: Мир
