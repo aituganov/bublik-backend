@@ -51,3 +51,5 @@ group :development, :test do
 	gem 'factory_girl_rails'
 	gem 'database_cleaner'
 end
+
+gem 'pg', '>= 0.17.1'
