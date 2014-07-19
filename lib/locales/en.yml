@@ -11,3 +11,10 @@ user:
       stores: Stores
       top: TOP
       news: News
+widget:
+  topOfCompanies:
+    mainHeader: Top of Companies
+    topLevel:
+      city: City
+      country: Country
+      world: World
