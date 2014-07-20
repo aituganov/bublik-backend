@@ -141,7 +141,7 @@ DEPENDENCIES
   jquery-rails
   log4r (>= 1.1.10)
   minitest (>= 5.4.0)
-  pg (>= 0.17.1)
+  pg
   rails (= 4.1.4)
   rspec-rails (>= 2.13.1)
   sass-rails (~> 4.0.3)
