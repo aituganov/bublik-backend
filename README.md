@@ -28,4 +28,7 @@ supported requests:
 
 * User actions
 
-        - /user/new - regiter new user, JSON params {user: {login, password, first_name, last_name}}
+        /user/ - GET user information request. For registered users request cookies must contain ACCESS_TOKEN value. If token is undefined, response contain information about anonymous user
+        /user/new - PUT request for user registration, JSON params {user: {login, password, first_name, last_name}}. Response contain access_token for created user
+        /user/login - PUT request for user login, JSON params {user: {login, password}}. Response contain access_token for created user
+        /user/login/check - PUT request for login available checking, JSON params {user: {login}}. Response code 200 for available login and 201 if login already existed
