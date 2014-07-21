@@ -6,6 +6,7 @@ describe CompaniesController do
 
 		it 'has a 200 response status code' do
 			get 'get', {id: 1}
+			response.status.should eq 200
 		end
 
 		it 'has a info for requested company' do
