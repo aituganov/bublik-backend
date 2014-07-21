@@ -28,49 +28,41 @@ class UsersController < ApplicationController
 
 	def login
 		user = User.where(user_params).take
-		respond_to do |format|
-			if user.nil?
-				format.json { render_error :unauthorized }
-			else
-				format.json { render_event :ok, {access_token: user.access_token} }
-			end
+		if user.nil?
+			render_error :unauthorized
+		else
+			render_event :ok, {access_token: user.access_token}
 		end
 	end
 
 	def check_login
 		user = User.where(login: params[:login]).take
-		respond_to do |format|
-			if user.nil?
-				format.json { render_event :ok }
-			else
-				format.json { render_error :created, {login: 'already registered'} }
-			end
+		if user.nil?
+			render_event :ok
+		else
+			render_error :created, {login: 'already registered'}
 		end
 	end
 
 	def update
 		user = get_user_by_access_token
-		respond_to do |format|
-			if user.nil?
-				format.json { render_error :not_found }
-			elsif user.update(user_params)
-				format.json { render_event :ok }
-			else
-				format.json { render_error :bad_request, user.errors }
-			end
+		if user.nil?
+			render_error :not_found
+		elsif user.update(user_params)
+			render_event :ok
+		else
+			render_error :bad_request, user.errors
 		end
 	end
 
 	def delete
 		user = get_user_by_access_token
-		respond_to do |format|
-			if user.nil?
-				format.json { render_error :not_found }
-			elsif user.mark_as_deleted
-				format.json { render_event :ok }
-			else
-				format.json { render_error :bad_request, user.errors }
-			end
+		if user.nil?
+			render_error :not_found
+		elsif user.mark_as_deleted
+			render_event :ok
+		else
+			render_error :bad_request, user.errors
 		end
 	end
 
