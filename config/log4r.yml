@@ -10,12 +10,12 @@ log4r_config:
       level     : DEBUG
       trace     : 'false'
       outputters :
-      - datefile
+      - console
     - name          : test
       level     : DEBUG
       trace     : 'true'
       outputters :
-      - console
+      - datefile
 
   # define all outputters (incl. formatters)
   outputters:
