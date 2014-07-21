@@ -34,8 +34,10 @@ widget:
         firstName:
           label: Имя
           emptyFieldError: Пожалуйста, заполните своё имя
+          tooLongError: Слишком длинное имя. Имя не должно привышать 50 символов.
         lastName:
           label: Фамилия
           emptyFieldError: Пожалуйста, заполните свою фамилию
+          tooLongError: Слишком длинная фамилия. Фамилия не должна привышать 50 символов.
         submitButton:
           caption: Зарегистрироваться

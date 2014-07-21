@@ -34,8 +34,10 @@ widget:
       firstName:
         label: First Name
         emptyFieldError: Fill your First Name please
+        tooLongError: Too long First Name
       lastName:
         label: Last Name
         emptyFieldError: Fill your Last Name please
+        tooLongError: Too long Second Name
       submitButton:
         caption: Registration
