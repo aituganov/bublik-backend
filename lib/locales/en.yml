@@ -18,3 +18,24 @@ widget:
       city: City
       country: Country
       world: World
+  userRegistration:
+    mainHeader: Registration
+    fields:
+      login:
+        label: E-mail address
+        incorrectEmailError: Invalid e-mail address
+        emptyFieldError: Fill your Email please
+        alreadyExistError: A user with this name already exists
+      password:
+        passwordLabel: Password
+        confirmLabel: Confirm Password
+        incorrectConfirmError: Password and confirmation do not match
+        emptyFieldError: Fill your Password please
+      firstName:
+        label: First Name
+        emptyFieldError: Fill your First Name please
+      lastName:
+        label: Last Name
+        emptyFieldError: Fill your Last Name please
+      submitButton:
+        caption: Registration
