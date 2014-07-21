@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+
 	# The priority is based upon order of creation: first created -> highest priority.
 	# See how all your routes lay out with "rake routes".
 
@@ -56,9 +57,20 @@ Rails.application.routes.draw do
 	scope :path => 'api' do
 		get 'localization' => 'localization#get'
 		get 'widget/:id' => 'widgets#get'
-		get 'user' => 'users#anonymous'
+
 		get 'company/:id' => 'companies#get'
 		get 'version' => 'versions#current_version'
+
+		# Route user controller
+		scope :path => 'user' do
+			get '/' => 'users#index'
+			match 'new' => 'users#registration', via: [:put]
+			match 'login' => 'users#login', via: [:put]
+			match 'login/check' => 'users#check_login', via: [:put]
+			post '/' => 'users#update'
+			match '/' => 'users#delete' , via: [:delete]
+		end
+
 	end
 
 	get '*path', :to => 'application#page_not_found'

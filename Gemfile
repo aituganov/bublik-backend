@@ -52,4 +52,8 @@ group :development, :test do
 	gem 'database_cleaner'
 end
 
+# Use postgresql adapter
 gem 'pg'
+
+# Use email validator
+gem 'validates_email_format_of'
