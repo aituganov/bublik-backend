@@ -24,4 +24,8 @@ supported requests:
 * Get widget data
 
 	/widget/:name?level=:level&limit=:limit&offset=:offset
-	where :name - widget name 
+	where :name - widget name
+
+* User actions
+
+        - /user/new - regiter new user, JSON params {user: {login, password, first_name, last_name}}
