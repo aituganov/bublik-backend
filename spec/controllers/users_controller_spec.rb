@@ -194,18 +194,18 @@ describe UsersController do
 
 	context 'check login' do
 		it 'check empty data return 200' do
-			put :check_login
+			get :check_login, login: ''
 			response.status.should eq 200
 		end
 
 		it 'check unexisted return 200' do
-			put :check_login, user: {login: 'new'}
+			get :check_login, login: 'new'
 			response.status.should eq 200
 		end
 
 		it 'check existed return 201' do
 			@correct_user.save
-			put :check_login, user: {login: @correct_user.login}
+			get :check_login, login: @correct_user.login
 			response.status.should eq 201
 		end
 	end
