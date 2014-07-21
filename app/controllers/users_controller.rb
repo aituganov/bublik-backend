@@ -38,7 +38,7 @@ class UsersController < ApplicationController
 	end
 
 	def check_login
-		user = User.where(user_params).take
+		user = User.where(login: params[:login]).take
 		respond_to do |format|
 			if user.nil?
 				format.json { render_event :ok }

@@ -66,7 +66,7 @@ Rails.application.routes.draw do
 			get '/' => 'users#index'
 			match 'new' => 'users#registration', via: [:put]
 			match 'login' => 'users#login', via: [:put]
-			match 'login/check' => 'users#check_login', via: [:put]
+			get 'login/check/:login' => 'users#check_login'
 			post '/' => 'users#update'
 			match '/' => 'users#delete' , via: [:delete]
 		end
