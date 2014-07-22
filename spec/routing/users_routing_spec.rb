@@ -20,7 +20,7 @@ describe UsersController do
 		end
 
 		it 'routes to #check_login' do
-			get('/api/user/login/check/new@login').should route_to('users#check_login', login: 'new@login')
+			get('/api/user/login/check/new@login.ru').should route_to('users#check_login', login: 'new@login.ru')
 		end
 
 		it 'routes to #update' do
