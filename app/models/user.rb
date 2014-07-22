@@ -1,10 +1,13 @@
+extend SecureRandom
+
 class User < ActiveRecord::Base
-	before_validation :generate_access_token, on: :create
-	extend SecureRandom
+	has_one :image
 
 	validates :login, :access_token, presence: true, uniqueness: true, length: {maximum: 61}
 	validates :login, email_format: { message: 'wrong email format' }
 	validates :password, :first_name, :last_name, presence: true, length: {maximum: 50}
+	
+	before_validation :generate_access_token, on: :create
 
 	def self.get_data(access_token)
 		user = User.where(access_token: access_token).take
