@@ -31,6 +31,8 @@ widget:
           confirmLabel: Подтверждение пароля
           incorrectConfirmError: Пароль и его подтверждение должны совпадать
           emptyFieldError: Пожалуйста, заполните свой пароль
+          tooShortPassword: Пароль должен быть не менее 6 символов
+          tooLongPassword: Пароль не должен превышать 255 символов
         firstName:
           label: Имя
           emptyFieldError: Пожалуйста, заполните своё имя

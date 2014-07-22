@@ -31,6 +31,8 @@ widget:
         confirmLabel: Confirm Password
         incorrectConfirmError: Password and confirmation do not match
         emptyFieldError: Fill your Password please
+        tooShortPassword: Password must be longer then 6 characters
+        tooLongPassword: Password must be shorter then 255 characters
       firstName:
         label: First Name
         emptyFieldError: Fill your First Name please
