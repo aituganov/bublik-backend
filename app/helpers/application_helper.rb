@@ -5,6 +5,7 @@ module ApplicationHelper
 		if !data.nil?
 			rs[:data] = data
 		end
+		logger.info "Response: #{rs}"
 		render json: rs, status: code
 	end
 
@@ -13,6 +14,7 @@ module ApplicationHelper
 		if !errors.nil?
 			rs[:errors] = errors
 		end
+		logger.error "Response: #{rs}"
 		render json: rs, status: code
 	end
 
