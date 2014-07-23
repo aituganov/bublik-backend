@@ -16,26 +16,26 @@ describe UsersController do
 
 		it 'has 422 error for partial user data' do
 			params = {login: @wrong_user.login}
-			put :registration, user: params
+			put :registration, params
 			response.status.should eq 422
 
 			params = {login: @wrong_user.login, password: @wrong_user.password}
-			put :registration, user: params
+			put :registration, params
 			response.status.should eq 422
 		end
 
 		it 'has 422 for wrong login format' do
-			put :registration, user: @wrong_user.as_json
+			put :registration, @wrong_user.as_json
 			response.status.should eq 422
 		end
 
 		it 'has 201 for correct user data' do
-			put :registration, user: @correct_user.as_json
+			put :registration, @correct_user.as_json
 			response.status.should eq 201
 		end
 
 		it 'has access token for correct user data' do
-			put :registration, user: @correct_user.as_json
+			put :registration, @correct_user.as_json
 			response.status.should eq 201
 			rs_data = JSON.parse(response.body)['data']
 			rs_data['access_token'].should_not be_nil
@@ -43,26 +43,26 @@ describe UsersController do
 
 		it 'has 422 for duplicate user login' do
 			@correct_user.save
-			put :registration, user: @correct_user.as_json
+			put :registration, @correct_user.as_json
 			response.status.should eq 422
 		end
 	end
 
 	context 'user login' do
 		it 'unregistered user login has 401' do
-			put :login, user: {login: @correct_user.login, password: @correct_user.password}
+			put :login, {login: @correct_user.login, password: @correct_user.password}
 			response.status.should eq 401
 		end
 
 		it 'registerd user login has 200' do
 			@correct_user.save
-			put :login, user: {login: @correct_user.login, password: @correct_user.password}
+			put :login, {login: @correct_user.login, password: @correct_user.password}
 			response.status.should eq 200
 		end
 
 		it 'registerd user login has access_token' do
 			@correct_user.save
-			put :login, user: {login: @correct_user.login, password: @correct_user.password}
+			put :login, {login: @correct_user.login, password: @correct_user.password}
 			response.status.should eq 200
 			rs_data = JSON.parse(response.body)['data']
 			rs_data['access_token'].should_not be_nil
@@ -142,7 +142,7 @@ describe UsersController do
 			@correct_user.save
 			user = User.first
 			request.cookies[:ACCESS_TOKEN] = user.access_token
-			post :update, user: {illegal_data: 'test_illegal_data'}
+			post :update, {illegal_data: 'test_illegal_data'}
 			response.status.should eq 200
 			user[:illegal_data].should be_nil
 		end
@@ -153,7 +153,7 @@ describe UsersController do
 			new_first_name = 'ChangedFN'
 			new_last_name = 'ChangedLN'
 			request.cookies[:ACCESS_TOKEN] = user.access_token
-			post :update, user: {first_name: new_first_name, last_name: new_last_name}
+			post :update, {first_name: new_first_name, last_name: new_last_name}
 			response.status.should eq 200
 			user.reload
 			user.first_name.should eq new_first_name
