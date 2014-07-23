@@ -69,7 +69,7 @@ class UsersController < ApplicationController
 	private
 
 	def user_params
-		params[:user].nil? ? {} : params.require(:user).permit(:login, :password, :last_name, :first_name)
+		params.permit(:login, :password, :last_name, :first_name)
 	end
 
 	def get_access_token
