@@ -25,7 +25,7 @@ widget:
         label: E-mail address
         incorrectEmailError: Invalid e-mail address
         emptyFieldError: Fill your Email please
-        alreadyExistError: A user with this name already exists
+        alreadyExistError: A user with this address already exists
       password:
         passwordLabel: Password
         confirmLabel: Confirm Password

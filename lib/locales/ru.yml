@@ -25,7 +25,7 @@ widget:
         label: Адрес электронной почты
         incorrectEmailError: Некорректный E-mail
         emptyFieldError: Пожалуйста, заполните свой E-mail
-        alreadyExistError: Пользователь с таким именем уже существует
+        alreadyExistError: Пользователь с таким адресом уже существует
       password:
         passwordLabel: Пароль
         confirmLabel: Подтверждение пароля
