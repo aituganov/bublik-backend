@@ -6,7 +6,8 @@ class User < ActiveRecord::Base
 	validates :login, :access_token, presence: true, uniqueness: true, length: {maximum: 61}
 	validates :login, email_format: { message: 'wrong email format' }
 	validates :password, :first_name, :last_name, presence: true, length: {maximum: 50}
-	
+	validates :password, length: {minimum: 6}
+
 	before_validation :generate_access_token, on: :create
 
 	def self.get_data(access_token)
