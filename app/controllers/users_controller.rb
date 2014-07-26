@@ -4,7 +4,7 @@ class UsersController < ApplicationController
 	skip_before_filter :verify_authenticity_token
 
 	def index
-		token = get_access_token
+		token = get_access_token(cookies)
 		if token.nil?
 			render json: get_fake_anonymous_data
 		else
@@ -45,7 +45,7 @@ class UsersController < ApplicationController
 	end
 
 	def update
-		user = get_user_by_access_token
+		user = get_user_by_access_token(cookies)
 		if user.nil?
 			render_error :not_found
 		elsif user.update(user_params)
@@ -56,7 +56,7 @@ class UsersController < ApplicationController
 	end
 
 	def delete
-		user = get_user_by_access_token
+		user = get_user_by_access_token(cookies)
 		if user.nil?
 			render_error :not_found
 		elsif user.mark_as_deleted
@@ -70,14 +70,6 @@ class UsersController < ApplicationController
 
 	def user_params
 		params.permit(:login, :password, :last_name, :first_name)
-	end
-
-	def get_access_token
-		cookies[:ACCESS_TOKEN]
-	end
-
-	def get_user_by_access_token
-		User.where(access_token: get_access_token).take
 	end
 
 end
