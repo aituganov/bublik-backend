@@ -18,9 +18,15 @@ describe User do
 			FactoryGirl.build(:user, login: correct_login).should be_valid
 		end
 
-		it 'should require a password' do
+		it 'should require a password and password dont less 6' do
 			FactoryGirl.build(:user, password: '').should_not be_valid
-			FactoryGirl.build(:user, password: '').should have(1).error_on(:password)
+			FactoryGirl.build(:user, password: '').should have(2).error_on(:password)
+		end
+
+		it 'password should error if less then 6' do
+			long_password = (0...5).map { ('a'..'z').to_a[rand(26)] }.join
+			FactoryGirl.build(:user, password: long_password).should_not be_valid
+			FactoryGirl.build(:user, password: long_password).should have(1).error_on(:password)
 		end
 
 		it 'password should error if more then 50' do
@@ -30,6 +36,9 @@ describe User do
 		end
 
 		it 'password should ok if less or equal then 50' do
+			correct_password = (0...6).map { ('a'..'z').to_a[rand(26)] }.join
+			FactoryGirl.build(:user, password: correct_password).should be_valid
+
 			correct_password = (0...50).map { ('a'..'z').to_a[rand(26)] }.join
 			FactoryGirl.build(:user, password: correct_password).should be_valid
 		end
