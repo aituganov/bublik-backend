@@ -44,3 +44,22 @@ widget:
         tooLongError: Too long Second Name
       submitButton:
         caption: Registration
+  userLogin:
+    mainHeader: Login
+    fields:
+      login:
+        label: E-mail
+        requiredError: Enter your E-mail please
+        incorrectEmailError: Invalid E-mail address
+      password:
+        label: Password
+        requiredError: Enter your Password please
+        tooLongPasswordError: Password must be shorter then 255 characters
+      rememberMe:
+        label: Remember me
+      incorrectLoginError:
+        label: Invalid Login or Password.
+        messageText: You type incorrect login or passwor. Please try again or
+        registerText: Register
+      submitButton:
+        label: Login
