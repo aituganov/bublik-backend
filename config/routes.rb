@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
 
+  resources :tags
+
 	# The priority is based upon order of creation: first created -> highest priority.
 	# See how all your routes lay out with "rake routes".
 
@@ -61,7 +63,7 @@ Rails.application.routes.draw do
 		get 'company/:id' => 'companies#get'
 		get 'version' => 'versions#current_version'
 
-		# Route user controller
+		# Route users
 		scope :path => 'user' do
 			get '/' => 'users#index'
 			match 'new' => 'users#registration', via: [:put]
@@ -69,6 +71,12 @@ Rails.application.routes.draw do
 			get 'login/check/:login' => 'users#check_login', constraints: { login: /.*/ }
 			post '/' => 'users#update'
 			match '/' => 'users#delete' , via: [:delete]
+		end
+
+		# Route tags
+		scope :path => 'tag' do
+			get ':name' => 'tags#find'
+			match 'new/:name' => 'tags#new', via: [:put]
 		end
 
 	end

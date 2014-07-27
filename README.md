@@ -1,4 +1,4 @@
-# Bublik BackEnd API #
+# Bublik BackEnd REST API #
 
 request prefix: /api
 
@@ -6,25 +6,19 @@ supported requests:
 
 * Get backend version
 
-	/version
+        /version - GET current backend version
 
 * Get localization
 
-	/localization
-
-* Get anonymous user info
-
-	/user
+        /version - GET localization by header language
 
 * Get company info
 
-	/company/:id
-	where :id - identificator of requested company
+        /company/:id - GET company information by identificator of requested company
 
 * Get widget data
 
-	/widget/:name?level=:level&limit=:limit&offset=:offset
-	where :name - widget name
+        /widget/:name?level=:level&limit=:limit&offset=:offset - get widget data, where :name - widget name
 
 * User actions
 
@@ -33,4 +27,8 @@ supported requests:
         /user/login - PUT request for user login, JSON params {user: {login, password}}. Response contain access_token for created user
         /user/login/check/:login - GET request for login available checking where query string parameter :login - user login for check. Response code 200 for available login and 201 if login already existed
         /user/- POST request for user update, JSON params {user: {first_name, last_name, city, e.t.c.}}. Request cookies must contain ACCESS_TOKEN value. 
-        /user/- DELETE request for marked user as deleted. Request cookies must contain ACCESS_TOKEN value. 
+        /user/- DELETE request for marked user as deleted. Request cookies must contain ACCESS_TOKEN value.
+
+* Tags
+        /tag/new/:name - PUT request for tag creation where :name - tag name
+        /tag/:name?limit=:limit - GET request for finding tag where :name - tag name, :limit - find limit
