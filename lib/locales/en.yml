@@ -61,3 +61,5 @@ widget:
         label: Invalid Login or Password.
         messageText: You type incorrect login or passwor. Please try again or
         registerText: Register
+      submitButton:
+        label: Login
