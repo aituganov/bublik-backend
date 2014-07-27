@@ -9,12 +9,4 @@ class ApplicationController < ActionController::Base
 		end
 	end
 
-	def get_access_token(cookies)
-		cookies[:ACCESS_TOKEN]
-	end
-
-	def get_user_by_access_token(cookies)
-		User.where(access_token: get_access_token(cookies)).take
-	end
-
 end
