@@ -57,4 +57,7 @@ widget:
           tooLongPasswordError: Пароль должен быть не длиннее 255 символов
         rememberMe:
           label: Запомнить меня на этом компьютере
-        incorrectLoginError: Неверный логин или пароль. Пожауйста, попробуйте ещё раз.
+        incorrectLoginError:
+                label: Неверные E-mail или пароль.
+                messageText: Вы ввели неверные имя пользователя или пароль. Пожалуйста, попробуйте ещё раз или
+                registerText: Зарегистрируйтесь

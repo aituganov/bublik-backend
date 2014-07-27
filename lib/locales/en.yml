@@ -57,4 +57,7 @@ widget:
         tooLongPasswordError: Password must be shorter then 255 characters
       rememberMe:
         label: Remember me
-      incorrectLoginError: Invalid Login or Password. Please, try again.
+      incorrectLoginError:
+        label: Invalid Login or Password.
+        messageText: You type incorrect login or passwor. Please try again or
+        registerText: Register
