@@ -53,6 +53,7 @@ widget:
         incorrectEmailError: Invalid E-mail address
       password:
         label: Password
+        requiredError: Enter your Password please
         tooLongPasswordError: Password must be shorter then 255 characters
       rememberMe:
         label: Remember me

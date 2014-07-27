@@ -53,6 +53,7 @@ widget:
           incorrectEmailError: Некорректный E-mail
         password:
           label: Пароль
+          requiredError: Пожалуйста, введите свой пароль
           tooLongPasswordError: Пароль должен быть не длиннее 255 символов
         rememberMe:
           label: Запомнить меня на этом компьютере
