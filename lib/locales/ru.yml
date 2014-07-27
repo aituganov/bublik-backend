@@ -44,3 +44,16 @@ widget:
         tooLongError: Слишком длинная фамилия. Фамилия не должна привышать 50 символов.
       submitButton:
         caption: Зарегистрироваться
+  userLogin:
+      mainHeader: Войти в систему
+      fields:
+        login:
+          label: E-mail
+          requiredError: Пожалуйста, введиде свой E-mail
+          incorrectEmailError: Некорректный E-mail
+        password:
+          label: Пароль
+          tooLongPasswordError: Пароль должен быть не длиннее 255 символов
+        rememberMe:
+          label: Запомнить меня на этом компьютере
+        incorrectLoginError: Неверный логин или пароль. Пожауйста, попробуйте ещё раз.
