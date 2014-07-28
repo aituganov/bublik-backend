@@ -79,4 +79,39 @@ describe Company do
 			FactoryGirl.build(:company, owner: @correct_user, rating: 5).should be_valid
 		end
 	end
+
+	context 'update tags' do
+		before(:each) do
+			@created_company = FactoryGirl.create(:company, owner: @correct_user, rating: 5)
+			@created_company.should be_valid
+		end
+		it 'add new interests to the user' do
+			tag_first = FactoryGirl.build(:tag_first)
+			tag_second = FactoryGirl.build(:tag_second)
+			@created_company.company_tags.create(tag: tag_first).should be_valid
+			@created_company.company_tags.create(tag: tag_second).should be_valid
+			@created_company.company_tags.should have(2).item
+			Tag.all.should have(2).item
+		end
+
+		it 'check interests uniq' do
+			tag_first = FactoryGirl.build(:tag_first)
+			@created_company.company_tags.create(tag: tag_first).should be_valid
+			expect{@created_company.company_tags.create(tag: tag_first)}.to raise_error(ActiveRecord::RecordNotUnique)
+			@created_company.company_tags.should have(1).item
+			Tag.all.should have(1).item
+		end
+
+		it 'link existed interests to the user' do
+			tag_first = FactoryGirl.create(:tag_first)
+			tag_second = FactoryGirl.create(:tag_second)
+			tag_first.should be_valid
+			tag_second.should be_valid
+			@created_company.company_tags.create(tag_id: tag_first.id).should be_valid
+			@created_company.company_tags.create(tag_id: tag_second.id).should be_valid
+			@created_company.company_tags.should have(2).item
+			@created_company.company_tags[0].tag_id.should eq tag_first.id
+			@created_company.company_tags[1].tag_id.should eq tag_second.id
+		end
+	end
 end
