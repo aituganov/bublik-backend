@@ -2,6 +2,8 @@ extend SecureRandom
 
 class User < ActiveRecord::Base
 	has_one :image
+	has_many :interests, dependent: :destroy
+	has_many :tags, through: :interests
 
 	validates :login, :access_token, presence: true, uniqueness: true, length: {maximum: 61}
 	validates :login, email_format: { message: 'wrong email format' }
@@ -22,6 +24,26 @@ class User < ActiveRecord::Base
 			res = self.update(is_deleted: true)
 		end
 		res
+	end
+
+	def set_interests tags
+		logger.info "Create interests for user ##{self.id}, tags: #{tags.to_json}"
+		errors = []
+		tags.each do |id|
+			tag = Tag.where(id: id).take
+			if tag.nil?
+				errors.push("Tag ##{id} not found")
+			else
+				begin
+					self.interests.create(tag_id: id)
+				rescue ActiveRecord::RecordNotUnique => e
+					errors.push "Interest ##{id} already registered"
+				rescue Exception => e
+					errors.push e.message
+				end
+			end
+		end
+		errors
 	end
 
 	private

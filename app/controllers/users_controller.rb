@@ -36,7 +36,7 @@ class UsersController < ApplicationController
 	end
 
 	def check_login
-		user = User.where(login: params[:login]).take
+		user = User.where(login: user_params[:login]).take
 		if user.nil?
 			render_event :ok
 		else
@@ -48,6 +48,14 @@ class UsersController < ApplicationController
 		user = get_user_by_access_token(cookies)
 		if user.nil?
 			render_error :not_found
+			return
+		end
+
+		if !params[:interests].nil?
+			interests_errors = user.set_interests interests
+		end
+		if interests_errors && interests_errors.count > 0
+			render_error :bad_request, interests_errors
 		elsif user.update(user_params)
 			render_event :ok
 		else
@@ -70,6 +78,10 @@ class UsersController < ApplicationController
 
 	def user_params
 		params.permit(:login, :password, :last_name, :first_name)
+	end
+
+	def interests
+		params.require(:interests)
 	end
 
 end

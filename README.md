@@ -26,7 +26,7 @@ supported requests:
         /user/new - PUT request for user registration, JSON params {user: {login, password, first_name, last_name}}. Response contain access_token for created user
         /user/login - PUT request for user login, JSON params {user: {login, password}}. Response contain access_token for created user
         /user/login/check/:login - GET request for login available checking where query string parameter :login - user login for check. Response code 200 for available login and 201 if login already existed
-        /user/- POST request for user update, JSON params {user: {first_name, last_name, city, e.t.c.}}. Request cookies must contain ACCESS_TOKEN value. 
+        /user/- POST request for user update, JSON params {user: {first_name, last_name, city, e.t.c.}}. Interests structure: interests:[tag_id, ...] Request cookies must contain ACCESS_TOKEN value.
         /user/- DELETE request for marked user as deleted. Request cookies must contain ACCESS_TOKEN value.
 
 * Tags
