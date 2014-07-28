@@ -159,6 +159,44 @@ describe UsersController do
 			user.first_name.should eq new_first_name
 			user.last_name.should eq new_last_name
 		end
+
+		it 'should 400 for legal user data with unexisted tags' do
+			@correct_user.save
+			user = User.first
+			request.cookies[:ACCESS_TOKEN] = user.access_token
+			post :update, interests: [-1, -2]
+			response.status.should eq 400
+			user.reload
+			user.interests.should have(0).item
+			Tag.all.should have(0).item
+		end
+
+		it 'should 400 for legal user data with duplicate tags' do
+			@correct_user.save
+			user = User.first
+			request.cookies[:ACCESS_TOKEN] = user.access_token
+			tag_first = FactoryGirl.create(:tag_first)
+			tag_first.should be_valid
+			post :update, interests: [tag_first.id, tag_first.id]
+			response.status.should eq 400
+			user.reload
+			user.interests.should have(1).item
+			Tag.all.should have(1).item
+		end
+
+		it 'should 200 for legal user data with existed tags' do
+			@correct_user.save
+			user = User.first
+			request.cookies[:ACCESS_TOKEN] = user.access_token
+			tag_first = FactoryGirl.create(:tag_first)
+			tag_first.should be_valid
+			tag_second = FactoryGirl.create(:tag_second)
+			tag_second.should be_valid
+			post :update, interests: [tag_first.id, tag_second.id]
+			response.status.should eq 200
+			user.reload
+			user.interests.should have(2).item
+		end
 	end
 
 	context 'user delete' do

@@ -99,12 +99,48 @@ describe User do
 			user.last_name.should eq last_name
 		end
 
-		context 'delete user' do
-			it 'user should be deleted' do
-				FactoryGirl.create(:user).should be_valid
-				User.first.destroy
-				User.first.should be_nil
-			end
+		it 'add new interests to the user' do
+			tag_first = FactoryGirl.build(:tag_first)
+			tag_second = FactoryGirl.build(:tag_second)
+			user = FactoryGirl.create(:user)
+			user.should be_valid
+			(user.interests.create(tag: tag_first)).should be_valid
+			(user.interests.create(tag: tag_second)).should be_valid
+			user.interests.should have(2).item
+			Tag.all.should have(2).item
+		end
+
+		it 'check interests uniq' do
+			tag_first = FactoryGirl.build(:tag_first)
+			user = FactoryGirl.create(:user)
+			user.should be_valid
+			(user.interests.create(tag: tag_first)).should be_valid
+			expect{user.interests.create(tag: tag_first)}.to raise_error(ActiveRecord::RecordNotUnique)
+			user.interests.should have(1).item
+			Tag.all.should have(1).item
+		end
+
+		it 'link existed interests to the user' do
+			tag_first = FactoryGirl.create(:tag_first)
+			tag_second = FactoryGirl.create(:tag_second)
+			tag_first.should be_valid
+			tag_second.should be_valid
+			user = FactoryGirl.create(:user)
+			user.should be_valid
+			user.interests.create(tag_id: tag_first.id).should be_valid
+			user.interests.create(tag_id: tag_second.id).should be_valid
+			user.interests.should have(2).item
+			user.interests[0].tag_id.should eq tag_first.id
+			user.interests[1].tag_id.should eq tag_second.id
+		end
+
+	end
+
+	context 'delete user' do
+		it 'user should be deleted' do
+			FactoryGirl.create(:user).should be_valid
+			User.first.destroy
+			User.first.should be_nil
 		end
 	end
 
