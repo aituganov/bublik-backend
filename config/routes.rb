@@ -60,7 +60,6 @@ Rails.application.routes.draw do
 		get 'localization' => 'localization#get'
 		get 'widget/:id' => 'widgets#get'
 
-		get 'company/:id' => 'companies#get'
 		get 'version' => 'versions#current_version'
 
 		# Route users
@@ -71,6 +70,14 @@ Rails.application.routes.draw do
 			get 'login/check/:login' => 'users#check_login', constraints: { login: /.*/ }
 			post '/' => 'users#update'
 			match '/' => 'users#delete' , via: [:delete]
+		end
+
+		# Route companies
+		scope :path => 'company' do
+			match '/new' => 'companies#registration', via: [:put]
+			get '/:id' => 'companies#get'
+			post '/:id' => 'companies#update'
+			match '/:id' => 'companies#delete' , via: [:delete]
 		end
 
 		# Route tags
