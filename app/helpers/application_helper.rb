@@ -1,11 +1,10 @@
 module ApplicationHelper
 
 	def render_event(code, data=nil)
-		rs = {status: code}
 		if !data.nil?
-			rs[:data] = data
+			rs = {data: data}
 		end
-		logger.info "Response: #{rs.to_json}"
+		logger.info "Response: #{rs ? rs.to_json : code}"
 		render json: rs, status: code
 	end
 
