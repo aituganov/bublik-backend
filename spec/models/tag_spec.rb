@@ -16,7 +16,7 @@ describe Tag do
 		end
 
 		it 'should ok if name less or equal then 100' do
-			correct_name = generate_random_string 101
+			correct_name = generate_random_string 100
 			FactoryGirl.build(:tag_first, name: correct_name).should be_valid
 		end
 
