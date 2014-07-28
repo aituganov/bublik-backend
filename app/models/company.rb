@@ -1,5 +1,11 @@
 class Company < ActiveRecord::Base
+	has_one :image
+
+	has_many :company_tags, dependent: :destroy
+	has_many :tags, through: :company_tags
+
 	belongs_to :owner, class_name: 'User', foreign_key: 'owner_id'
+
 	validates :owner, :title, presence: true
 	validates :title, :slogan, length: {maximum: 50}
 	validates :description, length: {maximum: 500}
@@ -9,15 +15,35 @@ class Company < ActiveRecord::Base
 		begin
 			company = Company.find(id)
 			if company.is_deleted
-				res = { is_deleted: company.is_deleted }
+				res = {is_deleted: company.is_deleted}
 			else
 				# TODO: tags
-				res = { id: company.id, title: company.title, slogan: company.slogan, tags: [], description: company.description, rating: company.rating }
+				res = {id: company.id, title: company.title, slogan: company.slogan, tags: [], description: company.description, rating: company.rating}
 			end
 		rescue ActiveRecord::RecordNotFound => e
 			res = nil
 		end
 		res
+	end
+
+	def set_tags tags
+		logger.info "Create tags for company ##{self.id}, tags: #{tags.to_json}"
+		errors = []
+		tags.each do |id|
+			tag = Tag.where(id: id).take
+			if tag.nil?
+				errors.push("Tag ##{id} not found")
+			else
+				begin
+					self.company_tags.create(tag_id: id)
+				rescue ActiveRecord::RecordNotUnique => e
+					errors.push "Tag ##{id} already registered"
+				rescue Exception => e
+					errors.push e.message
+				end
+			end
+		end
+		errors
 	end
 
 	def mark_as_deleted

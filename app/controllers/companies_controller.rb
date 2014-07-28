@@ -25,9 +25,9 @@ class CompaniesController < ApplicationController
 	def update
 		tags_errors = nil
 		if !params[:tags].nil?
-			#interests_errors = user.set_interests interests
+			tags_errors = @company.set_tags company_tags
 		end
-		if !tags_errors.nil? && tags_errors.count > 0
+		if tags_errors && tags_errors.count > 0
 			render_error :bad_request, tags_errors
 		elsif @company.update(company_params)
 			render_event :ok
