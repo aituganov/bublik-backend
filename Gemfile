@@ -57,3 +57,6 @@ gem 'pg'
 
 # Use email validator
 gem 'validates_email_format_of'
+
+# Use code coverage
+gem 'simplecov', :require => false, :group => :test
