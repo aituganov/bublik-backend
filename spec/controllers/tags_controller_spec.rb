@@ -42,6 +42,13 @@ describe TagsController do
 			response.status.should eq 404
 		end
 
+
+		it 'has 400 for correct access token & illegal data' do
+			post :new, {name: generate_random_string(101)}
+			response.status.should eq 400
+		end
+
+
 		it 'has 200 & empty rs data for unexist name' do
 			get :find, name: 'Test'
 			response.status.should eq 200

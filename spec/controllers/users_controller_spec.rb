@@ -147,6 +147,16 @@ describe UsersController do
 			user[:illegal_data].should be_nil
 		end
 
+		it 'user wrong login not change object' do
+			@correct_user.save
+			user = User.first
+			request.cookies[:ACCESS_TOKEN] = user.access_token
+			login_wrong = 'wrong'
+			post :update, {login: login_wrong}
+			response.status.should eq 400
+			user[:login].should_not eq login_wrong
+		end
+
 		it 'legal user data change object' do
 			@correct_user.save
 			user = User.first

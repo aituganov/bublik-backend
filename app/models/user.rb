@@ -42,10 +42,8 @@ class User < ActiveRecord::Base
 			else
 				begin
 					self.interests.create(tag_id: id)
-				rescue ActiveRecord::RecordNotUnique => e
-					errors.push "Interest ##{id} already registered"
 				rescue Exception => e
-					errors.push e.message
+					errors.push(e.class == ActiveRecord::RecordNotUnique ? "Interest ##{id} already registered" : e.message)
 				end
 			end
 		end

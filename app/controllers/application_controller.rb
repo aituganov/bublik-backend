@@ -4,9 +4,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
 
 	def page_not_found
-		respond_to do |format|
-			format.html {render html: 'Requested resource not found', status: :not_found, layout: false}
-		end
+		render html: 'Requested resource not found', status: :not_found, layout: false
 	end
 
 end

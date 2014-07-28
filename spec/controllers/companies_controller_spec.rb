@@ -1,4 +1,5 @@
 require 'spec_helper'
+include TestHelper
 
 describe CompaniesController do
 	before :each do
@@ -68,6 +69,11 @@ describe CompaniesController do
 				request.cookies[:ACCESS_TOKEN] = FactoryGirl.create(:user_second).access_token
 				post :update, {id: 1}
 				response.status.should eq 404
+			end
+
+			it 'has 400 for correct access token & illegal data' do
+				post :update, {id: @created_company.id, title: generate_random_string(51)}
+				response.status.should eq 400
 			end
 
 			it 'has 200 for correct access token & empty data' do

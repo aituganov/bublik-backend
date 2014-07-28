@@ -36,10 +36,8 @@ class Company < ActiveRecord::Base
 			else
 				begin
 					self.company_tags.create(tag_id: id)
-				rescue ActiveRecord::RecordNotUnique => e
-					errors.push "Tag ##{id} already registered"
 				rescue Exception => e
-					errors.push e.message
+					errors.push(e.class == ActiveRecord::RecordNotUnique ? "Tag ##{id} already registered" : e.message)
 				end
 			end
 		end
