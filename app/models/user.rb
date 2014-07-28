@@ -14,7 +14,13 @@ class User < ActiveRecord::Base
 
 	def self.get_data(access_token)
 		user = User.where(access_token: access_token).take
-		user.nil? ? nil : { first_name: user.first_name, last_name: user.last_name, city: user.city, is_deleted: user.is_deleted, anonymous: false }
+		if user.nil?
+			res = nil
+		else
+			interests = user.interests.map {|i| i.name}
+			res = { first_name: user.first_name, last_name: user.last_name, city: user.city, interests: interests, is_deleted: user.is_deleted, anonymous: false }
+		end
+		res
 	end
 
 	def mark_as_deleted
