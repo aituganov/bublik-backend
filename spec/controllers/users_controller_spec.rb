@@ -168,7 +168,7 @@ describe UsersController do
 			response.status.should eq 400
 			user.reload
 			user.interests.should have(0).item
-			Tag.all.should have(0).item
+			user.tags.should have(0).item
 		end
 
 		it 'should 400 for legal user data with duplicate tags' do
@@ -181,7 +181,7 @@ describe UsersController do
 			response.status.should eq 400
 			user.reload
 			user.interests.should have(1).item
-			Tag.all.should have(1).item
+			user.tags.should have(1).item
 		end
 
 		it 'should 200 for legal user data with existed tags' do
