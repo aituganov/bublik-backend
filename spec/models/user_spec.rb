@@ -8,13 +8,13 @@ describe User do
 		end
 
 		it 'login should error if more then 61' do
-			long_login = (0...30).map { ('a'..'z').to_a[rand(26)] }.join + '@' + (0...27).map { ('a'..'z').to_a[rand(26)] }.join + '.com'
+			long_login = generate_random_string(30) + '@' + generate_random_string(27) + '.com'
 			FactoryGirl.build(:user, login: long_login).should_not be_valid
 			FactoryGirl.build(:user, login: long_login).should have(1).error_on(:login)
 		end
 
 		it 'should ok if login less or equal then 61' do
-			correct_login = (0...30).map { ('a'..'z').to_a[rand(26)] }.join + '@' + (0...26).map { ('a'..'z').to_a[rand(26)] }.join + '.com'
+			correct_login = generate_random_string(30) + '@' + generate_random_string(26) + '.com'
 			FactoryGirl.build(:user, login: correct_login).should be_valid
 		end
 
@@ -24,22 +24,22 @@ describe User do
 		end
 
 		it 'password should error if less then 6' do
-			long_password = (0...5).map { ('a'..'z').to_a[rand(26)] }.join
-			FactoryGirl.build(:user, password: long_password).should_not be_valid
-			FactoryGirl.build(:user, password: long_password).should have(1).error_on(:password)
+			short_password = generate_random_string 5
+			FactoryGirl.build(:user, password: short_password).should_not be_valid
+			FactoryGirl.build(:user, password: short_password).should have(1).error_on(:password)
 		end
 
 		it 'password should error if more then 50' do
-			long_password = (0...51).map { ('a'..'z').to_a[rand(26)] }.join
+			long_password = generate_random_string 51
 			FactoryGirl.build(:user, password: long_password).should_not be_valid
 			FactoryGirl.build(:user, password: long_password).should have(1).error_on(:password)
 		end
 
 		it 'password should ok if less or equal then 50' do
-			correct_password = (0...6).map { ('a'..'z').to_a[rand(26)] }.join
+			correct_password = generate_random_string 6
 			FactoryGirl.build(:user, password: correct_password).should be_valid
 
-			correct_password = (0...50).map { ('a'..'z').to_a[rand(26)] }.join
+			correct_password = generate_random_string 50
 			FactoryGirl.build(:user, password: correct_password).should be_valid
 		end
 
@@ -49,13 +49,13 @@ describe User do
 		end
 
 		it 'first_name should error if more then 50' do
-			long_first_name = (0...51).map { ('a'..'z').to_a[rand(26)] }.join
+			long_first_name = generate_random_string 51
 			FactoryGirl.build(:user, first_name: long_first_name).should_not be_valid
 			FactoryGirl.build(:user, first_name: long_first_name).should have(1).error_on(:first_name)
 		end
 
 		it 'first_name should ok if less or equal then 50' do
-			correct_first_name = (0...50).map { ('a'..'z').to_a[rand(26)] }.join
+			correct_first_name = generate_random_string 50
 			FactoryGirl.build(:user, first_name: correct_first_name).should be_valid
 		end
 
@@ -66,13 +66,13 @@ describe User do
 	end
 
 	it 'last_name should error if more then 50' do
-		long_last_name = (0...51).map { ('a'..'z').to_a[rand(26)] }.join
+		long_last_name = generate_random_string 51
 		FactoryGirl.build(:user, last_name: long_last_name).should_not be_valid
 		FactoryGirl.build(:user, last_name: long_last_name).should have(1).error_on(:last_name)
 	end
 
 	it 'last_name should ok if less or equal then 50' do
-		correct_last_name = (0...50).map { ('a'..'z').to_a[rand(26)] }.join
+		correct_last_name = generate_random_string 50
 		FactoryGirl.build(:user, last_name: correct_last_name).should be_valid
 	end
 
