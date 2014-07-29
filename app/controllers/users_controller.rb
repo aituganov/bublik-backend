@@ -40,7 +40,7 @@ class UsersController < ApplicationController
 		if user.nil?
 			render_event :ok
 		else
-			render_error :created, {login: 'already registered'}
+			render_event :created
 		end
 	end
 
