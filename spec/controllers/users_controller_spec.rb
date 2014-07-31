@@ -191,6 +191,29 @@ describe UsersController do
 			@user.reload
 			@user.interests.should have(2).item
 		end
+
+		it 'should 200 for avatar illegal data' do
+			post :update, avatar: {illegal_data: ''}
+			response.status.should eq 200
+			@user.reload
+			@user.avatar.read.should be_nil
+			JSON.parse(response.body)['data']['avatar_url'].should be_nil
+		end
+
+		it 'should 400 for illegal user avatar format' do
+			image_path = "#{Rails.root}/spec/controllers/users_controller_spec.rb"
+			post :update, avatar: {data: Rack::Test::UploadedFile.new(image_path, 'text/jpg')}
+			response.status.should eq 400
+		end
+
+		it 'should 200 for legal user avatar data' do
+			image_path = "#{Rails.root}/spec/fixtures/images/test.jpg"
+			post :update, avatar: {data: Rack::Test::UploadedFile.new(image_path, 'text/jpg')}
+			response.status.should eq 200
+			@user.reload
+			@user.avatar.read.should eq File.open(image_path, 'rb').read
+			JSON.parse(response.body)['data']['avatar_url'].should_not be_nil
+		end
 	end
 
 	context 'user delete' do
