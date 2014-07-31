@@ -30,5 +30,13 @@ describe UsersController do
 		it 'routes to #delete' do
 			delete('/api/user').should route_to('users#delete')
 		end
+
+		it 'routes to #interests_add' do
+			put('/api/user/interests').should route_to('users#interests_add')
+		end
+
+		it 'routes to #interests_delete' do
+			delete('/api/user/interests').should route_to('users#interests_delete')
+		end
 	end
 end

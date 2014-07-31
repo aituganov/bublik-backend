@@ -85,33 +85,65 @@ describe Company do
 			@created_company = FactoryGirl.create(:company, owner: @correct_user, rating: 5)
 			@created_company.should be_valid
 		end
-		it 'add new interests to the user' do
-			tag_first = FactoryGirl.build(:tag_first)
-			tag_second = FactoryGirl.build(:tag_second)
-			@created_company.company_tags.create(tag: tag_first).should be_valid
-			@created_company.company_tags.create(tag: tag_second).should be_valid
-			@created_company.company_tags.should have(2).item
+
+		it 'add new tags to the company' do
+			@created_company.tag_list.add(['first', 'second'])
+			@created_company.save
+			@created_company.tag_list.should have(2).item
+			@created_company.tags.should have(2).item
 			Tag.all.should have(2).item
 		end
 
-		it 'check interests uniq' do
-			tag_first = FactoryGirl.build(:tag_first)
-			@created_company.company_tags.create(tag: tag_first).should be_valid
-			expect{@created_company.company_tags.create(tag: tag_first)}.to raise_error(ActiveRecord::RecordNotUnique)
-			@created_company.company_tags.should have(1).item
+		it 'check tags uniq' do
+			@created_company.tag_list.add(['first', 'first'])
+			@created_company.save
+			@created_company.tag_list.should have(1).item
+			@created_company.tags.should have(1).item
 			Tag.all.should have(1).item
 		end
 
-		it 'link existed interests to the user' do
-			tag_first = FactoryGirl.create(:tag_first)
-			tag_second = FactoryGirl.create(:tag_second)
-			tag_first.should be_valid
-			tag_second.should be_valid
-			@created_company.company_tags.create(tag_id: tag_first.id).should be_valid
-			@created_company.company_tags.create(tag_id: tag_second.id).should be_valid
-			@created_company.company_tags.should have(2).item
-			@created_company.company_tags[0].tag_id.should eq tag_first.id
-			@created_company.company_tags[1].tag_id.should eq tag_second.id
+		it 'add existed tags to company' do
+			@created_company.tag_list.add(['first', 'second'])
+			@created_company.save
+			@created_company.tag_list.should have(2).item
+			@created_company.tags.should have(2).item
+
+			second_company = FactoryGirl.create(:company_second, owner: @correct_user)
+			second_company.should be_valid
+			second_company.tag_list.add(['second', 'third'])
+			second_company.save
+			second_company.tag_list.should have(2).item
+			second_company.tags.should have(2).item
+
+			Tag.all.should have(3).item
+		end
+
+		it 'check tags remove' do
+			@created_company.tag_list.add(['first', 'second'])
+			@created_company.save
+			@created_company.tag_list.should have(2).item
+			@created_company.tags.should have(2).item
+			Tag.all.should have(2).item
+
+			@created_company.tag_list.remove(['first', 'second'])
+			@created_company.save
+			@created_company.tag_list.should have(0).item
+			@created_company.tags.should have(0).item
+			Tag.all.should have(2).item
+		end
+
+		it 'check remove unexisted tags' do
+			@created_company.tag_list.add(['first', 'second'])
+			@created_company.save
+			@created_company.tag_list.should have(2).item
+			@created_company.tags.should have(2).item
+			Tag.all.should have(2).item
+
+			@created_company.tag_list.remove(['third', 'fourth'])
+			@created_company.save
+			@created_company.tag_list.should have(2).item
+			@created_company.tags.should have(2).item
+			Tag.all.should have(2).item
 		end
 	end
 end

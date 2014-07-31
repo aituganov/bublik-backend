@@ -23,13 +23,7 @@ class CompaniesController < ApplicationController
 	end
 
 	def update
-		tags_errors = nil
-		if !params[:tags].nil?
-			tags_errors = @company.set_tags company_tags
-		end
-		if tags_errors && tags_errors.count > 0
-			render_error :bad_request, tags_errors
-		elsif @company.update(company_params)
+		if @company.update(company_params)
 			render_event :ok
 		else
 			render_error :bad_request, @company.errors
@@ -44,13 +38,31 @@ class CompaniesController < ApplicationController
 		end
 	end
 
+	def tags_add
+		begin
+			@company.tags_add tags
+			render_event :created
+		rescue ActionController::ParameterMissing => e
+			render_error :bad_request
+		end
+	end
+
+	def tags_delete
+		begin
+			@company.tags_delete tags
+			render_event :ok
+		rescue ActionController::ParameterMissing => e
+			render_error :bad_request
+		end
+	end
+
 	private
 
 	def company_params
 		params.permit(:id, :title, :slogan, :description)
 	end
 
-	def company_tags
+	def tags
 		params.require(:tags)
 	end
 

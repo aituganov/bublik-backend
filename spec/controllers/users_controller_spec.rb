@@ -163,33 +163,53 @@ describe UsersController do
 			@user.last_name.should eq new_last_name
 		end
 
-		it 'should 400 for legal user data with unexisted tags' do
-			post :update, interests: [-1, -2]
+		it 'should 400 for update with empty interests' do
+			put :interests_add
 			response.status.should eq 400
-			@user.reload
-			@user.interests.should have(0).item
-			@user.tags.should have(0).item
 		end
 
-		it 'should 400 for legal user data with duplicate tags' do
-			tag_first = FactoryGirl.create(:tag_first)
-			tag_first.should be_valid
-			post :update, interests: [tag_first.id, tag_first.id]
-			response.status.should eq 400
-			@user.reload
-			@user.interests.should have(1).item
-			@user.tags.should have(1).item
-		end
-
-		it 'should 200 for legal user data with existed tags' do
-			tag_first = FactoryGirl.create(:tag_first)
-			tag_first.should be_valid
-			tag_second = FactoryGirl.create(:tag_second)
-			tag_second.should be_valid
-			post :update, interests: [tag_first.id, tag_second.id]
-			response.status.should eq 200
+		it 'should 201 for update with unexisted interests' do
+			put :interests_add, interests: ['first tag', 'second_tag']
+			response.status.should eq 201
 			@user.reload
 			@user.interests.should have(2).item
+		end
+
+		it 'should 201 for update with duplicated interests' do
+			put :interests_add, interests: ['first tag', 'first tag']
+			response.status.should eq 201
+			@user.reload
+			@user.interests.should have(1).item
+		end
+
+		it 'should 400 for delete with empty interests' do
+			delete :interests_delete
+			response.status.should eq 400
+		end
+
+		it 'should 201 for delete with unexisted interests' do
+			delete :interests_delete, interests: ['first tag', 'second_tag']
+			response.status.should eq 200
+			@user.reload
+			@user.interests.should have(0).item
+		end
+
+		it 'should 201 for delete with existed interests' do
+			@user.interests_add ['first', 'second', 'third']
+			@user.interests.should have(3).item
+
+			delete :interests_delete, interests: ['first', 'second']
+			response.status.should eq 200
+			@user.interests.should have(1).item
+		end
+
+		it 'should 201 for delete with duplicated interests' do
+			@user.interests_add ['first']
+			@user.interests.should have(1).item
+
+			delete :interests_delete, interests: ['first', 'first']
+			response.status.should eq 200
+			@user.interests.should have(0).item
 		end
 
 		it 'should 200 for avatar illegal data' do

@@ -70,14 +70,18 @@ Rails.application.routes.draw do
 			get 'login/check/:login' => 'users#check_login', constraints: { login: /.*/ }
 			post '/' => 'users#update'
 			match '/' => 'users#delete' , via: [:delete]
+			match 'interests' => 'users#interests_add', via: [:put]
+			match 'interests' => 'users#interests_delete' , via: [:delete]
 		end
 
 		# Route companies
 		scope :path => 'company' do
-			match '/new' => 'companies#registration', via: [:put]
-			get '/:id' => 'companies#get'
-			post '/:id' => 'companies#update'
-			match '/:id' => 'companies#delete' , via: [:delete]
+			match 'new' => 'companies#registration', via: [:put]
+			get ':id' => 'companies#get'
+			post ':id' => 'companies#update'
+			match ':id' => 'companies#delete' , via: [:delete]
+			match ':id/tags' => 'companies#tags_add', via: [:put]
+			match ':id/tags' => 'companies#tags_delete' , via: [:delete]
 		end
 
 		# Route tags

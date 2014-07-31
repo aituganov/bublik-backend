@@ -90,50 +90,77 @@ describe User do
 	end
 
 	context 'update user' do
+		before (:each) do
+			@user = FactoryGirl.create(:user)
+			@user.should be_valid
+		end
+
 		it 'user should be updated' do
 			last_name = 'Changed last name'
-			FactoryGirl.create(:user).should be_valid
-			user = User.first
-			user.last_name = last_name
-			user.save
-			user.last_name.should eq last_name
+			@user.last_name = last_name
+			@user.save
+			@user.last_name.should eq last_name
 		end
 
 		it 'add new interests to the user' do
-			tag_first = FactoryGirl.build(:tag_first)
-			tag_second = FactoryGirl.build(:tag_second)
-			user = FactoryGirl.create(:user)
-			user.should be_valid
-			(user.interests.create(tag: tag_first)).should be_valid
-			(user.interests.create(tag: tag_second)).should be_valid
-			user.interests.should have(2).item
+			@user.interest_list.add(['first', 'second'])
+			@user.save
+			@user.interest_list.should have(2).item
+			@user.interests.should have(2).item
 			Tag.all.should have(2).item
 		end
 
 		it 'check interests uniq' do
-			tag_first = FactoryGirl.build(:tag_first)
-			user = FactoryGirl.create(:user)
-			user.should be_valid
-			(user.interests.create(tag: tag_first)).should be_valid
-			expect{user.interests.create(tag: tag_first)}.to raise_error(ActiveRecord::RecordNotUnique)
-			user.interests.should have(1).item
+			@user.interest_list.add(['first', 'first'])
+			@user.save
+			@user.interest_list.should have(1).item
+			@user.interests.should have(1).item
 			Tag.all.should have(1).item
 		end
 
-		it 'link existed interests to the user' do
-			tag_first = FactoryGirl.create(:tag_first)
-			tag_second = FactoryGirl.create(:tag_second)
-			tag_first.should be_valid
-			tag_second.should be_valid
-			user = FactoryGirl.create(:user)
-			user.should be_valid
-			user.interests.create(tag_id: tag_first.id).should be_valid
-			user.interests.create(tag_id: tag_second.id).should be_valid
-			user.interests.should have(2).item
-			user.interests[0].tag_id.should eq tag_first.id
-			user.interests[1].tag_id.should eq tag_second.id
+		it 'add existed interest to user' do
+			@user.interest_list.add(['first', 'second'])
+			@user.save
+			@user.interest_list.should have(2).item
+			@user.interests.should have(2).item
+
+			second_user = FactoryGirl.create(:user_second)
+			second_user.should be_valid
+			second_user.interest_list.add(['second', 'third'])
+			second_user.save
+			second_user.interest_list.should have(2).item
+			second_user.interests.should have(2).item
+
+			Tag.all.should have(3).item
 		end
 
+		it 'check interests remove' do
+			@user.interest_list.add(['first', 'second'])
+			@user.save
+			@user.interest_list.should have(2).item
+			@user.interests.should have(2).item
+			Tag.all.should have(2).item
+
+			@user.interest_list.remove(['first', 'second'])
+			@user.save
+			@user.interest_list.should have(0).item
+			@user.interests.should have(0).item
+			Tag.all.should have(2).item
+		end
+
+		it 'check remove unexisted interest' do
+			@user.interest_list.add(['first', 'second'])
+			@user.save
+			@user.interest_list.should have(2).item
+			@user.interests.should have(2).item
+			Tag.all.should have(2).item
+
+			@user.interest_list.remove(['third', 'fourth'])
+			@user.save
+			@user.interest_list.should have(2).item
+			@user.interests.should have(2).item
+			Tag.all.should have(2).item
+		end
 	end
 
 	context 'delete user' do

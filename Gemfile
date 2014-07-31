@@ -62,3 +62,6 @@ gem 'validates_email_format_of'
 
 # Use carrierwave for work with images
 gem 'carrierwave'
+
+# Use tags magic
+gem 'acts-as-taggable-on'

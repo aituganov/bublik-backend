@@ -17,5 +17,13 @@ describe CompaniesController do
 		it 'routes to #delete' do
 			delete('/api/company/1').should route_to('companies#delete', id: '1')
 		end
+
+		it 'routes to #tags_add' do
+			put('/api/company/1/tags').should route_to('companies#tags_add', id: '1')
+		end
+
+		it 'routes to #interests_delete' do
+			delete('/api/company/1/tags').should route_to('companies#tags_delete', id: '1')
+		end
 	end
 end

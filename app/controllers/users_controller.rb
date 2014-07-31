@@ -2,7 +2,7 @@ class UsersController < ApplicationController
 	include ApplicationHelper
 	include UsersHelper
 	skip_before_filter :verify_authenticity_token
-	before_filter :get_user, only: [:update, :delete]
+	before_filter :get_user, only: [:update, :delete, :interests_add, :interests_delete]
 
 	def index
 		token = get_access_token(cookies)
@@ -44,11 +44,6 @@ class UsersController < ApplicationController
 	def update
 		rs_data = {}
 
-		unless params[:interests].nil?
-			interests_errors = @user.set_interests interests
-			rs_data[User.RS_DATA[:INTERESTS]] = true
-		end
-
 		unless params[:avatar].nil?
 			unless avatar[:data].nil?
 				@user.avatar = avatar[:data]
@@ -58,9 +53,7 @@ class UsersController < ApplicationController
 			rs_data[User.RS_DATA[:AVATAR]] = true
 		end
 
-		if interests_errors && interests_errors.count > 0
-			render_error :bad_request, interests_errors
-		elsif @user.update(user_params)
+		if @user.update(user_params)
 			render_event :ok, @user.get_data(rs_data)
 		else
 			render_error :bad_request, @user.errors
@@ -72,6 +65,24 @@ class UsersController < ApplicationController
 			render_event :ok
 		else
 			render_error :bad_request, @user.errors
+		end
+	end
+
+	def interests_add
+		begin
+			@user.interests_add interests
+			render_event :created
+		rescue ActionController::ParameterMissing => e
+			render_error :bad_request
+		end
+	end
+
+	def interests_delete
+		begin
+			@user.interests_delete interests
+			render_event :ok
+		rescue ActionController::ParameterMissing => e
+			render_error :bad_request
 		end
 	end
 

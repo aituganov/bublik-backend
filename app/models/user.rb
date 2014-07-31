@@ -3,8 +3,7 @@ extend SecureRandom
 class User < ActiveRecord::Base
 	mount_uploader :avatar, AvatarUploader
 
-	has_many :interests, dependent: :destroy
-	has_many :tags, through: :interests
+	acts_as_taggable_on :interests
 
 	validates :login, :access_token, presence: true, uniqueness: true, length: {maximum: 61}
 	validates :login, email_format: { message: 'wrong email format' }
@@ -41,7 +40,7 @@ class User < ActiveRecord::Base
 	end
 
 	def put_interests_data(rs)
-		rs[:interests] = self.tags.map {|i| i.name}
+		rs[:interests] = self.interest_list
 	end
 
 	def put_avatar_data(rs)
@@ -57,22 +56,18 @@ class User < ActiveRecord::Base
 		res
 	end
 
-	def set_interests tags
-		logger.info "Create interests for user ##{self.id}, tags: #{tags.to_json}"
-		errors = []
-		tags.each do |id|
-			tag = Tag.where(id: id).take
-			if tag.nil?
-				errors.push("Tag ##{id} not found")
-			else
-				begin
-					self.interests.create(tag_id: id)
-				rescue Exception => e
-					errors.push(e.class == ActiveRecord::RecordNotUnique ? "Interest ##{id} already registered" : e.message)
-				end
-			end
-		end
-		errors
+	def interests_add interests
+		logger.info "Create interests #{interests.to_json} for user ##{self.id}..."
+		self.interest_list.add interests
+		self.save!
+		logger.info 'Created!'
+	end
+
+	def interests_delete interests
+		logger.info "Delete interests #{interests.to_json} from user ##{self.id}..."
+		self.interest_list.remove interests
+		self.save!
+		logger.info 'Deleted!'
 	end
 
 	private

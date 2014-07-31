@@ -91,33 +91,50 @@ describe CompaniesController do
 				@created_company.description.should eq company_second['description']
 			end
 
-			it 'should 400 for legal company data with unexisted tags' do
-				post :update, {id: @created_company.id, tags: [-1, -2]}
+			it 'should 400 for update with empty tags' do
+				put :tags_add, id: @created_company.id
 				response.status.should eq 400
-				@created_company.reload
-				@created_company.company_tags.should have(0).item
-				@created_company.company_tags.should have(0).item
 			end
 
-			it 'should 400 for legal company data with duplicate tags' do
-				tag_first = FactoryGirl.create(:tag_first)
-				tag_first.should be_valid
-				post :update, {id: @created_company.id, tags: [tag_first.id, tag_first.id]}
-				response.status.should eq 400
-				@created_company.reload
-				@created_company.company_tags.should have(1).item
-				@created_company.company_tags.should have(1).item
+			it 'should 201 for update with unexisted tags' do
+				put :tags_add, id: @created_company.id, tags: ['first tag', 'second_tag']
+				response.status.should eq 201
+				@created_company.tags.should have(2).item
 			end
 
-			it 'should 200 for legal company data with existed tags' do
-				tag_first = FactoryGirl.create(:tag_first)
-				tag_first.should be_valid
-				tag_second = FactoryGirl.create(:tag_second)
-				tag_second.should be_valid
-				post :update, {id: @created_company.id, tags: [tag_first.id, tag_second.id]}
+			it 'should 201 for update with duplicated tags' do
+				put :tags_add, id: @created_company.id, tags: ['first tag', 'first tag']
+				response.status.should eq 201
+				@created_company.tags.should have(1).item
+			end
+
+			it 'should 400 for delete with empty tags' do
+				delete :tags_delete, id: @created_company.id
+				response.status.should eq 400
+			end
+
+			it 'should 201 for delete with unexisted tags' do
+				delete :tags_delete, id: @created_company.id, tags: ['first tag', 'second_tag']
 				response.status.should eq 200
-				@created_company.reload
-				@created_company.company_tags.should have(2).item
+				@created_company.tags.should have(0).item
+			end
+
+			it 'should 201 for delete with existed tags' do
+				@created_company.tags_add ['first', 'second', 'third']
+				@created_company.tags.should have(3).item
+
+				delete :tags_delete, id: @created_company.id, tags: ['first', 'second']
+				response.status.should eq 200
+				@created_company.tags.should have(1).item
+			end
+
+			it 'should 201 for delete with duplicated tags' do
+				@created_company.tags_add ['first']
+				@created_company.tags.should have(1).item
+
+				delete :tags_delete, id: @created_company.id, tags: ['first', 'first']
+				response.status.should eq 200
+				@created_company.tags.should have(0).item
 			end
 		end
 
