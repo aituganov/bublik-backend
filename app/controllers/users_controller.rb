@@ -2,18 +2,15 @@ class UsersController < ApplicationController
 	include ApplicationHelper
 	include UsersHelper
 	skip_before_filter :verify_authenticity_token
+	before_filter :get_user, only: [:update, :delete]
 
 	def index
 		token = get_access_token(cookies)
 		if token.nil?
 			render json: get_fake_anonymous_data
 		else
-			data = User.get_data(token)
-			if data.nil?
-				render_error :not_found
-			else
-				render_event :ok, data
-			end
+			return unless get_user
+			render_event :ok, @user.get_data({User.RS_DATA[:FULL] => true})
 		end
 	end
 
@@ -45,36 +42,50 @@ class UsersController < ApplicationController
 	end
 
 	def update
-		user = get_user_by_access_token(cookies)
-		if user.nil?
-			render_error :not_found
-			return
+		rs_data = {}
+
+		unless params[:interests].nil?
+			interests_errors = @user.set_interests interests
+			rs_data[User.RS_DATA[:INTERESTS]] = true
 		end
 
-		if !params[:interests].nil?
-			interests_errors = user.set_interests interests
+		unless params[:avatar].nil?
+			unless avatar[:data].nil?
+				@user.avatar = avatar[:data]
+			else
+				#do crop
+			end
+			rs_data[User.RS_DATA[:AVATAR]] = true
 		end
+
 		if interests_errors && interests_errors.count > 0
 			render_error :bad_request, interests_errors
-		elsif user.update(user_params)
-			render_event :ok
+		elsif @user.update(user_params)
+			render_event :ok, @user.get_data(rs_data)
 		else
-			render_error :bad_request, user.errors
+			render_error :bad_request, @user.errors
 		end
 	end
 
 	def delete
-		user = get_user_by_access_token(cookies)
-		if user.nil?
-			render_error :not_found
-		elsif user.mark_as_deleted
+		if @user.mark_as_deleted
 			render_event :ok
 		else
-			render_error :bad_request, user.errors
+			render_error :bad_request, @user.errors
 		end
 	end
 
 	private
+
+	def get_user
+		res = true
+		@user = get_user_by_access_token cookies
+		if @user.nil?
+			head :not_found
+			res = false
+		end
+		res
+	end
 
 	def user_params
 		params.permit(:login, :password, :last_name, :first_name)
@@ -82,6 +93,10 @@ class UsersController < ApplicationController
 
 	def interests
 		params.require(:interests)
+	end
+
+	def avatar
+		params.require(:avatar).permit(:data, :crop)
 	end
 
 end

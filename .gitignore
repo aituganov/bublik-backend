@@ -18,3 +18,4 @@ log/*
 app_settings.yml
 version
 coverage/*
+public/images/*

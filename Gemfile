@@ -50,6 +50,8 @@ group :development, :test do
 	gem 'rspec-rails', '~> 2.14.0.rc1'
 	gem 'factory_girl_rails'
 	gem 'database_cleaner'
+	# Use code coverage
+	gem 'simplecov', :require => false, :group => :test
 end
 
 # Use postgresql adapter
@@ -58,7 +60,5 @@ gem 'pg'
 # Use email validator
 gem 'validates_email_format_of'
 
-# Use code coverage
-group :development, :test do
-	gem 'simplecov', :require => false, :group => :test
-end
+# Use carrierwave for work with images
+gem 'carrierwave'
