@@ -124,6 +124,11 @@ describe UsersController do
 	end
 
 	context 'user update' do
+		before :each do
+			@correct_user.save
+			@user = User.first
+			request.cookies[:ACCESS_TOKEN] = @user.access_token
+		end
 		it 'invalid user access token has 404' do
 			request.cookies[:ACCESS_TOKEN] = @invalid_access_token
 			post :update
@@ -131,81 +136,60 @@ describe UsersController do
 		end
 
 		it 'user update empty data has 200' do
-			@correct_user.save
-			user = User.first
-			request.cookies[:ACCESS_TOKEN] = user.access_token
 			post :update
 			response.status.should eq 200
 		end
 
 		it 'user illegal data not change object' do
-			@correct_user.save
-			user = User.first
-			request.cookies[:ACCESS_TOKEN] = user.access_token
 			post :update, {illegal_data: 'test_illegal_data'}
 			response.status.should eq 200
-			user[:illegal_data].should be_nil
+			@user[:illegal_data].should be_nil
 		end
 
 		it 'user wrong login not change object' do
-			@correct_user.save
-			user = User.first
-			request.cookies[:ACCESS_TOKEN] = user.access_token
 			login_wrong = 'wrong'
 			post :update, {login: login_wrong}
 			response.status.should eq 400
-			user[:login].should_not eq login_wrong
+			@user[:login].should_not eq login_wrong
 		end
 
 		it 'legal user data change object' do
-			@correct_user.save
-			user = User.first
 			new_first_name = 'ChangedFN'
 			new_last_name = 'ChangedLN'
-			request.cookies[:ACCESS_TOKEN] = user.access_token
 			post :update, {first_name: new_first_name, last_name: new_last_name}
 			response.status.should eq 200
-			user.reload
-			user.first_name.should eq new_first_name
-			user.last_name.should eq new_last_name
+			@user.reload
+			@user.first_name.should eq new_first_name
+			@user.last_name.should eq new_last_name
 		end
 
 		it 'should 400 for legal user data with unexisted tags' do
-			@correct_user.save
-			user = User.first
-			request.cookies[:ACCESS_TOKEN] = user.access_token
 			post :update, interests: [-1, -2]
 			response.status.should eq 400
-			user.reload
-			user.interests.should have(0).item
-			user.tags.should have(0).item
+			@user.reload
+			@user.interests.should have(0).item
+			@user.tags.should have(0).item
 		end
 
 		it 'should 400 for legal user data with duplicate tags' do
-			@correct_user.save
-			user = User.first
-			request.cookies[:ACCESS_TOKEN] = user.access_token
 			tag_first = FactoryGirl.create(:tag_first)
 			tag_first.should be_valid
 			post :update, interests: [tag_first.id, tag_first.id]
 			response.status.should eq 400
-			user.reload
-			user.interests.should have(1).item
-			user.tags.should have(1).item
+			@user.reload
+			@user.interests.should have(1).item
+			@user.tags.should have(1).item
 		end
 
 		it 'should 200 for legal user data with existed tags' do
-			@correct_user.save
-			user = User.first
-			request.cookies[:ACCESS_TOKEN] = user.access_token
 			tag_first = FactoryGirl.create(:tag_first)
 			tag_first.should be_valid
 			tag_second = FactoryGirl.create(:tag_second)
 			tag_second.should be_valid
 			post :update, interests: [tag_first.id, tag_second.id]
 			response.status.should eq 200
-			user.reload
-			user.interests.should have(2).item
+			@user.reload
+			@user.interests.should have(2).item
 		end
 	end
 
