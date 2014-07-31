@@ -37,13 +37,6 @@ ActiveRecord::Schema.define(version: 20140728151417) do
 
   add_index "company_tags", ["tag_id", "company_id"], name: "index_company_tags_on_tag_id_and_company_id", unique: true, using: :btree
 
-  create_table "images", force: true do |t|
-    t.string   "preview_url"
-    t.string   "fullsize_url"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "interests", force: true do |t|
     t.integer "tag_id"
     t.integer "user_id"
@@ -69,9 +62,6 @@ ActiveRecord::Schema.define(version: 20140728151417) do
     t.boolean  "is_deleted",   default: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "logo_id"
   end
-
-  add_index "users", ["logo_id"], name: "index_users_on_logo_id", using: :btree
 
 end

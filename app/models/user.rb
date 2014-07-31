@@ -1,7 +1,6 @@
 extend SecureRandom
 
 class User < ActiveRecord::Base
-	has_one :image
 	has_many :interests, dependent: :destroy
 	has_many :tags, through: :interests
 

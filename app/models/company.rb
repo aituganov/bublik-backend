@@ -1,6 +1,4 @@
 class Company < ActiveRecord::Base
-	has_one :image
-
 	has_many :company_tags, dependent: :destroy
 	has_many :tags, through: :company_tags
 
