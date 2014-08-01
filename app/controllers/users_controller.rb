@@ -2,15 +2,17 @@ class UsersController < ApplicationController
 	include ApplicationHelper
 	include UsersHelper
 	skip_before_filter :verify_authenticity_token
-	before_filter :get_user, only: [:update, :delete, :interests_add, :interests_delete]
+	before_filter :check_privileges, only: [:update, :interests_add, :interests_delete, :delete]
 
 	def index
-		token = get_access_token(cookies)
-		if token.nil?
-			render json: get_fake_anonymous_data
-		else
-			return unless get_user
-			render_event :ok, @user.get_data({User.RS_DATA[:FULL] => true})
+		# check self
+		get_user(false)
+
+		begin
+			@requested_user = User.find(user_params[:id])
+			render_event :ok, @requested_user.get_data({User.RS_DATA[:FULL] => true}, @is_self)
+		rescue  ActiveRecord::RecordNotFound => e
+			render_error :not_found
 		end
 	end
 
@@ -88,18 +90,36 @@ class UsersController < ApplicationController
 
 	private
 
-	def get_user
-		res = true
+	def get_user(generate_error=true)
+		res = false
 		@user = get_user_by_access_token cookies
-		if @user.nil?
+		if @user.nil? && generate_error
 			head :not_found
+		elsif @user.nil?
+			@is_self = false
 			res = false
+		else
+			@is_self = @user.id == user_params[:id].to_i
+			res = true
+		end
+		res
+	end
+
+	def check_privileges
+		res = false
+
+		return res unless get_user
+
+		if !@is_self
+			head :forbidden
+		else
+			res = true
 		end
 		res
 	end
 
 	def user_params
-		params.permit(:login, :password, :last_name, :first_name)
+		params.permit(:id, :login, :password, :last_name, :first_name)
 	end
 
 	def interests

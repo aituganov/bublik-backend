@@ -64,14 +64,14 @@ Rails.application.routes.draw do
 
 		# Route users
 		scope :path => 'user' do
-			get '/' => 'users#index'
+			get ':id' => 'users#index'
 			match 'new' => 'users#registration', via: [:put]
 			match 'login' => 'users#login', via: [:put]
 			get 'login/check/:login' => 'users#check_login', constraints: { login: /.*/ }
-			post '/' => 'users#update'
-			match '/' => 'users#delete' , via: [:delete]
-			match 'interests' => 'users#interests_add', via: [:put]
-			match 'interests' => 'users#interests_delete' , via: [:delete]
+			post ':id' => 'users#update'
+			match ':id' => 'users#delete' , via: [:delete]
+			match ':id/interests' => 'users#interests_add', via: [:put]
+			match ':id/interests' => 'users#interests_delete' , via: [:delete]
 		end
 
 		# Route companies
