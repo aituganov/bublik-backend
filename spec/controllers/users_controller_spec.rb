@@ -38,6 +38,7 @@ describe UsersController do
 			put :registration, @correct_user.as_json
 			response.status.should eq 201
 			rs_data = JSON.parse(response.body)['data']
+			rs_data['id'].should_not be_nil
 			rs_data['access_token'].should_not be_nil
 		end
 
@@ -65,6 +66,7 @@ describe UsersController do
 			put :login, {login: @correct_user.login, password: @correct_user.password}
 			response.status.should eq 200
 			rs_data = JSON.parse(response.body)['data']
+			rs_data['id'].should_not be_nil
 			rs_data['access_token'].should_not be_nil
 		end
 	end
@@ -124,6 +126,7 @@ describe UsersController do
 				get :index, @id_structure
 				response.status.should eq 200
 				rs_user_data = JSON.parse(response.body)['data']
+				rs_user_data['id'].should eq @correct_user.id
 				rs_user_data['first_name'].should eq @correct_user.first_name
 				rs_user_data['last_name'].should eq @correct_user.last_name
 				rs_user_data['is_deleted'].should eq @correct_user.is_deleted

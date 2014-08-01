@@ -46,6 +46,7 @@ class User < ActiveRecord::Base
 	end
 
 	def put_main_data(rs)
+		rs[:id] = self.id
 		rs[:first_name] = self.first_name
 		rs[:last_name] = self.last_name
 		rs[:is_deleted] = self.is_deleted

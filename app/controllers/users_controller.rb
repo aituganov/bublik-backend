@@ -19,7 +19,7 @@ class UsersController < ApplicationController
 	def registration
 		user = User.new(user_params)
 		if user.save
-			render_event :created, {access_token: user.access_token}
+			render_event :created, {id: user.id, access_token: user.access_token}
 		else
 			render_error :unprocessable_entity, user.errors
 		end
@@ -30,7 +30,7 @@ class UsersController < ApplicationController
 		if user.nil?
 			render_error :unauthorized
 		else
-			render_event :ok, {access_token: user.access_token}
+			render_event :ok, {id: user.id, access_token: user.access_token}
 		end
 	end
 
