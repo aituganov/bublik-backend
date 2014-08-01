@@ -9,17 +9,6 @@ class TagsController < ApplicationController
 		render_event :ok, {tags: finded.map{|t| {name: t.name, id: t.id}}}
 	end
 
-	def new
-		tag = Tag.new(tag_params)
-		if !Tag.where(tag_params).take.nil?
-			render_error :conflict, 'Tag already registered'
-		elsif tag.save
-			render_event :created, {tag: {name: tag.name, id: tag.id}}
-		else
-			render_error :bad_request, tag.errors
-		end
-	end
-
 	private
 
 	def check_user

@@ -7,47 +7,12 @@ describe TagsController do
 		@tag_first = FactoryGirl.build(:tag_first)
 	end
 
-	context 'tag create' do
-		it 'has 404 error for empty access token' do
-			cookies['ACCESS_TOKEN'] = ''
-			put :new
-			response.status.should eq 404
-		end
-
-		it 'has 409 for not unique name' do
-			FactoryGirl.create(:tag_first).should be_valid
-			put :new, @tag_first.name
-			response.status.should eq 409
-		end
-
-		it 'has 201 for correct tag param' do
-			put :new, name: @correct_name
-			response.status.should eq 201
-		end
-
-		it 'has 201 with correct response data' do
-			put :new, name: @correct_name
-			response.status.should eq 201
-			rs_tag = JSON.parse(response.body)['data']['tag']
-			rs_tag.should_not be_nil
-			rs_tag['id'].should_not be_nil
-			rs_tag['name'].should eq @correct_name
-		end
-	end
-
 	context 'tag find' do
 		it 'has 404 error for empty access token' do
 			cookies['ACCESS_TOKEN'] = ''
 			get :find, name: ''
 			response.status.should eq 404
 		end
-
-
-		it 'has 400 for correct access token & illegal data' do
-			post :new, {name: generate_random_string(101)}
-			response.status.should eq 400
-		end
-
 
 		it 'has 200 & empty rs data for unexist name' do
 			get :find, name: 'Test'

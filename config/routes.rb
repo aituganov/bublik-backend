@@ -87,7 +87,6 @@ Rails.application.routes.draw do
 		# Route tags
 		scope :path => 'tag' do
 			get ':name' => 'tags#find'
-			match 'new/:name' => 'tags#new', via: [:put]
 		end
 
 	end
