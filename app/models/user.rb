@@ -35,6 +35,10 @@ class User < ActiveRecord::Base
 		rs
 	end
 
+	def get_menu
+		{user_id: self.id, menu: %w(companies)}
+	end
+
 	def put_actions(rs_actions, requester_is_self)
 		return if rs_actions.nil?
 

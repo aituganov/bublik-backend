@@ -62,6 +62,11 @@ Rails.application.routes.draw do
 
 		get 'version' => 'versions#current_version'
 
+		# Route menu
+		scope :path => 'menu' do
+			get '/' => 'menu#get'
+		end
+
 		# Route users
 		scope :path => 'user' do
 			get ':id' => 'users#index'
