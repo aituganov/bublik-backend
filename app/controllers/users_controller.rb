@@ -61,7 +61,7 @@ class UsersController < ApplicationController
 	end
 
 	def delete
-		if @user.mark_as_deleted
+		if @user.destroy
 			render_event :ok
 		else
 			render_error :bad_request, @user.errors

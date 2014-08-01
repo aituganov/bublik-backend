@@ -263,7 +263,7 @@ describe UsersController do
 			user.is_deleted.should be_true
 
 			delete :delete
-			response.status.should eq 400
+			response.status.should eq 404
 		end
 	end
 

@@ -176,7 +176,7 @@ describe CompaniesController do
 				response.status.should eq 200
 
 				delete :delete, {id: @created_company.id}
-				response.status.should eq 400
+				response.status.should eq 404
 			end
 		end
 	end
@@ -210,13 +210,11 @@ describe CompaniesController do
 
 		it 'has a correct info for deleted company' do
 			put :registration, @company_data
-			id = JSON.parse(response.body)['data']['id']
-			delete :delete, {id: id}
+			@created_company = Company.find(JSON.parse(response.body)['data']['id'])
+			delete :delete, {id: @created_company.id}
 			response.status.should eq 200
-			get 'get', {id: id}
-			response.status.should eq 200
-			rs_data = JSON.parse(response.body)['data']
-			rs_data['is_deleted'].should be_true
+			@created_company.reload
+			@created_company.is_deleted.should be_true
 		end
 	end
 

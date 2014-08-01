@@ -2,7 +2,7 @@ extend SecureRandom
 
 class User < ActiveRecord::Base
 	mount_uploader :avatar, AvatarUploader
-
+	acts_as_paranoid
 	acts_as_taggable_on :interests
 
 	validates :login, :access_token, presence: true, uniqueness: true, length: {maximum: 61}
@@ -47,15 +47,6 @@ class User < ActiveRecord::Base
 		rs[:avatar_url] = self.avatar.url
 	end
 
-	def mark_as_deleted
-		if self.is_deleted?
-			res = false
-		else
-			res = self.update(is_deleted: true)
-		end
-		res
-	end
-
 	def interests_add interests
 		logger.info "Create interests #{interests.to_json} for user ##{self.id}..."
 		self.interest_list.add interests
@@ -68,6 +59,10 @@ class User < ActiveRecord::Base
 		self.interest_list.remove interests
 		self.save!
 		logger.info 'Deleted!'
+	end
+
+	def is_deleted
+		!self.deleted_at.nil?
 	end
 
 	private

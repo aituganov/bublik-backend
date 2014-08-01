@@ -23,12 +23,13 @@ ActiveRecord::Schema.define(version: 20140731164815) do
     t.text     "description"
     t.float    "rating",      default: 0.0
     t.integer  "image_id"
-    t.boolean  "is_deleted",  default: false
+    t.datetime "deleted_at"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   add_index "companies", ["image_id"], name: "index_companies_on_image_id", using: :btree
+  add_index "companies", ["title", "deleted_at"], name: "index_companies_on_title_and_deleted_at", using: :btree
 
   create_table "taggings", force: true do |t|
     t.integer  "tag_id"
@@ -57,10 +58,12 @@ ActiveRecord::Schema.define(version: 20140731164815) do
     t.string   "first_name"
     t.string   "last_name"
     t.string   "city"
-    t.boolean  "is_deleted",   default: false
+    t.datetime "deleted_at"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "avatar"
   end
+
+  add_index "users", ["login", "deleted_at"], name: "index_users_on_login_and_deleted_at", using: :btree
 
 end

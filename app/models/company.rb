@@ -1,4 +1,5 @@
 class Company < ActiveRecord::Base
+	acts_as_paranoid
 	acts_as_taggable_on :tags
 
 	belongs_to :owner, class_name: 'User', foreign_key: 'owner_id'
@@ -37,12 +38,7 @@ class Company < ActiveRecord::Base
 		logger.info 'Deleted!'
 	end
 
-	def mark_as_deleted
-		if self.is_deleted?
-			res = false
-		else
-			res = self.update(is_deleted: true)
-		end
-		res
+	def is_deleted
+		!self.deleted_at.nil?
 	end
 end

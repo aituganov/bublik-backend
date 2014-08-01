@@ -7,13 +7,15 @@ class CreateCompanies < ActiveRecord::Migration
 			t.text :description, length: 500
 			t.float :rating, default: 0
 			t.references :image, index: true
-			t.boolean :is_deleted, default: false
+			t.datetime :deleted_at
 
 			t.timestamps
 		end
+		add_index :companies, [:title, :deleted_at]
 	end
 
 	def self.down
+		remove_index :companies, [:title, :deleted_at]
 		drop_table :companies
 	end
 end
