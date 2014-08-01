@@ -68,3 +68,6 @@ gem 'acts-as-taggable-on'
 
 # Use fo mark record as delete
 gem 'paranoia', '~> 2.0'
+
+# Use foreigner for foreign_key
+gem 'foreigner'
