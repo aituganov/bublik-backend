@@ -67,206 +67,228 @@ describe UsersController do
 			rs_data = JSON.parse(response.body)['data']
 			rs_data['access_token'].should_not be_nil
 		end
-
 	end
 
-	context 'GET user info' do
-
-		it 'has a 200 response status code for anonymous user' do
-			get :index
-			response.status.should eq 200
-		end
-
-		it 'has a info for anonymous user' do
-			get :index
-			isAnonymous = JSON.parse(response.body)['anonymous']
-			isAnonymous.should be_true
-		end
-
-		it 'info for anonymous user has a menuItems' do
-			get :index
-			menu = JSON.parse(response.body)['menuItems']
-			menu.should_not be_empty
-		end
-
-		it 'info for anonymous user has a widgets' do
-			get :index
-			menu = JSON.parse(response.body)['widgets']
-			menu.should_not be_empty
-		end
-
-		it 'invalid user access token has 404' do
-			request.cookies[:ACCESS_TOKEN] = @invalid_access_token
-			get :index
-			response.status.should eq 404
-		end
-
-		it 'registered user info has 200' do
-			@correct_user.save
-			user = User.first
-			request.cookies[:ACCESS_TOKEN] = user.access_token
-			get :index
-			response.status.should eq 200
-		end
-
-		it 'registered user info has correct data' do
-			@correct_user.save
-			user = User.first
-			request.cookies[:ACCESS_TOKEN] = user.access_token
-			get :index
-			response.status.should eq 200
-			rs_user_data = JSON.parse(response.body)['data']
-			rs_user_data['first_name'].should eq user.first_name
-			rs_user_data['last_name'].should eq user.last_name
-			rs_user_data['city'].should eq user.city
-			rs_user_data['is_deleted'].should eq user.is_deleted
-		end
-	end
-
-	context 'user update' do
+	context 'actions with user' do
 		before :each do
 			@correct_user.save
-			@user = User.first
-			request.cookies[:ACCESS_TOKEN] = @user.access_token
-		end
-		it 'invalid user access token has 404' do
-			request.cookies[:ACCESS_TOKEN] = @invalid_access_token
-			post :update
-			response.status.should eq 404
+			@id_structure = {id: @correct_user.id}
+			@id_wrong_structure = {id: @correct_user.id + 1}
+			request.cookies[:ACCESS_TOKEN] = @correct_user.access_token
 		end
 
-		it 'user update empty data has 200' do
-			post :update
-			response.status.should eq 200
+		context 'info' do
+			it 'unexisted user has a 404 response status code for anonymous' do
+				request.cookies[:ACCESS_TOKEN] = ''
+				get :index, @id_wrong_structure
+				response.status.should eq 404
+			end
+
+			it 'existed user has a 200 response status code for anonymous' do
+				request.cookies[:ACCESS_TOKEN] = ''
+				get :index, @id_structure
+				response.status.should eq 200
+
+				actions = JSON.parse(response.body)['data']['actions']
+				actions.should_not be_nil
+				user_actions = actions['user']
+				user_actions.should_not be_nil
+				user_actions.should have(1).item
+				user_actions[0].should eq 'read'
+			end
+
+			it 'existed user has a info for anonymous user' do
+				request.cookies[:ACCESS_TOKEN] = ''
+				get :index, @id_structure
+				response.status.should eq 200
+
+				actions = JSON.parse(response.body)['data']['actions']
+				actions.should_not be_nil
+				user_actions = actions['user']
+				user_actions.should_not be_nil
+				user_actions.should have(1).item
+				user_actions[0].should eq 'read'
+			end
+
+			it 'unexisted user has a 404 response status code for registered' do
+				get :index, @id_wrong_structure
+				response.status.should eq 404
+			end
+
+			it 'registered user info has 200' do
+				get :index, @id_structure
+				response.status.should eq 200
+			end
+
+			it 'registered user info has correct data' do
+				get :index, @id_structure
+				response.status.should eq 200
+				rs_user_data = JSON.parse(response.body)['data']
+				rs_user_data['first_name'].should eq @correct_user.first_name
+				rs_user_data['last_name'].should eq @correct_user.last_name
+				rs_user_data['is_deleted'].should eq @correct_user.is_deleted
+
+				actions = rs_user_data['actions']
+				actions.should_not be_nil
+				user_actions = actions['user']
+				user_actions.should_not be_nil
+				user_actions.should have(3).item
+			end
 		end
 
-		it 'user illegal data not change object' do
-			post :update, {illegal_data: 'test_illegal_data'}
-			response.status.should eq 200
-			@user[:illegal_data].should be_nil
+		context 'update' do
+			it 'invalid user access token has 404' do
+				request.cookies[:ACCESS_TOKEN] = @invalid_access_token
+				post :update, {id: @correct_user.id}
+				response.status.should eq 404
+			end
+
+			it 'invalid user id has 403' do
+				post :update, {id: @correct_user.id + 1}
+				response.status.should eq 403
+			end
+
+			it 'user update empty data has 200' do
+				post :update, {id: @correct_user.id}
+				response.status.should eq 200
+			end
+
+			it 'user illegal data not change object' do
+				post :update, {id: @correct_user.id, illegal_data: 'test_illegal_data'}
+				response.status.should eq 200
+				@correct_user[:illegal_data].should be_nil
+			end
+
+			it 'user wrong login not change object' do
+				login_wrong = 'wrong'
+				post :update, {id: @correct_user.id, login: login_wrong}
+				response.status.should eq 400
+				@correct_user[:login].should_not eq login_wrong
+			end
+
+			it 'legal user data change object' do
+				new_first_name = 'ChangedFN'
+				new_last_name = 'ChangedLN'
+				post :update, {id: @correct_user.id, first_name: new_first_name, last_name: new_last_name}
+				response.status.should eq 200
+				@correct_user.reload
+				@correct_user.first_name.should eq new_first_name
+				@correct_user.last_name.should eq new_last_name
+			end
+
+			it 'should 400 for update with empty interests' do
+				put :interests_add, {id: @correct_user.id}
+				response.status.should eq 400
+			end
+
+			it 'should 403 for update with empty interests & invalid user id' do
+				put :interests_add, {id: @correct_user.id + 1}
+				response.status.should eq 403
+			end
+
+			it 'should 201 for update with unexisted interests' do
+				put :interests_add, {id: @correct_user.id, interests: ['first tag', 'second_tag']}
+				response.status.should eq 201
+				@correct_user.reload
+				@correct_user.interests.should have(2).item
+			end
+
+			it 'should 201 for update with duplicated interests' do
+				put :interests_add, {id: @correct_user.id,  interests: ['first tag', 'first tag']}
+				response.status.should eq 201
+				@correct_user.reload
+				@correct_user.interests.should have(1).item
+			end
+
+			it 'should 400 for delete with empty interests' do
+				delete :interests_delete, {id: @correct_user.id}
+				response.status.should eq 400
+			end
+
+			it 'should 403 for delete with empty interests & invalid user id' do
+				delete :interests_delete, {id: @correct_user.id + 1}
+				response.status.should eq 403
+			end
+
+			it 'should 201 for delete with unexisted interests' do
+				delete :interests_delete, {id: @correct_user.id, interests: ['first tag', 'second_tag']}
+				response.status.should eq 200
+				@correct_user.reload
+				@correct_user.interests.should have(0).item
+			end
+
+			it 'should 201 for delete with existed interests' do
+				@correct_user.interests_add ['first', 'second', 'third']
+				@correct_user.interests.should have(3).item
+
+				delete :interests_delete, {id: @correct_user.id, interests: ['first', 'second']}
+				response.status.should eq 200
+				@correct_user.interests.should have(1).item
+			end
+
+			it 'should 201 for delete with duplicated interests' do
+				@correct_user.interests_add ['first']
+				@correct_user.interests.should have(1).item
+
+				delete :interests_delete, {id: @correct_user.id, interests: ['first', 'first']}
+				response.status.should eq 200
+				@correct_user.interests.should have(0).item
+			end
+
+			it 'should 200 for avatar illegal data' do
+				post :update, {id: @correct_user.id, avatar: {illegal_data: ''}}
+				response.status.should eq 200
+				@correct_user.reload
+				@correct_user.avatar.read.should be_nil
+				JSON.parse(response.body)['data']['avatar_url'].should be_nil
+			end
+
+			it 'should 400 for illegal user avatar format' do
+				image_path = "#{Rails.root}/spec/controllers/users_controller_spec.rb"
+				post :update, {id: @correct_user.id, avatar: {data: Rack::Test::UploadedFile.new(image_path, 'text/jpg')}}
+				response.status.should eq 400
+			end
+
+			it 'should 200 for legal user avatar data' do
+				image_path = "#{Rails.root}/spec/fixtures/images/test.jpg"
+				post :update, {id: @correct_user.id, avatar: {data: Rack::Test::UploadedFile.new(image_path, 'text/jpg')}}
+				response.status.should eq 200
+				@correct_user.reload
+				@correct_user.avatar.read.should eq File.open(image_path, 'rb').read
+				JSON.parse(response.body)['data']['avatar_url'].should_not be_nil
+			end
 		end
 
-		it 'user wrong login not change object' do
-			login_wrong = 'wrong'
-			post :update, {login: login_wrong}
-			response.status.should eq 400
-			@user[:login].should_not eq login_wrong
-		end
+		context 'delete' do
+			it 'invalid user access_token has 404' do
+				request.cookies[:ACCESS_TOKEN] = ''
+				delete :delete, {id: @correct_user.id}
+				response.status.should eq 404
+			end
 
-		it 'legal user data change object' do
-			new_first_name = 'ChangedFN'
-			new_last_name = 'ChangedLN'
-			post :update, {first_name: new_first_name, last_name: new_last_name}
-			response.status.should eq 200
-			@user.reload
-			@user.first_name.should eq new_first_name
-			@user.last_name.should eq new_last_name
-		end
+			it 'invalid user id has 403' do
+				delete :delete, {id: @correct_user.id + 1}
+				response.status.should eq 403
+			end
 
-		it 'should 400 for update with empty interests' do
-			put :interests_add
-			response.status.should eq 400
-		end
+			it 'valid user access_token marked object as deleted' do
+				delete :delete, {id: @correct_user.id}
+				response.status.should eq 200
+				@correct_user.reload
+				@correct_user.is_deleted.should be_true
+			end
 
-		it 'should 201 for update with unexisted interests' do
-			put :interests_add, interests: ['first tag', 'second_tag']
-			response.status.should eq 201
-			@user.reload
-			@user.interests.should have(2).item
-		end
+			it 'second delete has 400' do
+				delete :delete, {id: @correct_user.id}
+				response.status.should eq 200
+				@correct_user.reload
+				@correct_user.is_deleted.should be_true
 
-		it 'should 201 for update with duplicated interests' do
-			put :interests_add, interests: ['first tag', 'first tag']
-			response.status.should eq 201
-			@user.reload
-			@user.interests.should have(1).item
-		end
-
-		it 'should 400 for delete with empty interests' do
-			delete :interests_delete
-			response.status.should eq 400
-		end
-
-		it 'should 201 for delete with unexisted interests' do
-			delete :interests_delete, interests: ['first tag', 'second_tag']
-			response.status.should eq 200
-			@user.reload
-			@user.interests.should have(0).item
-		end
-
-		it 'should 201 for delete with existed interests' do
-			@user.interests_add ['first', 'second', 'third']
-			@user.interests.should have(3).item
-
-			delete :interests_delete, interests: ['first', 'second']
-			response.status.should eq 200
-			@user.interests.should have(1).item
-		end
-
-		it 'should 201 for delete with duplicated interests' do
-			@user.interests_add ['first']
-			@user.interests.should have(1).item
-
-			delete :interests_delete, interests: ['first', 'first']
-			response.status.should eq 200
-			@user.interests.should have(0).item
-		end
-
-		it 'should 200 for avatar illegal data' do
-			post :update, avatar: {illegal_data: ''}
-			response.status.should eq 200
-			@user.reload
-			@user.avatar.read.should be_nil
-			JSON.parse(response.body)['data']['avatar_url'].should be_nil
-		end
-
-		it 'should 400 for illegal user avatar format' do
-			image_path = "#{Rails.root}/spec/controllers/users_controller_spec.rb"
-			post :update, avatar: {data: Rack::Test::UploadedFile.new(image_path, 'text/jpg')}
-			response.status.should eq 400
-		end
-
-		it 'should 200 for legal user avatar data' do
-			image_path = "#{Rails.root}/spec/fixtures/images/test.jpg"
-			post :update, avatar: {data: Rack::Test::UploadedFile.new(image_path, 'text/jpg')}
-			response.status.should eq 200
-			@user.reload
-			@user.avatar.read.should eq File.open(image_path, 'rb').read
-			JSON.parse(response.body)['data']['avatar_url'].should_not be_nil
+				delete :delete, {id: @correct_user.id}
+				response.status.should eq 404
+			end
 		end
 	end
-
-	context 'user delete' do
-		it 'invalid user access_token has 404' do
-			request.cookies[:ACCESS_TOKEN] =
-			delete :delete
-			response.status.should eq 404
-		end
-
-		it 'valid user access_token marked object as deleted' do
-			@correct_user.save
-			user = User.first
-			request.cookies[:ACCESS_TOKEN] = user.access_token
-			delete :delete
-			response.status.should eq 200
-			user = user.reload
-			user.is_deleted.should be_true
-		end
-
-		it 'second delete has 400' do
-			@correct_user.save
-			user = User.first
-			request.cookies[:ACCESS_TOKEN] = user.access_token
-			delete :delete
-			response.status.should eq 200
-			user = user.reload
-			user.is_deleted.should be_true
-
-			delete :delete
-			response.status.should eq 404
-		end
-	end
-
 	context 'check login' do
 		it 'check empty data return 200' do
 			get :check_login, login: ''

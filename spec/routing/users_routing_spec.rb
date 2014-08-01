@@ -4,7 +4,7 @@ describe UsersController do
 	describe 'routing' do
 
 		it 'routes to #index' do
-			get('/api/user').should route_to('users#index')
+			get('/api/user/1').should route_to('users#index', id: '1')
 		end
 
 		it 'routes to #registration' do
@@ -24,19 +24,19 @@ describe UsersController do
 		end
 
 		it 'routes to #update' do
-			post('/api/user').should route_to('users#update')
+			post('/api/user/1').should route_to('users#update', id: '1')
 		end
 
 		it 'routes to #delete' do
-			delete('/api/user').should route_to('users#delete')
+			delete('/api/user/1').should route_to('users#delete', id: '1')
 		end
 
 		it 'routes to #interests_add' do
-			put('/api/user/interests').should route_to('users#interests_add')
+			put('/api/user/1/interests').should route_to('users#interests_add', id: '1')
 		end
 
 		it 'routes to #interests_delete' do
-			delete('/api/user/interests').should route_to('users#interests_delete')
+			delete('/api/user/1/interests').should route_to('users#interests_delete', id: '1')
 		end
 	end
 end
