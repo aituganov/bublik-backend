@@ -63,11 +63,8 @@ class UsersController < ApplicationController
 	end
 
 	def delete
-		if @user.destroy
-			render_event :ok
-		else
-			render_error :bad_request, @user.errors
-		end
+		@user.destroy
+		render_event :ok
 	end
 
 	def interests_add
@@ -97,7 +94,6 @@ class UsersController < ApplicationController
 			head :not_found
 		elsif @user.nil?
 			@is_self = false
-			res = false
 		else
 			@is_self = @user.id == user_params[:id].to_i
 			res = true

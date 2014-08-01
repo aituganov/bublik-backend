@@ -31,11 +31,8 @@ class CompaniesController < ApplicationController
 	end
 
 	def delete
-		if @company.destroy
-			render_event :ok
-		else
-			render_error :bad_request, 'Company already deleted'
-		end
+		@company.destroy
+		render_event :ok
 	end
 
 	def tags_add

@@ -12,12 +12,8 @@ class Company < ActiveRecord::Base
 	def self.get_data(id)
 		begin
 			company = Company.find(id)
-			if company.is_deleted
-				res = {is_deleted: company.is_deleted}
-			else
-				# TODO: tags
-				res = {id: company.id, title: company.title, slogan: company.slogan, tags: [], description: company.description, rating: company.rating}
-			end
+			# TODO: tags
+			res = {id: company.id, title: company.title, slogan: company.slogan, tags: [], description: company.description, rating: company.rating}
 		rescue ActiveRecord::RecordNotFound => e
 			res = nil
 		end
