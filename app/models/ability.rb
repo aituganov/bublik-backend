@@ -32,6 +32,10 @@ class Ability
 		can :rud, User, :id => user.id
 		can :read, User
 
+		if !user.id.nil?
+			can :create, Company, :id => nil
+		end
+
 		can :rud, Company, :owner_id => user.id
 		can :read, Company
 	end

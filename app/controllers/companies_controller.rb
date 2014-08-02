@@ -2,8 +2,7 @@ include CompaniesHelper
 include ApplicationHelper
 
 class CompaniesController < ApplicationController
-	before_filter :get_user, except: [:get]
-	before_filter :check_privileges, except: [:get, :registration]
+	before_filter :check_updated, except: [:get, :registration]
 
 	def get
 		id = company_params[:id]
@@ -14,7 +13,9 @@ class CompaniesController < ApplicationController
 	end
 
 	def registration
-		company = Company.new company_params.merge({owner: @user})
+		return unless check_privileges access_token, :create, Company.new
+
+		company = Company.new company_params.merge({owner: get_user_by_access_token(access_token)})
 		if company.save(company_params)
 			render_event :created, {id: company.id}
 		else
@@ -23,21 +24,26 @@ class CompaniesController < ApplicationController
 	end
 
 	def update
-		if @company.update(company_params)
+		return unless check_privileges access_token, :update, company
+
+		if company.update(company_params)
 			render_event :ok
 		else
-			render_error :bad_request, @company.errors
+			render_error :bad_request, company.errors
 		end
 	end
 
 	def delete
-		@company.destroy
+		return unless check_privileges access_token, :destroy, company
+
+		company.destroy
 		render_event :ok
 	end
 
 	def tags_add
+		return unless check_privileges access_token, :update, company
 		begin
-			@company.tags_add tags
+			company.tags_add tags
 			render_event :created
 		rescue ActionController::ParameterMissing => e
 			render_error :bad_request
@@ -45,8 +51,9 @@ class CompaniesController < ApplicationController
 	end
 
 	def tags_delete
+		return unless check_privileges access_token, :update, company
 		begin
-			@company.tags_delete tags
+			company.tags_delete tags
 			render_event :ok
 		rescue ActionController::ParameterMissing => e
 			render_error :bad_request
@@ -63,19 +70,18 @@ class CompaniesController < ApplicationController
 		params.require(:tags)
 	end
 
-	def get_user
-		@user = get_user_by_access_token get_access_token(cookies)
-		render_error :not_found, 'User not found' if @user.nil?
+	def check_updated
+		unless Company.where(id: company_params[:id]).present?
+			render_error :not_found, "Company ##{company_params[:id]} isn't founded"
+		end
 	end
 
-	def check_privileges
-		company_id = company_params[:id]
-		begin
-			@company = Company.find(company_id)
-			render_error :not_acceptable, 'Action isn\'t acceptable for this user' unless @company.owner.id == @user.id
-		rescue ActiveRecord::RecordNotFound => e
-			render_error :not_found, "Company #{company_id} not found"
-		end
+	def company
+		Company.find(company_params[:id])
+	end
+
+	def access_token
+		get_access_token cookies
 	end
 
 end

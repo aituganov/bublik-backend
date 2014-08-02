@@ -30,25 +30,24 @@ module ApplicationHelper
 
 	def check_privileges(access_token, action, requested, render_er=true)
 		requester = get_user_by_access_token(access_token) || User.new # invalid token or new user
-
 		logger.info "Check privileges for #{requester.class} ##{requester.id} to #{action} #{requested.class} ##{requested.id}..."
-		@ability ||= Ability.new requester
+		ability = Ability.new requester
 		res = true
 
-		unless @ability.can? action, requested
+		unless ability.can? action, requested
 			render_error :forbidden if render_er
 			res = false
 		end
-		logger.info 'ok' if res
 		res
 	end
 
 	def build_privileges(access_token, requested_objects)
-		if @ability.nil?
-			@ability = Ability.new get_user_by_access_token access_token
-		end
-
-		@ability.build_privileges Array(requested_objects)
+		requester = get_user_by_access_token(access_token) || User.new # invalid token or new user
+		ability = Ability.new requester
+		logger.info "Build privileges for #{requester.class} ##{requester.id}..."
+		rs = ability.build_privileges Array(requested_objects)
+		logger.info "Builded: #{rs.to_json}"
+		rs
 	end
 
 end
