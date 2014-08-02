@@ -37,14 +37,14 @@ class Ability
 	end
 
 	def build_privileges(requested_objects)
-		privileges = {'actions' => {}}
+		privileges = {:actions => {}}
 
 		requested_objects.each do |requested|
 			actions = []
 			get_actions.each do |action|
 				actions.push action.to_s if can? action, requested
 			end
-			privileges['actions'][requested.class.name.downcase] = actions
+			privileges[:actions][requested.class.name.downcase.to_sym] = actions
 		end
 
 		privileges
