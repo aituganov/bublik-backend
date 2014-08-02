@@ -64,7 +64,7 @@ class CompaniesController < ApplicationController
 	end
 
 	def get_user
-		@user = get_user_by_access_token cookies
+		@user = get_user_by_access_token get_access_token(cookies)
 		render_error :not_found, 'User not found' if @user.nil?
 	end
 

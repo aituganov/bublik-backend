@@ -18,9 +18,8 @@ class User < ActiveRecord::Base
 		@@RS_DATA
 	end
 
-	def get_data(rs_data, requester_is_self=nil)
+	def get_data(rs_data)
 		rs = {}
-		rs[:actions] = {} unless requester_is_self.nil?
 
 		if rs_data[@@RS_DATA[:FULL]]
 			put_main_data rs
@@ -31,18 +30,11 @@ class User < ActiveRecord::Base
 		elsif rs_data[@@RS_DATA[:AVATAR]]
 			put_avatar_data rs
 		end
-		put_actions rs[:actions], requester_is_self
 		rs
 	end
 
 	def get_menu
 		{user_id: self.id, menu: %w(companies)}
-	end
-
-	def put_actions(rs_actions, requester_is_self)
-		return if rs_actions.nil?
-
-		rs_actions[:user] = requester_is_self ? %w(read, update, delete) : %w(read)
 	end
 
 	def put_main_data(rs)

@@ -3,7 +3,8 @@ include ApplicationHelper
 class MenuController < ApplicationController
 
 	def get
-		user = get_user_by_access_token cookies
+		token = get_access_token cookies
+		user = get_user_by_access_token token
 		if get_access_token(cookies).nil?
 			render_event :ok, {anonymous: true, menu: []}
 		elsif user.nil?

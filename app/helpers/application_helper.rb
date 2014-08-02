@@ -24,8 +24,31 @@ module ApplicationHelper
 		cookies[:ACCESS_TOKEN]
 	end
 
-	def get_user_by_access_token(cookies)
-		User.where(access_token: get_access_token(cookies)).take
+	def get_user_by_access_token(access_token)
+		User.where(access_token: access_token).take
+	end
+
+	def check_privileges(access_token, action, requested, render_er=true)
+		requester = get_user_by_access_token(access_token) || User.new # invalid token or new user
+
+		logger.info "Check privileges for #{requester.class} ##{requester.id} to #{action} #{requested.class} ##{requested.id}..."
+		@ability ||= Ability.new requester
+		res = true
+
+		unless @ability.can? action, requested
+			render_error :forbidden if render_er
+			res = false
+		end
+		logger.info 'ok' if res
+		res
+	end
+
+	def build_privileges(access_token, requested_objects)
+		if @ability.nil?
+			@ability = Ability.new get_user_by_access_token access_token
+		end
+
+		@ability.build_privileges Array(requested_objects)
 	end
 
 end

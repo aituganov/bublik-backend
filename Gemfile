@@ -71,3 +71,6 @@ gem 'paranoia', '~> 2.0'
 
 # Use foreigner for foreign_key
 gem 'foreigner'
+
+# Use cancan for permissions check
+gem 'cancancan', '~> 1.9'
