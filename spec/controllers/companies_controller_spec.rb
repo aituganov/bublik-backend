@@ -10,16 +10,16 @@ describe CompaniesController do
 	end
 
 	context 'company registration' do
-		it 'has 404 error for empty access token & empty data' do
+		it 'has 403 error for empty access token & empty data' do
 			request.cookies[:ACCESS_TOKEN] = ''
 			put :registration
-			response.status.should eq 404
+			response.status.should eq 403
 		end
 
-		it 'has 404 error for empty access token & correct data' do
+		it 'has 403 error for empty access token & correct data' do
 			request.cookies[:ACCESS_TOKEN] = ''
 			put :registration, @company_data
-			response.status.should eq 404
+			response.status.should eq 403
 		end
 
 		it 'has 400 error for correct access token & empty data' do
@@ -37,32 +37,33 @@ describe CompaniesController do
 	context 'change company' do
 		before :each do
 			put :registration, @company_data
+			response.status.should eq 201
 			@created_company = Company.find(JSON.parse(response.body)['data']['id'])
 		end
 
 		context 'update company' do
-			it 'has 404 for empty access token & empty data' do
+			it 'has 403 for empty access token & empty data' do
 				request.cookies[:ACCESS_TOKEN] = ''
 				post :update, {id: @created_company.id}
-				response.status.should eq 404
+				response.status.should eq 403
 			end
 
-			it 'has 404 for empty access token & empty data' do
+			it 'has 403 for empty access token & empty data' do
 				request.cookies[:ACCESS_TOKEN] = ''
 				post :update, {id: @created_company.id}
-				response.status.should eq 404
+				response.status.should eq 403
 			end
 
-			it 'has 404 error for empty access token & correct data' do
+			it 'has 403 error for empty access token & correct data' do
 				request.cookies[:ACCESS_TOKEN] = ''
 				post :update, {id: @created_company.id, title: 'New title'}
-				response.status.should eq 404
+				response.status.should eq 403
 			end
 
-			it 'has 406 for not owner' do
+			it 'has 403 for not owner' do
 				request.cookies[:ACCESS_TOKEN] = FactoryGirl.create(:user_second).access_token
 				post :update, {id: @created_company.id}
-				response.status.should eq 406
+				response.status.should eq 403
 			end
 
 			it 'has 404 for unexisted' do
@@ -96,6 +97,12 @@ describe CompaniesController do
 				response.status.should eq 400
 			end
 
+			it 'has 403 for not owner update with unexisted tags' do
+				request.cookies[:ACCESS_TOKEN] = FactoryGirl.create(:user_second).access_token
+				post :update, id: @created_company.id, tags: ['first tag', 'second_tag']
+				response.status.should eq 403
+			end
+
 			it 'should 201 for update with unexisted tags' do
 				put :tags_add, id: @created_company.id, tags: ['first tag', 'second_tag']
 				response.status.should eq 201
@@ -111,6 +118,12 @@ describe CompaniesController do
 			it 'should 400 for delete with empty tags' do
 				delete :tags_delete, id: @created_company.id
 				response.status.should eq 400
+			end
+
+			it 'has 403 for not owner delete with unexisted tags' do
+				request.cookies[:ACCESS_TOKEN] = FactoryGirl.create(:user_second).access_token
+				post :update, id: @created_company.id, tags: ['first tag', 'second_tag']
+				response.status.should eq 403
 			end
 
 			it 'should 201 for delete with unexisted tags' do
@@ -139,16 +152,16 @@ describe CompaniesController do
 		end
 
 		context 'delete company' do
-			it 'has 404 for empty access token' do
+			it 'has 403 for empty access token' do
 				request.cookies[:ACCESS_TOKEN] = ''
 				delete :delete, {id: @created_company.id}
-				response.status.should eq 404
+				response.status.should eq 403
 			end
 
-			it 'has 406 for not owner' do
+			it 'has 403 for not owner' do
 				request.cookies[:ACCESS_TOKEN] = FactoryGirl.create(:user_second).access_token
 				delete :delete, {id: @created_company.id}
-				response.status.should eq 406
+				response.status.should eq 403
 			end
 
 			it 'has 404 for unexisted' do

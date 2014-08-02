@@ -75,8 +75,12 @@ describe UsersController do
 		before :each do
 			@correct_user.save
 			@id_structure = {id: @correct_user.id}
-			@id_wrong_structure = {id: @correct_user.id + 1}
+			@id_wrong_structure = {id: @correct_user.id - 1}
 			request.cookies[:ACCESS_TOKEN] = @correct_user.access_token
+
+			@new_user = FactoryGirl.create(:user_second)
+			@new_user.should be_valid
+			@id_new_user_structure = {id: @new_user.id}
 		end
 
 		context 'info' do
@@ -102,6 +106,18 @@ describe UsersController do
 			it 'existed user has a info for anonymous user' do
 				request.cookies[:ACCESS_TOKEN] = ''
 				get :index, @id_structure
+				response.status.should eq 200
+
+				actions = JSON.parse(response.body)['data']['actions']
+				actions.should_not be_nil
+				user_actions = actions['user']
+				user_actions.should_not be_nil
+				user_actions.should have(1).item
+				user_actions[0].should eq 'read'
+			end
+
+			it 'existed user has a info for another user' do
+				get :index, @id_new_user_structure
 				response.status.should eq 200
 
 				actions = JSON.parse(response.body)['data']['actions']
@@ -140,19 +156,24 @@ describe UsersController do
 		end
 
 		context 'update' do
-			it 'invalid user access token has 404' do
+			it 'invalid user access token has 403' do
 				request.cookies[:ACCESS_TOKEN] = @invalid_access_token
-				post :update, {id: @correct_user.id}
+				post :update, @id_structure
+				response.status.should eq 403
+			end
+
+			it 'invalid user id has 404' do
+				post :update, @id_wrong_structure
 				response.status.should eq 404
 			end
 
-			it 'invalid user id has 403' do
-				post :update, {id: @correct_user.id + 1}
+			it 'user update another user has 403' do
+				post :update, @id_new_user_structure
 				response.status.should eq 403
 			end
 
 			it 'user update empty data has 200' do
-				post :update, {id: @correct_user.id}
+				post :update, @id_structure
 				response.status.should eq 200
 			end
 
@@ -180,12 +201,17 @@ describe UsersController do
 			end
 
 			it 'should 400 for update with empty interests' do
-				put :interests_add, {id: @correct_user.id}
+				put :interests_add, @id_structure
 				response.status.should eq 400
 			end
 
-			it 'should 403 for update with empty interests & invalid user id' do
-				put :interests_add, {id: @correct_user.id + 1}
+			it 'should 404 for update with empty interests & invalid user id' do
+				put :interests_add, @id_wrong_structure
+				response.status.should eq 404
+			end
+
+			it 'should 403 for update with another user' do
+				put :interests_add, {id: @new_user.id, interests: ['first tag', 'second_tag']}
 				response.status.should eq 403
 			end
 
@@ -204,13 +230,20 @@ describe UsersController do
 			end
 
 			it 'should 400 for delete with empty interests' do
-				delete :interests_delete, {id: @correct_user.id}
+				delete :interests_delete, @id_structure
 				response.status.should eq 400
 			end
 
-			it 'should 403 for delete with empty interests & invalid user id' do
-				delete :interests_delete, {id: @correct_user.id + 1}
+			it 'should 404 for delete with empty interests & invalid user id' do
+				delete :interests_delete, @id_wrong_structure
+				response.status.should eq 404
+			end
+
+			it 'should 403 for delete with another user' do
+				delete :interests_delete, {id: @new_user.id, interests: ['first tag', 'second_tag']}
 				response.status.should eq 403
+				@correct_user.reload
+				@correct_user.interests.should have(0).item
 			end
 
 			it 'should 201 for delete with unexisted interests' do
@@ -263,31 +296,37 @@ describe UsersController do
 		end
 
 		context 'delete' do
-			it 'invalid user access_token has 404' do
+			it 'invalid user access_token has 403' do
 				request.cookies[:ACCESS_TOKEN] = ''
-				delete :delete, {id: @correct_user.id}
-				response.status.should eq 404
-			end
-
-			it 'invalid user id has 403' do
-				delete :delete, {id: @correct_user.id + 1}
+				delete :delete, @id_structure
 				response.status.should eq 403
 			end
 
+			it 'another user has 403' do
+				request.cookies[:ACCESS_TOKEN] = ''
+				delete :delete, @id_new_user_structure
+				response.status.should eq 403
+			end
+
+			it 'invalid user id has 404' do
+				delete :delete, @id_wrong_structure
+				response.status.should eq 404
+			end
+
 			it 'valid user access_token marked object as deleted' do
-				delete :delete, {id: @correct_user.id}
+				delete :delete, @id_structure
 				response.status.should eq 200
 				@correct_user.reload
 				@correct_user.is_deleted.should be_true
 			end
 
 			it 'second delete has 400' do
-				delete :delete, {id: @correct_user.id}
+				delete :delete, @id_structure
 				response.status.should eq 200
 				@correct_user.reload
 				@correct_user.is_deleted.should be_true
 
-				delete :delete, {id: @correct_user.id}
+				delete :delete, @id_structure
 				response.status.should eq 404
 			end
 		end

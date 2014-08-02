@@ -2,18 +2,11 @@ class UsersController < ApplicationController
 	include ApplicationHelper
 	include UsersHelper
 	skip_before_filter :verify_authenticity_token
-	before_filter :check_privileges, only: [:update, :interests_add, :interests_delete, :delete]
+	before_filter :check_updated, only: [:index, :update, :delete, :interests_add, :interests_delete]
 
 	def index
-		# check self
-		get_user(false)
-
-		begin
-			@requested_user = User.find(user_params[:id])
-			render_event :ok, @requested_user.get_data({User.RS_DATA[:FULL] => true}, @is_self)
-		rescue  ActiveRecord::RecordNotFound => e
-			render_error :not_found
-		end
+		rs = rq_user.get_data({User.RS_DATA[:FULL] => true})
+		render_event :ok, rs.merge(build_privileges access_token, rq_user)
 	end
 
 	def registration
@@ -45,31 +38,34 @@ class UsersController < ApplicationController
 
 	def update
 		rs_data = {}
+		return unless check_privileges access_token, :update, rq_user
 
 		unless params[:avatar].nil?
 			unless avatar[:data].nil?
-				@user.avatar = avatar[:data]
+				rq_user.avatar = avatar[:data]
 			else
 				#do crop
 			end
 			rs_data[User.RS_DATA[:AVATAR]] = true
 		end
 
-		if @user.update(user_params)
-			render_event :ok, @user.get_data(rs_data)
+		if rq_user.update(user_params)
+			render_event :ok, rq_user.get_data(rs_data)
 		else
-			render_error :bad_request, @user.errors
+			render_error :bad_request, rq_user.errors
 		end
 	end
 
 	def delete
-		@user.destroy
+		return unless check_privileges access_token, :destroy, rq_user
+		rq_user.destroy
 		render_event :ok
 	end
 
 	def interests_add
+		return unless check_privileges access_token, :update, rq_user
 		begin
-			@user.interests_add interests
+			rq_user.interests_add interests
 			render_event :created
 		rescue ActionController::ParameterMissing => e
 			render_error :bad_request
@@ -77,8 +73,9 @@ class UsersController < ApplicationController
 	end
 
 	def interests_delete
+		return unless check_privileges access_token, :update, rq_user
 		begin
-			@user.interests_delete interests
+			rq_user.interests_delete interests
 			render_event :ok
 		rescue ActionController::ParameterMissing => e
 			render_error :bad_request
@@ -86,33 +83,6 @@ class UsersController < ApplicationController
 	end
 
 	private
-
-	def get_user(generate_error=true)
-		res = false
-		@user = get_user_by_access_token cookies
-		if @user.nil? && generate_error
-			head :not_found
-		elsif @user.nil?
-			@is_self = false
-		else
-			@is_self = @user.id == user_params[:id].to_i
-			res = true
-		end
-		res
-	end
-
-	def check_privileges
-		res = false
-
-		return res unless get_user
-
-		if !@is_self
-			head :forbidden
-		else
-			res = true
-		end
-		res
-	end
 
 	def user_params
 		params.permit(:id, :login, :password, :last_name, :first_name)
@@ -124,6 +94,20 @@ class UsersController < ApplicationController
 
 	def avatar
 		params.require(:avatar).permit(:data, :crop)
+	end
+
+	def check_updated
+		unless User.where(id: user_params[:id]).present?
+			render_error :not_found, "User ##{user_params[:id]} isn't founded"
+		end
+	end
+
+	def access_token
+		@access_token ||= get_access_token cookies
+	end
+
+	def rq_user
+		@rq_user ||= User.find(user_params[:id])
 	end
 
 end
