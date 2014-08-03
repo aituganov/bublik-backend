@@ -95,12 +95,13 @@ describe UsersController do
 				get :index, @id_structure
 				response.status.should eq 200
 
-				actions = JSON.parse(response.body)['data']['actions']
-				actions.should_not be_nil
-				user_actions = actions['user']
+				user_actions = JSON.parse(response.body)['data']['actions']
 				user_actions.should_not be_nil
-				user_actions.should have(1).item
-				user_actions[0].should eq 'read'
+				user_actions.should have(4).item
+				user_actions['create'].should be_false
+				user_actions['read'].should be_true
+				user_actions['update'].should be_false
+				user_actions['destroy'].should be_false
 			end
 
 			it 'existed user has a info for anonymous user' do
@@ -108,24 +109,26 @@ describe UsersController do
 				get :index, @id_structure
 				response.status.should eq 200
 
-				actions = JSON.parse(response.body)['data']['actions']
-				actions.should_not be_nil
-				user_actions = actions['user']
+				user_actions = JSON.parse(response.body)['data']['actions']
 				user_actions.should_not be_nil
-				user_actions.should have(1).item
-				user_actions[0].should eq 'read'
+				user_actions.should have(4).item
+				user_actions['create'].should be_false
+				user_actions['read'].should be_true
+				user_actions['update'].should be_false
+				user_actions['destroy'].should be_false
 			end
 
 			it 'existed user has a info for another user' do
 				get :index, @id_new_user_structure
 				response.status.should eq 200
 
-				actions = JSON.parse(response.body)['data']['actions']
-				actions.should_not be_nil
-				user_actions = actions['user']
+				user_actions = JSON.parse(response.body)['data']['actions']
 				user_actions.should_not be_nil
-				user_actions.should have(1).item
-				user_actions[0].should eq 'read'
+				user_actions.should have(4).item
+				user_actions['create'].should be_false
+				user_actions['read'].should be_true
+				user_actions['update'].should be_false
+				user_actions['destroy'].should be_false
 			end
 
 			it 'unexisted user has a 404 response status code for registered' do
@@ -147,11 +150,13 @@ describe UsersController do
 				rs_user_data['last_name'].should eq @correct_user.last_name
 				rs_user_data['is_deleted'].should eq @correct_user.is_deleted
 
-				actions = rs_user_data['actions']
-				actions.should_not be_nil
-				user_actions = actions['user']
+				user_actions = rs_user_data['actions']
 				user_actions.should_not be_nil
-				user_actions.should have(3).item
+				user_actions.should have(4).item
+				user_actions['create'].should be_false
+				user_actions['read'].should be_true
+				user_actions['update'].should be_true
+				user_actions['destroy'].should be_true
 			end
 		end
 
