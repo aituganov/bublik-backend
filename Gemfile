@@ -51,7 +51,7 @@ group :development, :test do
 	gem 'factory_girl_rails'
 	gem 'database_cleaner'
 	# Use code coverage
-	gem 'simplecov', :require => false, :group => :test
+	gem 'simplecov'
 	gem 'simplecov-teamcity-summary'
 end
 

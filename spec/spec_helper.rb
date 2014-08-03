@@ -7,12 +7,13 @@ require 'simplecov'
 
 # Simplecov for Teamcity
 begin
-	SimpleCov.start do
+	SimpleCov.start 'teamcity' do
 		at_exit do
 			SimpleCov::Formatter::TeamcitySummaryFormatter.new.format(SimpleCov.result) if ENV['TEAMCITY_VERSION']
 		end
 	end
 rescue Exception => e
+	warn e.message
 	warn 'Simplecov disabled'
 end
 
