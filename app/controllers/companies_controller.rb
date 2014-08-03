@@ -3,12 +3,13 @@ include AppUtils
 include CompaniesHelper
 
 class CompaniesController < ApplicationController
-	before_filter :check_updated, except: [:get, :registration]
+	before_filter :check_updated, except: [:index, :registration]
 
-	def get
+	def index
 		id = company_params[:id]
 		begin
-			company = Company.get_data(id) || get_fake_company(id)
+			# TODO: refactor without fakes
+			company = Company.get_data(id, {access_token: access_token}) || get_fake_company(id)
 		end
 		render_event :ok, company
 	end

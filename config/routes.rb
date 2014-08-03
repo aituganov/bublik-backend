@@ -70,6 +70,7 @@ Rails.application.routes.draw do
 		# Route users
 		scope :path => 'user' do
 			get ':id' => 'users#index'
+			get ':id/created_companies' => 'users#created_companies'
 			match 'new' => 'users#registration', via: [:put]
 			match 'login' => 'users#login', via: [:put]
 			get 'login/check/:login' => 'users#check_login', constraints: { login: /.*/ }
@@ -82,7 +83,7 @@ Rails.application.routes.draw do
 		# Route companies
 		scope :path => 'company' do
 			match 'new' => 'companies#registration', via: [:put]
-			get ':id' => 'companies#get'
+			get ':id' => 'companies#index'
 			post ':id' => 'companies#update'
 			match ':id' => 'companies#delete' , via: [:delete]
 			match ':id/tags' => 'companies#tags_add', via: [:put]

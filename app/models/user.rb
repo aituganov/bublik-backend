@@ -1,3 +1,4 @@
+include AppUtils
 extend SecureRandom
 
 class User < ActiveRecord::Base
@@ -12,23 +13,31 @@ class User < ActiveRecord::Base
 
 	before_validation :generate_access_token, on: :create
 
-	@@RS_DATA = {:FULL => 'full', :INTERESTS => 'interests', :AVATAR => 'avatar'}
+#	attr_accessor :id, :first_name, :last_name, :is_deleted
+
+	@@RS_DATA = {FULL: 'full', PRIVILEGES: 'privileges', INTERESTS: 'interests', AVATAR: 'avatar', CREATED_COMPANIES: 'created_companies'}
 
 	def self.RS_DATA
 		@@RS_DATA
 	end
 
-	def get_data(rs_data)
+	def build_response(rs_data, options={})
 		rs = {}
 
 		if rs_data[@@RS_DATA[:FULL]]
 			put_main_data rs
 			put_interests_data rs
 			put_avatar_data rs
+			put_privileges_data rs, self, options[:access_token]
+			put_created_company_data rs, options
+		elsif rs_data[@@RS_DATA[:PRIVILEGES]]
+			put_privileges_data rs, self, options.access_token
 		elsif rs_data[@@RS_DATA[:INTERESTS]]
 			put_interests_data rs
 		elsif rs_data[@@RS_DATA[:AVATAR]]
 			put_avatar_data rs
+		elsif rs_data[@@RS_DATA[:CREATED_COMPANIES]]
+			put_created_company_data rs, options
 		end
 		rs
 	end
@@ -46,11 +55,25 @@ class User < ActiveRecord::Base
 	end
 
 	def put_interests_data(rs)
-		rs[:interests] = self.interest_list
+		rs[@@RS_DATA[:INTERESTS]] = self.interest_list
 	end
 
 	def put_avatar_data(rs)
 		rs[:avatar_url] = self.avatar.url
+	end
+
+	def put_created_company_data(rs, options)
+		rs[@@RS_DATA[:CREATED_COMPANIES]] = []
+		get_created_companies(options[:limit] || 6, options[:offset] || 0).each do |company|
+			rs[@@RS_DATA[:CREATED_COMPANIES]].push (company.build_response Company.RS_DATA[:FULL], options)
+		end
+	end
+
+	def get_created_companies(limit, offset)
+		logger.info "Finding created companies for user ##{self.id}, limit = #{limit}, offset = #{offset}..."
+		res = Company.where(owner_id: self.id).limit(limit).offset(offset)
+		logger.info "#{res.count} finded!"
+		res
 	end
 
 	def interests_add interests

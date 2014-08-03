@@ -4,11 +4,14 @@ include UsersHelper
 
 class UsersController < ApplicationController
 	skip_before_filter :verify_authenticity_token
-	before_filter :check_updated, only: [:index, :update, :delete, :interests_add, :interests_delete]
+	before_filter :check_updated, only: [:index, :created_companies, :update, :delete, :interests_add, :interests_delete]
 
 	def index
-		rs = rq_user.get_data({User.RS_DATA[:FULL] => true})
-		render_event :ok, rs.merge(build_privileges access_token, rq_user)
+		render_event :ok, rq_user.build_response({User.RS_DATA[:FULL] => true}, {access_token: access_token, limit: user_params[:company_limit]})
+	end
+
+	def created_companies
+		render_event :ok, rq_user.build_response({User.RS_DATA[:CREATED_COMPANIES] => true}, {access_token: access_token, offset: user_params[:company_offset], limit: user_params[:company_limit]})
 	end
 
 	def registration
@@ -52,7 +55,7 @@ class UsersController < ApplicationController
 		end
 
 		if rq_user.update(user_params)
-			render_event :ok, rq_user.get_data(rs_data)
+			render_event :ok, rq_user.build_response(rs_data)
 		else
 			render_error :bad_request, rq_user.errors
 		end
@@ -87,7 +90,7 @@ class UsersController < ApplicationController
 	private
 
 	def user_params
-		params.permit(:id, :login, :password, :last_name, :first_name, :company_limit)
+		params.permit(:id, :login, :password, :last_name, :first_name, :company_limit, :company_offset)
 	end
 
 	def interests

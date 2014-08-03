@@ -41,12 +41,11 @@ class Ability
 	end
 
 	def build_privileges(requested_objects)
-		privileges = {actions: {}}
-		actions = privileges[:actions]
+		privileges = {}
 
 		requested_objects.each do |requested|
 			get_actions.each do |action|
-				actions[action] = can? action, requested
+				privileges[action] = can? action, requested
 			end
 		end
 		privileges

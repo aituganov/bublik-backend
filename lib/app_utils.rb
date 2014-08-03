@@ -28,4 +28,8 @@ module AppUtils
 		logger.info "Builded: #{rs.to_json}"
 		rs
 	end
+
+	def put_privileges_data(rs, object, access_token)
+		rs[:actions] = build_privileges access_token, object
+	end
 end
