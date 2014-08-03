@@ -14,8 +14,8 @@ supported requests:
 
 * User actions
 
-        /user/:id - GET user information request. For registered users request cookies must contain ACCESS_TOKEN value. If token is undefined, response contain information for anonymous user
-        /user/:id/created_company - GET user created companies. For registered users request cookies must contain ACCESS_TOKEN value.
+        /user/:id?company_limit=:limit - GET user information request. For registered users request cookies must contain ACCESS_TOKEN value. If token is undefined, response contain information for anonymous user. Params: :id - user ID, :limit - limit for user companies count in response data
+        /user/:id/created_company?company_limit=:limit&company_offset=:offset - GET user created companies. For registered users request cookies must contain ACCESS_TOKEN value. Params: :id - see above, :limit - see above, :offset - user created companies offset
         /user/new - PUT request for user registration, JSON params {login, password, first_name, last_name}. Response contain access_token for created user
         /user/login - PUT request for user login, JSON params {login, password}. Response contain access_token for created user
         /user/login/check/:login - GET request for login available checking where query string parameter :login - user login for check. Response code 200 for available login and 201 if login already existed
