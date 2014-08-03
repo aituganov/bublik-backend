@@ -149,6 +149,7 @@ describe UsersController do
 				rs_user_data['first_name'].should eq @correct_user.first_name
 				rs_user_data['last_name'].should eq @correct_user.last_name
 				rs_user_data['is_deleted'].should eq @correct_user.is_deleted
+				rs_user_data['interests'].should eq @correct_user.interest_list
 
 				user_actions = rs_user_data['actions']
 				user_actions.should_not be_nil
@@ -157,6 +158,95 @@ describe UsersController do
 				user_actions['read'].should be_true
 				user_actions['update'].should be_true
 				user_actions['destroy'].should be_true
+			end
+
+			it 'registered user info has correct interests data' do
+				@correct_user.interest_list.add %w(first second)
+				@correct_user.reload
+
+				get :index, @id_structure
+				response.status.should eq 200
+				rs_user_data = JSON.parse(response.body)['data']
+				rs_user_data['interests'].should eq @correct_user.interest_list
+			end
+
+			it 'registered user info has correct created companies data' do
+				@created_company = FactoryGirl.create(:company, owner: @correct_user)
+				@created_company.should be_valid
+
+				get :index, @id_structure
+				response.status.should eq 200
+				rs_user_data = JSON.parse(response.body)['data']
+				companies_data = rs_user_data['created_companies']
+				companies_data.should_not be_nil
+				companies_data.should have(1).item
+				company_data = companies_data[0]
+				company_data['id'] = @created_company.id
+			end
+
+			it 'registered user info has correct default company limit' do
+				7.times {company = FactoryGirl.create(:company, owner: @correct_user); company.should be_valid}
+
+				get :index, @id_structure
+				response.status.should eq 200
+				rs_user_data = JSON.parse(response.body)['data']
+				companies_data = rs_user_data['created_companies']
+				companies_data.should_not be_nil
+				companies_data.should have(6).item
+			end
+
+			it 'registered user info has correct data for defined company limit' do
+				7.times {company = FactoryGirl.create(:company, owner: @correct_user); company.should be_valid}
+
+				get :index, @id_structure.merge({company_limit: 7})
+				response.status.should eq 200
+				rs_user_data = JSON.parse(response.body)['data']
+				companies_data = rs_user_data['created_companies']
+				companies_data.should_not be_nil
+				companies_data.should have(7).item
+			end
+
+			it 'unexist user created companies data has 404' do
+				@created_company = FactoryGirl.create(:company, owner: @correct_user)
+				@created_company.should be_valid
+
+				get :created_companies, @id_wrong_structure
+				response.status.should eq 404
+			end
+
+			it 'registered user has created companies data' do
+				@created_company = FactoryGirl.create(:company, owner: @correct_user)
+				@created_company.should be_valid
+
+				get :created_companies, @id_structure
+				response.status.should eq 200
+				rs_user_data = JSON.parse(response.body)['data']
+				companies_data = rs_user_data['created_companies']
+				companies_data.should_not be_nil
+				companies_data.should have(1).item
+				company_data = companies_data[0]
+				company_data['id'] = @created_company.id
+			end
+
+			it 'check created companies offset' do
+				companies = []
+				2.times {company = FactoryGirl.create(:company, owner: @correct_user); company.should be_valid; companies.push company}
+
+				get :created_companies, @id_structure.merge({company_limit: 1})
+				response.status.should eq 200
+				rs_user_data = JSON.parse(response.body)['data']
+				companies_data = rs_user_data['created_companies']
+				companies_data.should_not be_nil
+				companies_data.should have(1).item
+				companies_data[0]['id'] = companies[0]['id']
+
+				get :index, @id_structure.merge({company_limit: 1, company_offset: 1})
+				response.status.should eq 200
+				rs_user_data = JSON.parse(response.body)['data']
+				companies_data = rs_user_data['created_companies']
+				companies_data.should_not be_nil
+				companies_data.should have(1).item
+				companies_data[0]['id'] = companies[1]['id']
 			end
 		end
 

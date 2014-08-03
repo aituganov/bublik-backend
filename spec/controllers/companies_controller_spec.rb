@@ -34,200 +34,245 @@ describe CompaniesController do
 		end
 	end
 
-	context 'change company' do
+	context 'actions with company' do
 		before :each do
 			put :registration, @company_data
 			response.status.should eq 201
 			@created_company = Company.find(JSON.parse(response.body)['data']['id'])
+			@id_structure = {id: @created_company}
 		end
 
-		context 'update company' do
-			it 'has 403 for empty access token & empty data' do
-				request.cookies[:ACCESS_TOKEN] = ''
-				post :update, {id: @created_company.id}
-				response.status.should eq 403
+		context 'change company' do
+			context 'update company' do
+				it 'has 403 for empty access token & empty data' do
+					request.cookies[:ACCESS_TOKEN] = ''
+					post :update, @id_structure
+					response.status.should eq 403
+				end
+
+				it 'has 403 for empty access token & empty data' do
+					request.cookies[:ACCESS_TOKEN] = ''
+					post :update, @id_structure
+					response.status.should eq 403
+				end
+
+				it 'has 403 error for empty access token & correct data' do
+					request.cookies[:ACCESS_TOKEN] = ''
+					post :update, {id: @created_company.id, title: 'New title'}
+					response.status.should eq 403
+				end
+
+				it 'has 403 for not owner' do
+					request.cookies[:ACCESS_TOKEN] = FactoryGirl.create(:user_second).access_token
+					post :update, @id_structure
+					response.status.should eq 403
+				end
+
+				it 'has 404 for unexisted' do
+					request.cookies[:ACCESS_TOKEN] = FactoryGirl.create(:user_second).access_token
+					post :update, {id: 1}
+					response.status.should eq 404
+				end
+
+				it 'has 400 for correct access token & illegal data' do
+					post :update, {id: @created_company.id, title: generate_random_string(51)}
+					response.status.should eq 400
+				end
+
+				it 'has 200 for correct access token & empty data' do
+					post :update, @id_structure
+					response.status.should eq 200
+				end
+
+				it 'has 200 for correct access token & correct data' do
+					company_second = FactoryGirl.build(:company_second).attributes
+					post :update, company_second.merge(@id_structure)
+					response.status.should eq 200
+					@created_company.reload
+					@created_company.title.should eq company_second['title']
+					@created_company.slogan.should eq company_second['slogan']
+					@created_company.description.should eq company_second['description']
+				end
+
+				it 'should 400 for update with empty tags' do
+					put :tags_add, @id_structure
+					response.status.should eq 400
+				end
+
+				it 'has 403 for not owner update with unexisted tags' do
+					request.cookies[:ACCESS_TOKEN] = FactoryGirl.create(:user_second).access_token
+					post :update, id: @created_company.id, tags: ['first tag', 'second_tag']
+					response.status.should eq 403
+				end
+
+				it 'should 201 for update with unexisted tags' do
+					put :tags_add, id: @created_company.id, tags: ['first tag', 'second_tag']
+					response.status.should eq 201
+					@created_company.tags.should have(2).item
+				end
+
+				it 'should 201 for update with duplicated tags' do
+					put :tags_add, id: @created_company.id, tags: ['first tag', 'first tag']
+					response.status.should eq 201
+					@created_company.tags.should have(1).item
+				end
+
+				it 'should 400 for delete with empty tags' do
+					delete :tags_delete, @id_structure
+					response.status.should eq 400
+				end
+
+				it 'has 403 for not owner delete with unexisted tags' do
+					request.cookies[:ACCESS_TOKEN] = FactoryGirl.create(:user_second).access_token
+					post :update, id: @created_company.id, tags: ['first tag', 'second_tag']
+					response.status.should eq 403
+				end
+
+				it 'should 201 for delete with unexisted tags' do
+					delete :tags_delete, id: @created_company.id, tags: ['first tag', 'second_tag']
+					response.status.should eq 200
+					@created_company.tags.should have(0).item
+				end
+
+				it 'should 201 for delete with existed tags' do
+					@created_company.tags_add ['first', 'second', 'third']
+					@created_company.tags.should have(3).item
+
+					delete :tags_delete, id: @created_company.id, tags: ['first', 'second']
+					response.status.should eq 200
+					@created_company.tags.should have(1).item
+				end
+
+				it 'should 201 for delete with duplicated tags' do
+					@created_company.tags_add ['first']
+					@created_company.tags.should have(1).item
+
+					delete :tags_delete, id: @created_company.id, tags: ['first', 'first']
+					response.status.should eq 200
+					@created_company.tags.should have(0).item
+				end
 			end
 
-			it 'has 403 for empty access token & empty data' do
-				request.cookies[:ACCESS_TOKEN] = ''
-				post :update, {id: @created_company.id}
-				response.status.should eq 403
-			end
+			context 'delete company' do
+				it 'has 403 for empty access token' do
+					request.cookies[:ACCESS_TOKEN] = ''
+					delete :delete, @id_structure
+					response.status.should eq 403
+				end
 
-			it 'has 403 error for empty access token & correct data' do
-				request.cookies[:ACCESS_TOKEN] = ''
-				post :update, {id: @created_company.id, title: 'New title'}
-				response.status.should eq 403
-			end
+				it 'has 403 for not owner' do
+					request.cookies[:ACCESS_TOKEN] = FactoryGirl.create(:user_second).access_token
+					delete :delete, @id_structure
+					response.status.should eq 403
+				end
 
-			it 'has 403 for not owner' do
-				request.cookies[:ACCESS_TOKEN] = FactoryGirl.create(:user_second).access_token
-				post :update, {id: @created_company.id}
-				response.status.should eq 403
-			end
+				it 'has 404 for unexisted' do
+					request.cookies[:ACCESS_TOKEN] = FactoryGirl.create(:user_second).access_token
+					delete :delete, {id: 1}
+					response.status.should eq 404
+				end
 
-			it 'has 404 for unexisted' do
-				request.cookies[:ACCESS_TOKEN] = FactoryGirl.create(:user_second).access_token
-				post :update, {id: 1}
-				response.status.should eq 404
-			end
+				it 'has 200 for correct access token' do
+					delete :delete, @id_structure
+					response.status.should eq 200
+					@created_company.reload
+					@created_company.is_deleted.should be_true
+				end
 
-			it 'has 400 for correct access token & illegal data' do
-				post :update, {id: @created_company.id, title: generate_random_string(51)}
-				response.status.should eq 400
-			end
+				it 'has 200 for correct access token' do
+					delete :delete, @id_structure
+					response.status.should eq 200
+					@created_company.reload
+					@created_company.is_deleted.should be_true
+				end
 
-			it 'has 200 for correct access token & empty data' do
-				post :update, {id: @created_company.id}
-				response.status.should eq 200
-			end
+				it 'has 400 for double delete' do
+					delete :delete, @id_structure
+					response.status.should eq 200
 
-			it 'has 200 for correct access token & correct data' do
-				company_second = FactoryGirl.build(:company_second).attributes
-				post :update, company_second.merge({id: @created_company.id})
-				response.status.should eq 200
-				@created_company.reload
-				@created_company.title.should eq company_second['title']
-				@created_company.slogan.should eq company_second['slogan']
-				@created_company.description.should eq company_second['description']
-			end
-
-			it 'should 400 for update with empty tags' do
-				put :tags_add, id: @created_company.id
-				response.status.should eq 400
-			end
-
-			it 'has 403 for not owner update with unexisted tags' do
-				request.cookies[:ACCESS_TOKEN] = FactoryGirl.create(:user_second).access_token
-				post :update, id: @created_company.id, tags: ['first tag', 'second_tag']
-				response.status.should eq 403
-			end
-
-			it 'should 201 for update with unexisted tags' do
-				put :tags_add, id: @created_company.id, tags: ['first tag', 'second_tag']
-				response.status.should eq 201
-				@created_company.tags.should have(2).item
-			end
-
-			it 'should 201 for update with duplicated tags' do
-				put :tags_add, id: @created_company.id, tags: ['first tag', 'first tag']
-				response.status.should eq 201
-				@created_company.tags.should have(1).item
-			end
-
-			it 'should 400 for delete with empty tags' do
-				delete :tags_delete, id: @created_company.id
-				response.status.should eq 400
-			end
-
-			it 'has 403 for not owner delete with unexisted tags' do
-				request.cookies[:ACCESS_TOKEN] = FactoryGirl.create(:user_second).access_token
-				post :update, id: @created_company.id, tags: ['first tag', 'second_tag']
-				response.status.should eq 403
-			end
-
-			it 'should 201 for delete with unexisted tags' do
-				delete :tags_delete, id: @created_company.id, tags: ['first tag', 'second_tag']
-				response.status.should eq 200
-				@created_company.tags.should have(0).item
-			end
-
-			it 'should 201 for delete with existed tags' do
-				@created_company.tags_add ['first', 'second', 'third']
-				@created_company.tags.should have(3).item
-
-				delete :tags_delete, id: @created_company.id, tags: ['first', 'second']
-				response.status.should eq 200
-				@created_company.tags.should have(1).item
-			end
-
-			it 'should 201 for delete with duplicated tags' do
-				@created_company.tags_add ['first']
-				@created_company.tags.should have(1).item
-
-				delete :tags_delete, id: @created_company.id, tags: ['first', 'first']
-				response.status.should eq 200
-				@created_company.tags.should have(0).item
+					delete :delete, @id_structure
+					response.status.should eq 404
+				end
 			end
 		end
 
-		context 'delete company' do
-			it 'has 403 for empty access token' do
+		context 'GET company info' do
+			it 'has a 200 response status code for not existed company' do
+				get :index, {id: 1}
+				response.status.should eq 200
+			end
+
+			it 'has a fake info for unexisted company' do
+				id = 1
+				get :index, {id: id}
+				response.status.should eq 200
+				rs_data = JSON.parse(response.body)['data']
+				rs_data['id'].to_i.should eq id
+				rs_data['is_fake'].should be_true
+			end
+
+			it 'has a correct info for existed company' do
+				put :registration, @id_structure
+				get :index, @id_structure
+				response.status.should eq 200
+				rs_data = JSON.parse(response.body)['data']
+				rs_data['id'].to_i.should eq @created_company.id
+				rs_data['title'].should eq @created_company.title
+				rs_data['slogan'].should eq @created_company.slogan
+				rs_data['rating'].should eq @created_company.rating
+				rs_data['description'].should eq @created_company.description
+				rs_data['tags'].should eq @created_company.tag_list
+			end
+
+			it 'has a correct actions for anonymous' do
 				request.cookies[:ACCESS_TOKEN] = ''
-				delete :delete, {id: @created_company.id}
-				response.status.should eq 403
+				get :index, @id_structure
+				response.status.should eq 200
+
+				company_actions = JSON.parse(response.body)['data']['actions']
+				company_actions.should_not be_nil
+				company_actions.should have(4).item
+				company_actions['create'].should be_false
+				company_actions['read'].should be_true
+				company_actions['update'].should be_false
+				company_actions['destroy'].should be_false
 			end
 
-			it 'has 403 for not owner' do
+			it 'has a correct actions for not owner' do
 				request.cookies[:ACCESS_TOKEN] = FactoryGirl.create(:user_second).access_token
-				delete :delete, {id: @created_company.id}
-				response.status.should eq 403
+				get :index, @id_structure
+				response.status.should eq 200
+
+				company_actions = JSON.parse(response.body)['data']['actions']
+				company_actions.should_not be_nil
+				company_actions.should have(4).item
+				company_actions['create'].should be_false
+				company_actions['read'].should be_true
+				company_actions['update'].should be_false
+				company_actions['destroy'].should be_false
 			end
 
-			it 'has 404 for unexisted' do
-				request.cookies[:ACCESS_TOKEN] = FactoryGirl.create(:user_second).access_token
-				delete :delete, {id: 1}
-				response.status.should eq 404
+			it 'has a correct actions for owner' do
+				get :index, @id_structure
+				response.status.should eq 200
+
+				company_actions = JSON.parse(response.body)['data']['actions']
+				company_actions.should_not be_nil
+				company_actions.should have(4).item
+				company_actions['create'].should be_false
+				company_actions['read'].should be_true
+				company_actions['update'].should be_true
+				company_actions['destroy'].should be_true
 			end
 
-			it 'has 200 for correct access token' do
+			it 'has a correct info for deleted company' do
+				put :registration, @company_data
+				@created_company = Company.find(JSON.parse(response.body)['data']['id'])
 				delete :delete, {id: @created_company.id}
 				response.status.should eq 200
 				@created_company.reload
 				@created_company.is_deleted.should be_true
 			end
-
-			it 'has 200 for correct access token' do
-				delete :delete, {id: @created_company.id}
-				response.status.should eq 200
-				@created_company.reload
-				@created_company.is_deleted.should be_true
-			end
-
-			it 'has 400 for double delete' do
-				delete :delete, {id: @created_company.id}
-				response.status.should eq 200
-
-				delete :delete, {id: @created_company.id}
-				response.status.should eq 404
-			end
-		end
-	end
-
-	context 'GET company info' do
-		it 'has a 200 response status code' do
-			get 'get', {id: 1}
-			response.status.should eq 200
-		end
-
-		it 'has a fake info for unexisted company' do
-			id = 1
-			get 'get', {id: id}
-			response.status.should eq 200
-			rs_data = JSON.parse(response.body)['data']
-			rs_data['id'].to_i.should eq id
-			rs_data['is_fake'].should be_true
-		end
-
-		it 'has a correct info for existed company' do
-			put :registration, @company_data
-			@created_company = Company.find(JSON.parse(response.body)['data']['id'])
-			get 'get', {id: @created_company.id}
-			response.status.should eq 200
-			rs_data = JSON.parse(response.body)['data']
-			rs_data['id'].to_i.should eq @created_company.id
-			rs_data['title'].should eq @created_company.title
-			rs_data['slogan'].should eq @created_company.slogan
-			rs_data['description'].should eq @created_company.description
-		end
-
-		it 'has a correct info for deleted company' do
-			put :registration, @company_data
-			@created_company = Company.find(JSON.parse(response.body)['data']['id'])
-			delete :delete, {id: @created_company.id}
-			response.status.should eq 200
-			@created_company.reload
-			@created_company.is_deleted.should be_true
 		end
 	end
 

@@ -7,7 +7,7 @@ describe CompaniesController do
 		end
 
 		it 'routes to #get' do
-			get('/api/company/1').should route_to('companies#get', id: '1')
+			get('/api/company/1').should route_to('companies#index', id: '1')
 		end
 
 		it 'routes to #update' do

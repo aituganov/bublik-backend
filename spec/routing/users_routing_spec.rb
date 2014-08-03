@@ -7,6 +7,10 @@ describe UsersController do
 			get('/api/user/1').should route_to('users#index', id: '1')
 		end
 
+		it 'routes to #interests_delete' do
+			get('/api/user/1/created_companies').should route_to('users#created_companies', id: '1')
+		end
+
 		it 'routes to #registration' do
 			put('/api/user/new').should route_to('users#registration')
 		end
