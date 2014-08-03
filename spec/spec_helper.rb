@@ -5,7 +5,16 @@ require 'rspec/rails'
 require 'rspec/autorun'
 require 'simplecov'
 
-SimpleCov.start
+# Simplecov for Teamcity
+begin
+	SimpleCov.start do
+		at_exit do
+			SimpleCov::Formatter::TeamcitySummaryFormatter.new.format(SimpleCov.result) if ENV['TEAMCITY_VERSION']
+		end
+	end
+rescue Exception => e
+	warn 'Simplecov disabled'
+end
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.

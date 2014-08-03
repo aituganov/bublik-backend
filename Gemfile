@@ -52,6 +52,9 @@ group :development, :test do
 	gem 'database_cleaner'
 	# Use code coverage
 	gem 'simplecov', :require => false, :group => :test
+	if ENV.key?('TEAMCITY_VERSION')
+		gem 'simplecov-teamcity-summary', :require => false
+	end
 end
 
 # Use postgresql adapter
