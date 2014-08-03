@@ -248,6 +248,68 @@ describe UsersController do
 				companies_data.should have(1).item
 				companies_data[0]['id'] = companies[1]['id']
 			end
+
+			it 'check created companies actions for owner' do
+				2.times {company = FactoryGirl.create(:company, owner: @correct_user); company.should be_valid }
+
+				get :created_companies, @id_structure
+				response.status.should eq 200
+				rs_user_data = JSON.parse(response.body)['data']
+				companies_data = rs_user_data['created_companies']
+				companies_data.should_not be_nil
+				companies_data.should have(2).item
+				companies_data.each do |company|
+					created_actions = company['actions']
+					created_actions.should_not be_nil
+					created_actions.should have(4).item
+					created_actions['create'].should be_false
+					created_actions['read'].should be_true
+					created_actions['update'].should be_true
+					created_actions['destroy'].should be_true
+				end
+			end
+
+			it 'check created companies actions for not owner' do
+				2.times {company = FactoryGirl.create(:company, owner: @correct_user); company.should be_valid }
+
+				request.cookies[:ACCESS_TOKEN] = @new_user.access_token
+				get :created_companies, @id_structure
+				response.status.should eq 200
+				rs_user_data = JSON.parse(response.body)['data']
+				companies_data = rs_user_data['created_companies']
+				companies_data.should_not be_nil
+				companies_data.should have(2).item
+				companies_data.each do |company|
+					created_actions = company['actions']
+					created_actions.should_not be_nil
+					created_actions.should have(4).item
+					created_actions['create'].should be_false
+					created_actions['read'].should be_true
+					created_actions['update'].should be_false
+					created_actions['destroy'].should be_false
+				end
+			end
+
+			it 'check created companies actions for anonymous' do
+				2.times {company = FactoryGirl.create(:company, owner: @correct_user); company.should be_valid }
+
+				request.cookies[:ACCESS_TOKEN] = ''
+				get :created_companies, @id_structure
+				response.status.should eq 200
+				rs_user_data = JSON.parse(response.body)['data']
+				companies_data = rs_user_data['created_companies']
+				companies_data.should_not be_nil
+				companies_data.should have(2).item
+				companies_data.each do |company|
+					created_actions = company['actions']
+					created_actions.should_not be_nil
+					created_actions.should have(4).item
+					created_actions['create'].should be_false
+					created_actions['read'].should be_true
+					created_actions['update'].should be_false
+					created_actions['destroy'].should be_false
+				end
+			end
 		end
 
 		context 'update' do
