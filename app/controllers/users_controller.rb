@@ -1,6 +1,8 @@
+include ApplicationHelper
+include AppUtils
+include UsersHelper
+
 class UsersController < ApplicationController
-	include ApplicationHelper
-	include UsersHelper
 	skip_before_filter :verify_authenticity_token
 	before_filter :check_updated, only: [:index, :update, :delete, :interests_add, :interests_delete]
 
@@ -85,7 +87,7 @@ class UsersController < ApplicationController
 	private
 
 	def user_params
-		params.permit(:id, :login, :password, :last_name, :first_name)
+		params.permit(:id, :login, :password, :last_name, :first_name, :company_limit)
 	end
 
 	def interests

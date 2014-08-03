@@ -1,5 +1,6 @@
-include CompaniesHelper
 include ApplicationHelper
+include AppUtils
+include CompaniesHelper
 
 class CompaniesController < ApplicationController
 	before_filter :check_updated, except: [:get, :registration]
