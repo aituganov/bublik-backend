@@ -21,9 +21,11 @@ module AppUtils
 		res = true
 
 		unless ability.can? action, requested
+			logger.warn 'forbidden!'
 			render_error :forbidden if render_er
 			res = false
 		end
+		logger.info 'accepted!'
 		res
 	end
 

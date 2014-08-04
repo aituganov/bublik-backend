@@ -9,7 +9,7 @@ defaults: &defaults
     limit_default: 10
   images:
     dir: /opt/galaxias/bublik/webapps/images/
-    tmp_dir: /opt/galaxias/b`ublik/webapps/images/tmp/
+    tmp_dir: /opt/galaxias/bublik/webapps/images/tmp/
     preview_size: 300
 
 development:
