@@ -427,28 +427,89 @@ describe UsersController do
 				response.status.should eq 200
 				@correct_user.interests.should have(0).item
 			end
+		end
 
-			it 'should 200 for avatar illegal data' do
-				post :update, {id: @correct_user.id, avatar: {illegal_data: ''}}
-				response.status.should eq 200
-				@correct_user.reload
-				@correct_user.avatar.read.should be_nil
-				JSON.parse(response.body)['data']['avatar_url'].should be_nil
+		context 'avatar' do
+			after :each do
+				@correct_user.remove_avatar!
+				@correct_user.remove_avatar = true
+				@correct_user.save
 			end
-
-			it 'should 400 for illegal user avatar format' do
-				image_path = "#{Rails.root}/spec/controllers/users_controller_spec.rb"
-				post :update, {id: @correct_user.id, avatar: {data: Rack::Test::UploadedFile.new(image_path, 'text/jpg')}}
+			it 'should 400 for avatar illegal data' do
+				post :update_avatar, {id: @correct_user.id, illegal_data: ''}
 				response.status.should eq 400
 			end
 
-			it 'should 200 for legal user avatar data' do
+			it 'should 400 for particial user avatar data' do
+				image_path = "#{Rails.root}/spec/controllers/users_controller_spec.rb"
+				file_data = File.open(image_path, "rb") { |f| f.read }
+				post :update_avatar, {id: @correct_user.id, data: file_data}
+				response.status.should eq 400
+
+				post :update_avatar, {id: @correct_user.id, data: file_data, content_type: 'js'}
+				response.status.should eq 400
+
+				post :update_avatar, {id: @correct_user.id, data: file_data, content_type: 'js', crop_x: 0}
+				response.status.should eq 400
+
+				post :update_avatar, {id: @correct_user.id, data: file_data, content_type: 'js', crop_x: 0, crop_y: 0}
+				response.status.should eq 400
+			end
+
+			it 'should 400 for illegal avatar content type' do
+				image_path = "#{Rails.root}/spec/controllers/users_controller_spec.rb"
+				file_data = File.open(image_path, "rb") { |f| f.read }
+				post :update_avatar, {id: @correct_user.id, data: file_data, content_type: 'js', crop_x: 0, crop_y: 0, crop_l: 0}
+				response.status.should eq 400
+			end
+
+			it 'should 200 & coorect urls for legal user avatar data' do
 				image_path = "#{Rails.root}/spec/fixtures/images/test.jpg"
-				post :update, {id: @correct_user.id, avatar: {data: Rack::Test::UploadedFile.new(image_path, 'text/jpg')}}
+				file = File.open(image_path, "rb")
+				contents = File.open(image_path, "rb").read
+				file.close
+				data = Base64.encode64(contents)
+				post :update_avatar, {id: @correct_user.id, data: data, content_type: 'image/jpeg', crop_x: 10, crop_y: 10, crop_l:10 }
 				response.status.should eq 200
 				@correct_user.reload
 				@correct_user.avatar.read.should eq File.open(image_path, 'rb').read
-				JSON.parse(response.body)['data']['avatar_url'].should_not be_nil
+				rs_avatar_data = JSON.parse(response.body)['data']['avatar']
+				rs_avatar_data.should_not be_nil
+				rs_avatar_data['preview_url'].should eq @correct_user.avatar.preview.url
+				rs_avatar_data['fullsize_url'].should eq @correct_user.avatar.url
+			end
+
+			it 'should 200 & correct urls for legal user avatar data' do
+				image_path = "#{Rails.root}/spec/fixtures/images/test.jpg"
+				file = File.open(image_path, "rb")
+				contents = File.open(image_path, "rb").read
+				file.close
+				data = Base64.encode64(contents)
+				post :update_avatar, {id: @correct_user.id, data: data, content_type: 'image/jpeg', crop_x: 10, crop_y: 10, crop_l:10 }
+				response.status.should eq 200
+				@correct_user.reload
+				@correct_user.avatar.read.should eq File.open(image_path, 'rb').read
+				rs_avatar_data = JSON.parse(response.body)['data']['avatar']
+				rs_avatar_data.should_not be_nil
+				rs_avatar_data['preview_url'].should eq @correct_user.avatar.preview.url
+				rs_avatar_data['fullsize_url'].should eq @correct_user.avatar.url
+			end
+
+			it 'should 200 & correct preview size' do
+				image_path = "#{Rails.root}/spec/fixtures/images/test.jpg"
+				file = File.open(image_path, "rb")
+				contents = File.open(image_path, "rb").read
+				file.close
+				data = Base64.encode64(contents)
+				post :update_avatar, {id: @correct_user.id, data: data, content_type: 'image/jpeg', crop_x: 10, crop_y: 10, crop_l:10 }
+				response.status.should eq 200
+				@correct_user.reload
+
+				rs_avatar_data = JSON.parse(response.body)['data']['avatar']
+				rs_avatar_data.should_not be_nil
+				img = Magick::Image.read( "#{Rails.root}/public/#{rs_avatar_data['preview_url']}" ).first
+				img.columns.should eq AppSettings.images.preview_size
+				img.rows.should eq AppSettings.images.preview_size
 			end
 		end
 

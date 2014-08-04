@@ -31,6 +31,10 @@ describe UsersController do
 			post('/api/user/1').should route_to('users#update', id: '1')
 		end
 
+		it 'routes to #update_avatar' do
+			post('/api/user/1/avatar').should route_to('users#update_avatar', id: '1')
+		end
+
 		it 'routes to #delete' do
 			delete('/api/user/1').should route_to('users#delete', id: '1')
 		end
