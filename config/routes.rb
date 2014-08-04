@@ -69,15 +69,21 @@ Rails.application.routes.draw do
 
 		# Route users
 		scope :path => 'user' do
-			get ':id' => 'users#index'
-			get ':id/created_companies' => 'users#created_companies'
+			# Create
 			match 'new' => 'users#registration', via: [:put]
+			# Login
 			match 'login' => 'users#login', via: [:put]
 			get 'login/check/:login' => 'users#check_login', constraints: { login: /.*/ }
+			# Info
+			get ':id' => 'users#index'
+			get ':id/created_companies' => 'users#created_companies'
+			# Updaters
 			post ':id' => 'users#update'
-			match ':id' => 'users#delete' , via: [:delete]
+			post ':id/avatar' => 'users#update_avatar'
 			match ':id/interests' => 'users#interests_add', via: [:put]
 			match ':id/interests' => 'users#interests_delete' , via: [:delete]
+			# Delete
+			match ':id' => 'users#delete' , via: [:delete]
 		end
 
 		# Route companies

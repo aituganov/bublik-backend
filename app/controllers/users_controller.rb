@@ -45,19 +45,32 @@ class UsersController < ApplicationController
 		rs_data = {}
 		return unless check_privileges access_token, :update, rq_user
 
-		unless params[:avatar].nil?
-			unless avatar[:data].nil?
-				rq_user.avatar = avatar[:data]
-			else
-				#do crop
-			end
-			rs_data[User.RS_DATA[:AVATAR]] = true
-		end
-
 		if rq_user.update(user_params)
 			render_event :ok, rq_user.build_response(rs_data)
 		else
 			render_error :bad_request, rq_user.errors
+		end
+	end
+
+	def update_avatar
+		return unless check_privileges access_token, :update, rq_user
+		return unless avatar_params_valid? avatar
+
+		begin
+			rq_user.avatar = create_tmp_image avatar[:data], avatar[:content_type]
+			rq_user.crop_x = avatar[:crop_x]
+			rq_user.crop_y = avatar[:crop_y]
+			rq_user.crop_l = avatar[:crop_l]
+			if rq_user.save
+				render_event :ok, rq_user.build_response({User.RS_DATA[:AVATAR] => true})
+			else
+				render_error :bad_request, rq_user.errors
+			end
+		rescue Exception => e
+			log_exception e
+			render_error :bad_request
+		ensure
+			clear_tmp_file
 		end
 	end
 
@@ -90,7 +103,7 @@ class UsersController < ApplicationController
 	private
 
 	def user_params
-		params.permit(:id, :login, :password, :last_name, :first_name, :company_limit, :company_offset)
+		params.permit(:login, :password, :last_name, :first_name, :company_limit, :company_offset)
 	end
 
 	def interests
@@ -98,11 +111,11 @@ class UsersController < ApplicationController
 	end
 
 	def avatar
-		params.require(:avatar).permit(:data, :crop)
+		params.permit(:data, :content_type, :crop_x, :crop_y, :crop_l)
 	end
 
 	def check_updated
-		unless User.where(id: user_params[:id]).present?
+		unless User.where(id: params[:id]).present?
 			render_error :not_found, "User ##{user_params[:id]} isn't founded"
 		end
 	end
@@ -112,7 +125,7 @@ class UsersController < ApplicationController
 	end
 
 	def rq_user
-		@rq_user ||= User.find(user_params[:id])
+		@rq_user ||= User.find(params[:id])
 	end
 
 end

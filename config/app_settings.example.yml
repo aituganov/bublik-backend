@@ -7,12 +7,20 @@ defaults: &defaults
   widgets:
     level_default: city
     limit_default: 10
+  images:
+    dir: /opt/galaxias/bublik/webapps/images/
+    tmp_dir: /opt/galaxias/b`ublik/webapps/images/tmp/
+    preview_size: 300
 
 development:
   <<: *defaults
 
 test:
   <<: *defaults
+  images:
+    dir: uploads/public/images/
+    tmp_dir: uploads/tmp/
+    preview_size: 300
 
 production:
   <<: *defaults

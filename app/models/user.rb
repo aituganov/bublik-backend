@@ -12,8 +12,13 @@ class User < ActiveRecord::Base
 	validates :password, length: {minimum: 6}
 
 	before_validation :generate_access_token, on: :create
+	after_update :crop_proccess, :if => :cropping?
 
-#	attr_accessor :id, :first_name, :last_name, :is_deleted
+	attr_accessor :crop_x, :crop_y, :crop_l
+
+	def cropping?
+		!crop_x.blank? && !crop_y.blank? && !crop_l.blank?
+	end
 
 	@@RS_DATA = {FULL: 'full', PRIVILEGES: 'privileges', INTERESTS: 'interests', AVATAR: 'avatar', CREATED_COMPANIES: 'created_companies'}
 
@@ -59,7 +64,7 @@ class User < ActiveRecord::Base
 	end
 
 	def put_avatar_data(rs)
-		rs[:avatar_url] = self.avatar.url
+		rs[@@RS_DATA[:AVATAR]] = {preview_url: self.avatar.preview.url, fullsize_url: self.avatar.url}
 	end
 
 	def put_created_company_data(rs, options)
@@ -95,10 +100,16 @@ class User < ActiveRecord::Base
 	end
 
 	private
+
 	def generate_access_token
 		logger.info 'Generate access token...'
 		self.access_token = SecureRandom.uuid
 		logger.info "Acces token is generated: #{self.access_token}"
+	end
+
+	def crop_proccess
+		self.avatar.preview.manualcrop(crop_x, crop_y, crop_l)
+		self.avatar.recreate_versions!
 	end
 
 end
