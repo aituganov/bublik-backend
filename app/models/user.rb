@@ -64,7 +64,7 @@ class User < ActiveRecord::Base
 	end
 
 	def put_avatar_data(rs)
-		rs[@@RS_DATA[:AVATAR]] = {preview_url: self.avatar.preview.url, fullsize_url: self.avatar.url}
+		rs[@@RS_DATA[:AVATAR]] = {preview_url: prepare_avatar_url(self.avatar.preview.url), fullsize_url: prepare_avatar_url(self.avatar.url)}
 	end
 
 	def put_created_company_data(rs, options)
@@ -110,6 +110,10 @@ class User < ActiveRecord::Base
 	def crop_proccess
 		self.avatar.preview.manualcrop(crop_x, crop_y, crop_l)
 		self.avatar.recreate_versions!
+	end
+
+	def prepare_avatar_url(url)
+		url.nil? ? nil : url[(url.index(AppSettings.images.dir) + AppSettings.images.dir.length)..-1]
 	end
 
 end

@@ -8,7 +8,7 @@ defaults: &defaults
     level_default: city
     limit_default: 10
   images:
-    dir: /opt/galaxias/bublik/webapps/images/
+    dir: /opt/galaxias/bublik/webapps/
     tmp_dir: /opt/galaxias/bublik/webapps/images/tmp/
     preview_size: 300
 
@@ -18,7 +18,7 @@ development:
 test:
   <<: *defaults
   images:
-    dir: uploads/public/images/
+    dir: uploads/public/
     tmp_dir: uploads/tmp/
     preview_size: 300
 

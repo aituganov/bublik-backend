@@ -475,8 +475,8 @@ describe UsersController do
 				@correct_user.avatar.read.should eq File.open(image_path, 'rb').read
 				rs_avatar_data = JSON.parse(response.body)['data']['avatar']
 				rs_avatar_data.should_not be_nil
-				rs_avatar_data['preview_url'].should eq @correct_user.avatar.preview.url
-				rs_avatar_data['fullsize_url'].should eq @correct_user.avatar.url
+				"/#{AppSettings.images.dir}#{rs_avatar_data['preview_url']}".should eq @correct_user.avatar.preview.url
+				"/#{AppSettings.images.dir}#{rs_avatar_data['fullsize_url']}".should eq @correct_user.avatar.url
 			end
 
 			it 'should 200 & correct urls for legal user avatar data' do
@@ -491,8 +491,8 @@ describe UsersController do
 				@correct_user.avatar.read.should eq File.open(image_path, 'rb').read
 				rs_avatar_data = JSON.parse(response.body)['data']['avatar']
 				rs_avatar_data.should_not be_nil
-				rs_avatar_data['preview_url'].should eq @correct_user.avatar.preview.url
-				rs_avatar_data['fullsize_url'].should eq @correct_user.avatar.url
+				"/#{AppSettings.images.dir}#{rs_avatar_data['preview_url']}".should eq @correct_user.avatar.preview.url
+				"/#{AppSettings.images.dir}#{rs_avatar_data['fullsize_url']}".should eq @correct_user.avatar.url
 			end
 
 			it 'should 200 & correct preview size' do
@@ -507,7 +507,7 @@ describe UsersController do
 
 				rs_avatar_data = JSON.parse(response.body)['data']['avatar']
 				rs_avatar_data.should_not be_nil
-				img = Magick::Image.read( "#{Rails.root}/public/#{rs_avatar_data['preview_url']}" ).first
+				img = Magick::Image.read( "#{Rails.root}/public/#{AppSettings.images.dir}#{rs_avatar_data['preview_url']}" ).first
 				img.columns.should eq AppSettings.images.preview_size
 				img.rows.should eq AppSettings.images.preview_size
 			end
