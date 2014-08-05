@@ -33,11 +33,12 @@ class Ability
 		can :read, User
 
 		if !user.id.nil?
-			can :create, Company, :id => nil
+			can :create, [Company, Image], :id => nil
 		end
 
+		can :read, [Company, Image]
 		can :rud, Company, :owner_id => user.id
-		can :read, Company
+		can :rud, Image, :imageable_id => user.id, :imageable_type => user.class.name
 	end
 
 	def build_privileges(requested_objects)

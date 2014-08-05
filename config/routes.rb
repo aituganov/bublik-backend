@@ -79,7 +79,11 @@ Rails.application.routes.draw do
 			get ':id/created_companies' => 'users#created_companies'
 			# Updaters
 			post ':id' => 'users#update'
-			post ':id/avatar' => 'users#update_avatar'
+			get ':id/avatars' => 'users#get_avatars'
+			post ':id/avatar' => 'users#create_avatar'
+			post ':id/avatar/current/:avatar_id' => 'users#set_current_avatar'
+			match ':id/avatar/:avatar_id' => 'users#delete_avatar' , via: [:delete]
+			# Interests
 			match ':id/interests' => 'users#interests_add', via: [:put]
 			match ':id/interests' => 'users#interests_delete' , via: [:delete]
 			# Delete

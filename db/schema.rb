@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140731164815) do
+ActiveRecord::Schema.define(version: 20140804131350) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -30,6 +30,17 @@ ActiveRecord::Schema.define(version: 20140731164815) do
 
   add_index "companies", ["image_id"], name: "index_companies_on_image_id", using: :btree
   add_index "companies", ["title", "deleted_at"], name: "index_companies_on_title_and_deleted_at", using: :btree
+
+  create_table "images", force: true do |t|
+    t.string   "file"
+    t.boolean  "current",        default: true
+    t.integer  "imageable_id"
+    t.string   "imageable_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "images", ["imageable_id", "imageable_type"], name: "index_images_on_imageable_id_and_imageable_type", using: :btree
 
   create_table "taggings", force: true do |t|
     t.integer  "tag_id"
@@ -61,7 +72,6 @@ ActiveRecord::Schema.define(version: 20140731164815) do
     t.datetime "deleted_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "avatar"
   end
 
   add_index "users", ["login", "deleted_at"], name: "index_users_on_login_and_deleted_at", using: :btree

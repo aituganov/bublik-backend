@@ -8,8 +8,7 @@ defaults: &defaults
     level_default: city
     limit_default: 10
   images:
-    dir: /opt/galaxias/bublik/webapps/
-    tmp_dir: /opt/galaxias/bublik/webapps/images/tmp/
+    dir: /opt/galaxias/bublik/webapps/images/
     preview_size: 300
 
 development:
@@ -18,8 +17,7 @@ development:
 test:
   <<: *defaults
   images:
-    dir: uploads/public/
-    tmp_dir: uploads/tmp/
+    dir: <%= "#{Rails.root}/public/images/" %>
     preview_size: 300
 
 production:

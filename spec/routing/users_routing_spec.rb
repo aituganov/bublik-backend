@@ -31,8 +31,20 @@ describe UsersController do
 			post('/api/user/1').should route_to('users#update', id: '1')
 		end
 
+		it 'routes to #get_avatars' do
+			get('/api/user/1/avatars').should route_to('users#get_avatars', id: '1')
+		end
+
 		it 'routes to #update_avatar' do
-			post('/api/user/1/avatar').should route_to('users#update_avatar', id: '1')
+			post('/api/user/1/avatar').should route_to('users#create_avatar', id: '1')
+		end
+
+		it 'routes to #set_current_avatar' do
+			post('/api/user/1/avatar/current/12').should route_to('users#set_current_avatar', id: '1', avatar_id: '12')
+		end
+
+		it 'routes to #set_current_avatar' do
+			delete('/api/user/1/avatar/12').should route_to('users#delete_avatar', id: '1', avatar_id: '12')
 		end
 
 		it 'routes to #delete' do

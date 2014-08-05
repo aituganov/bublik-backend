@@ -2,9 +2,9 @@ include AppUtils
 extend SecureRandom
 
 class User < ActiveRecord::Base
-	mount_uploader :avatar, AvatarUploader
 	acts_as_paranoid
 	acts_as_taggable_on :interests
+	has_many :images, as: :imageable, :dependent => :destroy
 
 	validates :login, :access_token, presence: true, uniqueness: true, length: {maximum: 61}
 	validates :login, email_format: { message: 'wrong email format' }
@@ -12,18 +12,19 @@ class User < ActiveRecord::Base
 	validates :password, length: {minimum: 6}
 
 	before_validation :generate_access_token, on: :create
-	after_update :crop_proccess, :if => :cropping?
 
-	attr_accessor :crop_x, :crop_y, :crop_l
-
-	def cropping?
-		!crop_x.blank? && !crop_y.blank? && !crop_l.blank?
-	end
-
-	@@RS_DATA = {FULL: 'full', PRIVILEGES: 'privileges', INTERESTS: 'interests', AVATAR: 'avatar', CREATED_COMPANIES: 'created_companies'}
+	@@RS_DATA = {FULL: 'full', PRIVILEGES: 'privileges', INTERESTS: 'interests', AVATAR: 'avatar', AVATARS: 'avatars', CREATED_COMPANIES: 'created_companies'}
 
 	def self.RS_DATA
 		@@RS_DATA
+	end
+
+	def get_menu
+		{user_id: self.id, menu: %w(companies)}
+	end
+
+	def get_current_image
+		Image.get_current(self)
 	end
 
 	def build_response(rs_data, options={})
@@ -32,23 +33,21 @@ class User < ActiveRecord::Base
 		if rs_data[@@RS_DATA[:FULL]]
 			put_main_data rs
 			put_interests_data rs
-			put_avatar_data rs
+			put_current_avatar_data rs
 			put_privileges_data rs, self, options[:access_token]
 			put_created_company_data rs, options
 		elsif rs_data[@@RS_DATA[:PRIVILEGES]]
 			put_privileges_data rs, self, options.access_token
 		elsif rs_data[@@RS_DATA[:INTERESTS]]
 			put_interests_data rs
+		elsif rs_data[@@RS_DATA[:AVATARS]]
+			put_all_avatars_data rs
 		elsif rs_data[@@RS_DATA[:AVATAR]]
-			put_avatar_data rs
+			put_current_avatar_data rs
 		elsif rs_data[@@RS_DATA[:CREATED_COMPANIES]]
 			put_created_company_data rs, options
 		end
 		rs
-	end
-
-	def get_menu
-		{user_id: self.id, menu: %w(companies)}
 	end
 
 	def put_main_data(rs)
@@ -63,8 +62,14 @@ class User < ActiveRecord::Base
 		rs[@@RS_DATA[:INTERESTS]] = self.interest_list
 	end
 
-	def put_avatar_data(rs)
-		rs[@@RS_DATA[:AVATAR]] = {preview_url: prepare_avatar_url(self.avatar.preview.url), fullsize_url: prepare_avatar_url(self.avatar.url)}
+	def put_all_avatars_data(rs)
+		rs[@@RS_DATA[:AVATARS]] = []
+		self.images.each { |i| rs[@@RS_DATA[:AVATARS]].push(i.build_response) }
+	end
+
+	def put_current_avatar_data(rs)
+		current = get_current_image
+		rs[@@RS_DATA[:AVATAR]] = current.build_response unless current.nil?
 	end
 
 	def put_created_company_data(rs, options)
@@ -105,15 +110,6 @@ class User < ActiveRecord::Base
 		logger.info 'Generate access token...'
 		self.access_token = SecureRandom.uuid
 		logger.info "Acces token is generated: #{self.access_token}"
-	end
-
-	def crop_proccess
-		self.avatar.preview.manualcrop(crop_x, crop_y, crop_l)
-		self.avatar.recreate_versions!
-	end
-
-	def prepare_avatar_url(url)
-		url.nil? ? nil : url[(url.index(AppSettings.images.dir) + AppSettings.images.dir.length)..-1]
 	end
 
 end

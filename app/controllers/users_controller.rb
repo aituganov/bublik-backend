@@ -1,10 +1,10 @@
 include ApplicationHelper
-include AppUtils
 include UsersHelper
 
 class UsersController < ApplicationController
 	skip_before_filter :verify_authenticity_token
-	before_filter :check_updated, only: [:index, :created_companies, :update, :delete, :interests_add, :interests_delete]
+	before_filter :check_updated, only: [:index, :created_companies, :update, :delete, :interests_add, :interests_delete, :get_avatars, :create_avatar, :set_current_avatar, :delete_avatar]
+	rescue_from ArgumentError, ActionController::ParameterMissing, with: :bad_request
 
 	def index
 		render_event :ok, rq_user.build_response({User.RS_DATA[:FULL] => true}, {access_token: access_token, limit: user_params[:company_limit]})
@@ -52,25 +52,48 @@ class UsersController < ApplicationController
 		end
 	end
 
-	def update_avatar
-		return unless check_privileges access_token, :update, rq_user
-		return unless avatar_params_valid? avatar
+	def get_avatars
+		return unless check_privileges access_token, :read, rq_user
+		render_event :ok, rq_user.build_response({User.RS_DATA[:AVATARS] => true})
+	end
 
-		begin
-			rq_user.avatar = create_tmp_image avatar[:data], avatar[:content_type]
-			rq_user.crop_x = avatar[:crop_x]
-			rq_user.crop_y = avatar[:crop_y]
-			rq_user.crop_l = avatar[:crop_l]
-			if rq_user.save
-				render_event :ok, rq_user.build_response({User.RS_DATA[:AVATAR] => true})
-			else
-				render_error :bad_request, rq_user.errors
-			end
-		rescue Exception => e
-			log_exception e
+	def create_avatar
+		return unless check_privileges access_token, :update, rq_user
+		return unless check_privileges access_token, :create, Image.new
+		return unless avatar_params_valid? avatar
+		current_avatar = Image.get_current rq_user
+		new_avatar = rq_user.images.build avatar
+		if new_avatar.save && (!current_avatar || current_avatar.set_uncurrent)
+			render_event :ok, rq_user.build_response({User.RS_DATA[:AVATAR] => true})
+		else
+			render_error :bad_request, rq_user.errors
+		end
+	end
+
+	def set_current_avatar
+		return unless check_privileges access_token, :update, rq_user
+		return unless check_privileges access_token, :update, rq_avatar
+		current_avatar = Image.get_current rq_user
+		if !current_avatar.nil? && current_avatar.id == rq_avatar.id
+			render_event :ok
+			return
+		else !current_avatar.nil?
+			res = current_avatar.set_uncurrent
+		end
+		if res && @rq_avatar.set_current
+			render_event :ok
+		else
 			render_error :bad_request
-		ensure
-			clear_tmp_file
+		end
+	end
+
+	def delete_avatar
+		return unless check_privileges access_token, :update, rq_user
+		return unless check_privileges access_token, :destroy, rq_avatar
+		if rq_avatar.destroy
+			render_event :ok
+		else
+			render_error :bad_request, rq_avatar.errors
 		end
 	end
 
@@ -82,22 +105,16 @@ class UsersController < ApplicationController
 
 	def interests_add
 		return unless check_privileges access_token, :update, rq_user
-		begin
-			rq_user.interests_add interests
-			render_event :created
-		rescue ActionController::ParameterMissing => e
-			render_error :bad_request
-		end
+
+		rq_user.interests_add interests
+		render_event :created
 	end
 
 	def interests_delete
 		return unless check_privileges access_token, :update, rq_user
-		begin
-			rq_user.interests_delete interests
-			render_event :ok
-		rescue ActionController::ParameterMissing => e
-			render_error :bad_request
-		end
+
+		rq_user.interests_delete interests
+		render_event :ok
 	end
 
 	private
@@ -111,7 +128,7 @@ class UsersController < ApplicationController
 	end
 
 	def avatar
-		params.permit(:data, :content_type, :crop_x, :crop_y, :crop_l)
+		params.permit(:avatar_id, :data, :content_type, :crop_x, :crop_y, :crop_l)
 	end
 
 	def check_updated
@@ -126,6 +143,14 @@ class UsersController < ApplicationController
 
 	def rq_user
 		@rq_user ||= User.find(params[:id])
+	end
+
+	def rq_avatar
+		@rq_avatar ||= Image.find(params[:avatar_id])
+	end
+
+	def bad_request(exception)
+		render_error :bad_request, exception.message
 	end
 
 end

@@ -48,28 +48,25 @@ module AppUtils
 		rs[:actions] = build_privileges access_token, object
 	end
 
-	def create_tmp_image(data_base_64, content_type)
-		logger.info "Create image with content_type #{content_type}"
-		prepared_data = !data_base_64.index('base64,').nil? ?
-							data_base_64[(data_base_64.index('base64,') + 7)..-1] : data_base_64# cut content_type
-		extension = Rack::Mime::MIME_TYPES.invert[content_type]  #=> ".jpg"
-		logger.info "File extension #{extension}"
-		@tmpfile = Tempfile.new([Time.now.to_time.to_i, extension], Rails.root.join('tmp'), encoding: 'BINARY')
-		@tmpfile.write(Base64.decode64(prepared_data))
-		file = CarrierWave::SanitizedFile.new(@tmpfile)
-		file.content_type = content_type
-
-		file
-	end
-
-	def clear_tmp_file
-		return if @tmpfile.nil?
-
-		@tmpfile.close!
-		@tmpfile.unlink
-	end
-
 	def log_exception(ex)
 		logger.error "#{ex.class}: #{ex.message}\n #{ex.backtrace.join("\n")}"
+	end
+
+	def from_cache(key)
+		from_cache = Rails.cache.read(key)
+		logger.info "Take #{key} from cache"
+		if (from_cache.nil?)
+			logger.info 'Not found'
+		end
+		from_cache
+	end
+
+	def to_cache(key, val)
+		logger.info "Write #{key}: #{val.to_s} to cache"
+		Rails.cache.write(key, val)
+	end
+
+	def raise_exception(type, object)
+		raise type, object
 	end
 end
