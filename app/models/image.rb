@@ -16,7 +16,7 @@ class Image < ActiveRecord::Base
 	@@CACHE_KEY = '_current_avatar';
 
 	def self.get_current(imageable)
-		cache_key = "#{imageable.id}#{@@CACHE_KEY}"
+		cache_key = "#{imageable.class.name}_#{imageable.id}#{@@CACHE_KEY}"
 		cached = from_cache cache_key
 		image = Image.where(cached.nil? ? {imageable_id: imageable.id, current: true} : {id: cached}).take
 		if image.nil? && !cached.nil?
@@ -29,21 +29,31 @@ class Image < ActiveRecord::Base
 	end
 
 	def set_current
+		logger.info "Set image ##{self.id} current..."
+		prev_current = self.imageable.get_current_image
+		if !prev_current.nil? && prev_current.id == self.id
+			logger.info 'Already!'
+			return true
+		end
+		prev_current.set_uncurrent unless prev_current.nil?
 		self.current = true;
 		res = self.save
-		to_cache("#{self.imageable_id}#{@@CACHE_KEY}", self.id) if res
+		to_cache("#{self.imageable_type}_#{self.imageable_id}#{@@CACHE_KEY}", self.id) if res
+		logger.info 'Updated!'
 		res
 	end
 
 	def set_uncurrent
+		logger.info "Set image ##{self.id} uncurrent..."
 		self.current = false;
 		res = self.save
-		to_cache("#{self.imageable_id}#{@@CACHE_KEY}", nil) if res
+		to_cache("#{self.imageable_type}_#{self.imageable_id}#{@@CACHE_KEY}", nil) if res
+		logger.info 'Updated!'
 		res
 	end
 
 	def build_response
-		{id: self.id, current: true, preview_url: self.file.preview.url, fullsize_url: self.file.url}
+		{id: self.id, current: self.current, preview_url: self.file.preview.url, fullsize_url: self.file.url}
 	end
 
 	private

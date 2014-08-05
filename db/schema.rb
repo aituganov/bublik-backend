@@ -33,7 +33,7 @@ ActiveRecord::Schema.define(version: 20140804131350) do
 
   create_table "images", force: true do |t|
     t.string   "file"
-    t.boolean  "current",        default: true
+    t.boolean  "current",        default: false
     t.integer  "imageable_id"
     t.string   "imageable_type"
     t.datetime "created_at"

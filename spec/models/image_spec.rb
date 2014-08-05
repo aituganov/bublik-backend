@@ -58,6 +58,7 @@ describe Image do
 		end
 
 		it 'correct current images' do
+			@created_image.set_current
 			@user.get_current_image.should eq @created_image
 		end
 
@@ -73,16 +74,16 @@ describe Image do
 			data[:preview_url].should eq @created_image.file.preview.url
 		end
 
-		it 'set uncurrent, current' do
-			@created_image.set_uncurrent.should be_true
-			@created_image.reload
-			@created_image.current.should be_false
-			@user.get_current_image.should be_nil
-
+		it 'set current && uncurrent' do
 			@created_image.set_current.should be_true
-			@created_image.reload
+			@user.reload
 			@created_image.current.should be_true
 			@user.get_current_image.should eq @created_image
+
+			@created_image.set_uncurrent.should be_true
+			@user.reload
+			@created_image.current.should be_false
+			@user.get_current_image.should be_nil
 		end
 	end
 end

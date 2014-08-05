@@ -2,7 +2,7 @@ class CreateImages < ActiveRecord::Migration
 	def self.up
 		create_table :images do |t|
 			t.string :file
-			t.boolean :current, default: true
+			t.boolean :current, default: false
 			t.references :imageable, polymorphic: true, index: true
 
 			t.timestamps

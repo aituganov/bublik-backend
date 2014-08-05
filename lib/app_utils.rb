@@ -62,7 +62,7 @@ module AppUtils
 	end
 
 	def to_cache(key, val)
-		logger.info "Write #{key}: #{val.to_s} to cache"
+		logger.info "Write #{key}: #{val.nil? ? 'null' : val.to_s} to cache"
 		Rails.cache.write(key, val)
 	end
 
