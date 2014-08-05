@@ -4,15 +4,23 @@ include CarrierWave::Test::Matchers
 describe Image do
 	context 'check model validators' do
 		it 'data not nil' do
-			image = FactoryGirl.build(:image_wrong)
-			image.should_not be_valid
-			image.should have(1).error_on(:data)
+			expect { FactoryGirl.create(:image, data: nil) }.to raise_error(ArgumentError)
+			FactoryGirl.create(:image).should be_valid
+		end
+
+		it 'data not blank' do
+			expect { FactoryGirl.create(:image, data: '') }.to raise_error(ArgumentError)
+			FactoryGirl.create(:image).should be_valid
 		end
 
 		it 'content_type not nil' do
-			image = FactoryGirl.build(:image_wrong)
-			image.should_not be_valid
-			image.should have(1).error_on(:content_type)
+			expect { FactoryGirl.create(:image, content_type: nil) }.to raise_error(ArgumentError)
+			FactoryGirl.create(:image).should be_valid
+		end
+
+		it 'content_type not blank' do
+			expect { FactoryGirl.create(:image, content_type: '') }.to raise_error(ArgumentError)
+			FactoryGirl.create(:image).should be_valid
 		end
 
 		it 'crop_x >= 0' do
@@ -58,7 +66,7 @@ describe Image do
 		end
 
 		it 'correct current images' do
-			@created_image.set_current
+			@created_image.set_current.valid?.should be_true
 			@user.get_current_image.should eq @created_image
 		end
 
@@ -75,15 +83,28 @@ describe Image do
 		end
 
 		it 'set current && uncurrent' do
-			@created_image.set_current.should be_true
-			@user.reload
+			@created_image.set_current.valid?.should be_true
 			@created_image.current.should be_true
 			@user.get_current_image.should eq @created_image
 
-			@created_image.set_uncurrent.should be_true
-			@user.reload
+			@created_image.set_uncurrent.valid?.should be_true
 			@created_image.current.should be_false
 			@user.get_current_image.should be_nil
+		end
+
+		it 'set current twice' do
+			@created_image.set_current.valid?.should be_true
+			@created_image.current.should be_true
+			@user.get_current_image.should eq @created_image
+
+			@second_image = @user.images.build(FactoryGirl.build(:image_hash))
+			@second_image.should be_valid
+
+			@second_image.set_current.valid?.should be_true
+			@created_image.reload
+			@created_image.current.should be_false
+			@second_image.current.should be_true
+			@user.get_current_image.should eq @second_image
 		end
 	end
 end

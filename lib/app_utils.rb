@@ -1,9 +1,17 @@
 require 'rack/mime'
 
 module AppUtils
-	class CarrierStringIO < StringIO
-		attr_accessor :original_filename
-		attr_accessor :content_type
+	class Response
+		attr_accessor :errors
+
+		def initialize(valid, errors={})
+			@valid = valid
+			@errors = errors
+		end
+
+		def valid?
+			@valid
+		end
 	end
 
 	def get_access_token(cookies)
@@ -57,6 +65,8 @@ module AppUtils
 		logger.info "Take #{key} from cache"
 		if (from_cache.nil?)
 			logger.info 'Not found'
+		else
+			logger.info "Taked: #{from_cache}"
 		end
 		from_cache
 	end

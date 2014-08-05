@@ -63,7 +63,7 @@ class UsersController < ApplicationController
 		return unless avatar_params_valid? avatar
 
 		new_avatar = rq_user.images.build avatar
-		if new_avatar.save && new_avatar.set_current
+		if new_avatar.save && new_avatar.set_current.valid?
 			render_event :ok, rq_user.build_response({User.RS_DATA[:AVATAR] => true})
 		else
 			render_error :bad_request, rq_user.errors
@@ -74,10 +74,11 @@ class UsersController < ApplicationController
 		return unless check_privileges access_token, :update, rq_user
 		return unless check_privileges access_token, :update, rq_avatar
 
-		if rq_avatar.set_current
+		rs = rq_avatar.set_current
+		if rs.valid?
 			render_event :ok
 		else
-			render_error :bad_request
+			render_error :bad_request, rs.errors
 		end
 	end
 

@@ -7,7 +7,6 @@ class Image < ActiveRecord::Base
 	before_create :import_image_from_rq, if: :need_image_import?
 	after_create :crop_proccess, if: :cropping?
 
-	validates :data, :content_type, presence: true
 	validates_integrity_of :file
 	validates_processing_of :file
 
@@ -16,6 +15,7 @@ class Image < ActiveRecord::Base
 	@@CACHE_KEY = '_current_avatar';
 
 	def self.get_current(imageable)
+		logger.info "Get current image for #{imageable.class.name} ##{imageable.id}"
 		cache_key = "#{imageable.class.name}_#{imageable.id}#{@@CACHE_KEY}"
 		cached = from_cache cache_key
 		image = Image.where(cached.nil? ? {imageable_id: imageable.id, current: true} : {id: cached}).take
@@ -30,26 +30,39 @@ class Image < ActiveRecord::Base
 
 	def set_current
 		logger.info "Set image ##{self.id} current..."
+
 		prev_current = self.imageable.get_current_image
 		if !prev_current.nil? && prev_current.id == self.id
 			logger.info 'Already!'
-			return true
+			return AppUtils::Response.new true
 		end
-		prev_current.set_uncurrent unless prev_current.nil?
-		self.current = true;
-		res = self.save
-		to_cache("#{self.imageable_type}_#{self.imageable_id}#{@@CACHE_KEY}", self.id) if res
-		logger.info 'Updated!'
-		res
+
+		rs = prev_current.set_uncurrent unless prev_current.nil?
+		return rs if !rs.nil? && !rs.valid?
+
+		self.current = true
+		self.save
+		rs = AppUtils::Response.new self.valid?, self.errors
+		if rs.valid?
+			to_cache("#{self.imageable_type}_#{self.imageable_id}#{@@CACHE_KEY}", self.id)
+			logger.info 'Updated!'
+		end
+
+		rs
 	end
 
 	def set_uncurrent
 		logger.info "Set image ##{self.id} uncurrent..."
 		self.current = false;
-		res = self.save
-		to_cache("#{self.imageable_type}_#{self.imageable_id}#{@@CACHE_KEY}", nil) if res
-		logger.info 'Updated!'
-		res
+		self.save
+		rs = AppUtils::Response.new self.valid?, self.errors
+
+		if rs.valid?
+			to_cache("#{self.imageable_type}_#{self.imageable_id}#{@@CACHE_KEY}", nil)
+			logger.info 'Updated!'
+		end
+
+		rs
 	end
 
 	def build_response
@@ -59,7 +72,7 @@ class Image < ActiveRecord::Base
 	private
 
 	def need_image_import?
-		!data.blank?
+		self.file.url.nil?
 	end
 
 	def cropping?
@@ -70,7 +83,9 @@ class Image < ActiveRecord::Base
 		begin
 			logger.info "Create image with content_type #{content_type}"
 			extension = Rack::Mime::MIME_TYPES.invert[content_type]  #=> ".jpg"
-			if extension.nil?
+			if data.nil? || data.blank?
+				raise_exception ArgumentError, 'image: data is blank'
+			elsif extension.nil?
 				raise_exception ArgumentError, 'image: invalid content type'
 			end
 			logger.info "File extension #{extension}"
