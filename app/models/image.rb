@@ -69,6 +69,11 @@ class Image < ActiveRecord::Base
 		{id: self.id, current: self.current, preview_url: self.file.preview.url, fullsize_url: self.file.url}
 	end
 
+	def destroy
+		self.remove_file!
+		self.destroy!
+	end
+
 	private
 
 	def need_image_import?

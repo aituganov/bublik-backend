@@ -4,6 +4,8 @@ include UsersHelper
 class UsersController < ApplicationController
 	skip_before_filter :verify_authenticity_token
 	before_filter :check_updated, only: [:index, :created_companies, :update, :delete, :interests_add, :interests_delete, :get_avatars, :create_avatar, :set_current_avatar, :delete_avatar]
+	after_action :clears
+
 	rescue_from ArgumentError, ActionController::ParameterMissing, with: :bad_request
 
 	def index
@@ -76,7 +78,7 @@ class UsersController < ApplicationController
 
 		rs = rq_avatar.set_current
 		if rs.valid?
-			render_event :ok
+			render_event :ok, rq_user.build_response({User.RS_DATA[:AVATAR] => true})
 		else
 			render_error :bad_request, rs.errors
 		end
@@ -85,6 +87,7 @@ class UsersController < ApplicationController
 	def delete_avatar
 		return unless check_privileges access_token, :update, rq_user
 		return unless check_privileges access_token, :destroy, rq_avatar
+
 		if rq_avatar.destroy
 			render_event :ok
 		else
@@ -129,6 +132,11 @@ class UsersController < ApplicationController
 	def check_updated
 		unless User.where(id: params[:id]).present?
 			render_error :not_found, "User ##{user_params[:id]} isn't founded"
+			return
+		end
+
+		if params[:avatar_id].present? && !Image.where(id: params[:avatar_id]).present?
+			render_error :not_found, "Image ##{user_params[:id]} isn't founded"
 		end
 	end
 
@@ -146,6 +154,12 @@ class UsersController < ApplicationController
 
 	def bad_request(exception)
 		render_error :bad_request, exception.message
+	end
+
+	def clears
+		@access_token = nil
+		@rq_user = nil
+		@rq_avatar = nil
 	end
 
 end
