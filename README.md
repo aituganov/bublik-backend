@@ -23,6 +23,10 @@ supported requests:
         /user/:id - DELETE request for marked user as deleted. Request cookies must contain ACCESS_TOKEN value.
         /user/:id/interests - PUT request for interests create, JSON params {interests: ['first', 'second']}. Request cookies must contain ACCESS_TOKEN value.
         /user/:id/interests - DELETE request for interests delete, JSON params {interests: ['first', 'second']}. Request cookies must contain ACCESS_TOKEN value.
+        /user/:id/avatars - GET request for all user avatars, rq param id - user id, avatars owner.
+        /user/:id/avatar - POST request for create new avatar for user, JSON params {id: user id, data: base 64 image data, content_type: image content type, crop_x: x coord for crop (>=0), crop_y: y coord for crop (>=0), crop_l: cropped square side length (>=10)}.
+        /user/:id/avatar/current/:avatar_id - POST request for set avatar as current, rq params id - user id, avatar_id - avatar id.
+        /user/:id/avatar/:avatar_id - DELETE request for delete avatar, rq params id - user id, avatar_id - avatar id.
 
 * Get user menu
 
