@@ -1,6 +1,6 @@
 include ApplicationHelper
 
-class MenuController < ApplicationController
+class Api::MenuController < Api::ApplicationController
 
 	def get
 		token = get_access_token cookies

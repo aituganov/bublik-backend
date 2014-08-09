@@ -26,15 +26,8 @@ module AppUtils
 		requester = get_user_by_access_token(access_token) || User.new # invalid token or new user
 		logger.info "Check privileges for #{requester.class} ##{requester.id} to #{action} #{requested.class} ##{requested.id}..."
 		ability = Ability.new requester
-		res = true
-
-		unless ability.can? action, requested
-			logger.warn 'forbidden!'
-			render_error :forbidden if render_er
-			res = false
-		end
+		raise ApiExceptions::User::NotAllowed.new(action, requester.id) unless ability.can? action, requested
 		logger.info 'accepted!'
-		res
 	end
 
 	def avatar_params_valid?(avatar)

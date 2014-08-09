@@ -7,4 +7,8 @@ class ApplicationController < ActionController::Base
 		render html: 'Requested resource not found', status: :not_found, layout: false
 	end
 
+  def test_method
+	  puts 'OLD'
+  end
+
 end

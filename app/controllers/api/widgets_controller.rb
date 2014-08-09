@@ -1,4 +1,4 @@
-class WidgetsController < ApplicationController
+class Api::WidgetsController < Api::ApplicationController
 	include WidgetsHelper
 
 	before_filter :validate_params
