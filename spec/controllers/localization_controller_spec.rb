@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Api::LocalizationController do
+describe Api::LocalizationController, type: :controller do
 	before :each do
 		@def_locale = AppSettings.localization.default
 	end

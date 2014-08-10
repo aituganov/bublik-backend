@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Api::User::Avatars::AvatarsController do
+describe Api::User::Avatars::AvatarsController, type: :controller do
 	context 'actions with user avatars' do
 		include CarrierWave::Test::Matchers
 		before :each do
@@ -74,6 +74,17 @@ describe Api::User::Avatars::AvatarsController do
 
 			it 'should 200 & correct preview size' do
 				post :create, {id: @correct_user.id, data: @data, content_type: 'image/jpeg', crop_x: 10, crop_y: 10, crop_l: 10 }
+				response.status.should eq 200
+				rs_avatar_data = JSON.parse(response.body)['data']['avatar']
+				rs_avatar_data.should_not be_nil
+				img = Magick::Image.read( "#{AppSettings.images.dir}#{rs_avatar_data['preview_url']}" ).first
+				img.columns.should eq AppSettings.images.preview_size
+				img.rows.should eq AppSettings.images.preview_size
+			end
+
+			it 'should 200 & correct preview size' do
+				@data_base64 = 'base64,' + Base64.encode64(@file_content)
+				post :create, {id: @correct_user.id, data: @data_base64, content_type: 'image/jpeg', crop_x: 10, crop_y: 10, crop_l: 10 }
 				response.status.should eq 200
 				rs_avatar_data = JSON.parse(response.body)['data']['avatar']
 				rs_avatar_data.should_not be_nil
@@ -212,6 +223,7 @@ describe Api::User::Avatars::AvatarsController do
 
 			it 'delete should 200 for correct params' do
 				@ids.each do |id|
+					session[:avatar_id] = id
 					fullsize_url = Image.find(id).file.url
 					preview_url = Image.find(id).file.preview.url
 

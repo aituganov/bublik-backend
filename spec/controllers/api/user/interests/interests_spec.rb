@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Api::User::Interests::InterestsController do
+describe Api::User::Interests::InterestsController, type: :controller do
 	context 'actions with user interests' do
 		before :each do
 			@correct_user = FactoryGirl.create(:user)

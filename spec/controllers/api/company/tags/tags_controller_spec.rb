@@ -1,20 +1,19 @@
 require 'spec_helper'
 include TestHelper
 
-describe Api::Company::Tags::TagsController do
+describe Api::Company::Tags::TagsController, type: :controller do
 	context 'actions with company' do
 		before :each do
 			@user = FactoryGirl.create(:user)
 			request.cookies[:ACCESS_TOKEN] = @user.access_token
-
-			#put :registration,
-			#response.status.should eq 201
-			@created_company = FactoryGirl.create(:company, owner_id: @user.id )#.attributes
-				#Company.find(JSON.parse(response.body)['data']['id'])
+			@created_company = FactoryGirl.create(:company, owner_id: @user.id )
 			@id_structure = {id: @created_company.id}
 		end
 
-		#TODO: tags for unexist user
+		it 'should 404 for update with unexist user' do
+			put :add, id: -1
+			response.status.should eq 404
+		end
 
 		it 'should 400 for update with empty tags' do
 			put :add, @id_structure

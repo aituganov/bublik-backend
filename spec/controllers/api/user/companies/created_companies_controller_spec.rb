@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Api::User::Companies::CreatedCompaniesController do
+describe Api::User::Companies::CreatedCompaniesController, type: :controller do
 	context 'actions with user created companies' do
 		before :each do
 			@correct_user = FactoryGirl.create(:user)

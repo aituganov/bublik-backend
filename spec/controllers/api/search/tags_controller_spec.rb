@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Api::TagsController do
+describe Api::Search::TagsController, type: :controller do
 	before :each do
 		cookies['ACCESS_TOKEN'] = FactoryGirl.create(:user).access_token
 		@correct_name = 'Correct name'

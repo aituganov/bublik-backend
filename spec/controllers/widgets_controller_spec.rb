@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Api::WidgetsController do
+describe Api::WidgetsController, type: :controller do
 
 	context 'GET widgets by id' do
 

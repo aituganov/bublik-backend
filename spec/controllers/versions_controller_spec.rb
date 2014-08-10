@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Api::VersionsController do
+describe Api::VersionsController, type: :controller do
 
 	describe 'GET version' do
 		it 'has a 200 status code' do

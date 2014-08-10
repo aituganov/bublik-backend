@@ -1,7 +1,7 @@
 require 'spec_helper'
 include TestHelper
 
-describe Api::Company::CompaniesController do
+describe Api::Company::CompaniesController, type: :controller do
 	before :each do
 		@company = FactoryGirl.build(:company)
 		@company_data = @company.attributes

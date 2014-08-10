@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Api::User::UsersController do
+describe Api::User::UsersController, type: :controller do
 	before :each do
 		request.env['HTTP_ACCEPT'] = 'application/json'
 		@wrong_user = FactoryGirl.build(:wrong_user)
@@ -9,24 +9,24 @@ describe Api::User::UsersController do
 	end
 
 	context 'user registration' do
-		it 'has 422 error for empty user data' do
+		it 'has 400 error for empty user data' do
 			put :registration
-			response.status.should eq 422
+			response.status.should eq 400
 		end
 
-		it 'has 422 error for partial user data' do
+		it 'has 400 error for partial user data' do
 			params = {login: @wrong_user.login}
 			put :registration, params
-			response.status.should eq 422
+			response.status.should eq 400
 
 			params = {login: @wrong_user.login, password: @wrong_user.password}
 			put :registration, params
-			response.status.should eq 422
+			response.status.should eq 400
 		end
 
-		it 'has 422 for wrong login format' do
+		it 'has 400 for wrong login format' do
 			put :registration, @wrong_user.as_json
-			response.status.should eq 422
+			response.status.should eq 400
 		end
 
 		it 'has 201 for correct user data' do
@@ -42,10 +42,10 @@ describe Api::User::UsersController do
 			rs_data['access_token'].should_not be_nil
 		end
 
-		it 'has 422 for duplicate user login' do
+		it 'has 400 for duplicate user login' do
 			@correct_user.save
 			put :registration, @correct_user.as_json
-			response.status.should eq 422
+			response.status.should eq 400
 		end
 	end
 
