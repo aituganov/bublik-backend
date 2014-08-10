@@ -45,21 +45,34 @@ widget:
       submitButton:
         caption: Зарегистрироваться
   userLogin:
-      mainHeader: Войти в систему
-      fields:
-        login:
-          label: E-mail
-          requiredError: Пожалуйста, введиде свой E-mail
-          incorrectEmailError: Некорректный E-mail
-        password:
-          label: Пароль
-          requiredError: Пожалуйста, введите свой пароль
-          tooLongPasswordError: Пароль должен быть не длиннее 255 символов
-        rememberMe:
-          label: Запомнить меня на этом компьютере
-        incorrectLoginError:
-                label: Неверные E-mail или пароль.
-                messageText: Вы ввели неверные имя пользователя или пароль. Пожалуйста, попробуйте ещё раз или
-                registerText: Зарегистрируйтесь
-        submitButton:
-          label: Войти
+    mainHeader: Войти в систему
+    fields:
+      login:
+        label: E-mail
+        requiredError: Пожалуйста, введиде свой E-mail
+        incorrectEmailError: Некорректный E-mail
+      password:
+        label: Пароль
+        requiredError: Пожалуйста, введите свой пароль
+        tooLongPasswordError: Пароль должен быть не длиннее 255 символов
+      rememberMe:
+        label: Запомнить меня на этом компьютере
+      incorrectLoginError:
+              label: Неверные E-mail или пароль.
+              messageText: Вы ввели неверные имя пользователя или пароль. Пожалуйста, попробуйте ещё раз или
+              registerText: Зарегистрируйтесь
+      submitButton:
+        label: Войти
+  userInfo:
+    alert:
+      firstNameChange:
+        success: "Имя успешно изменено"
+        error: "Произошла ошибка. Пожалуйста, попробуйте позже"
+      secondNameChange:
+        success: "Фамилия успешно изменена"
+        error: "Произошла ошибка. Пожалуйста, попробуйте позже"
+  userAvatar:
+    windowHeader: "Выберите ваш аватар"
+    alert:
+      successAvatarChanged: "Аватар успешно изменён"
+      errorAvatarChanged: "Произошла ошибка. Пожалуйста, попробуйте позже"

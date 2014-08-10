@@ -63,3 +63,16 @@ widget:
         registerText: Register
       submitButton:
         label: Login
+  userInfo:
+      alert:
+        firstNameChange:
+          success: "Name has been successfully changed"
+          error: "Error. Please, try again latter"
+        secondNameChange:
+          success: "Second name has been successfully changed"
+          error: "Error. Please, try again latter"
+  userAvatar:
+      windowHeader: "Choose your avatar"
+      alert:
+        successAvatarChanged: "Avatar has been successfully changed"
+        errorAvatarChanged: "Error. Please, try again letter"
