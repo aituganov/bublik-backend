@@ -1,17 +1,13 @@
 class Api::User::UsersController < Api::ApplicationController
-	before_filter :check_user, only: [:index, :created_companies, :update, :delete]
+	before_filter :check_user, except: [:registration, :login, :check_login]
 
 	def index
-		render_event :ok, rq_user.build_response({User.RS_DATA[:FULL] => true}, {access_token: access_token, limit: user_params[:company_limit]})
+		render_event :ok, @rq_user.build_response({User.RS_DATA[:FULL] => true}, {access_token: @access_token, limit: user_params[:company_limit]})
 	end
 
 	def registration
-		user = User.new(user_params)
-		if user.save
-			render_event :created, {id: user.id, access_token: user.access_token}
-		else
-			render_error :unprocessable_entity, user.errors
-		end
+		user = User.create!(user_params)
+		render_event :created, {id: user.id, access_token: user.access_token}
 	end
 
 	def login
@@ -33,32 +29,26 @@ class Api::User::UsersController < Api::ApplicationController
 	end
 
 	def update
-		check_privileges access_token, :update, rq_user
+		check_privileges @access_token, :update, @rq_user
 
-		if rq_user.update(user_params)
-			render_event :ok
-		else
-			render_error :bad_request, rq_user.errors
-		end
+		@rq_user.update!(user_params)
+		render_event :ok
 	end
 
 	def delete
-		check_privileges access_token, :destroy, rq_user
+		check_privileges @access_token, :destroy, @rq_user
 
-		rq_user.destroy
+		@rq_user.destroy!
 		render_event :ok
 	end
 
 	private
 
-	def rq_user
-		@rq_user = User.find(params[:id])
-	end
-
 	def check_user
 		id = params[:id]
 		logger.info "check user ##{id}..."
 		raise ApiExceptions::NotFound::User.new(id) unless User.where(id: id).present?
+		@rq_user = User.find(params[:id])
 		logger.info 'finded!'
 	end
 

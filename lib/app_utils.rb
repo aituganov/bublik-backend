@@ -1,19 +1,6 @@
 require 'rack/mime'
 
 module AppUtils
-	class Response
-		attr_accessor :errors
-
-		def initialize(valid, errors={})
-			@valid = valid
-			@errors = errors
-		end
-
-		def valid?
-			@valid
-		end
-	end
-
 	def get_access_token(cookies)
 		cookies[:ACCESS_TOKEN]
 	end
@@ -32,8 +19,7 @@ module AppUtils
 
 	def avatar_params_valid?(avatar)
 		res = !(avatar[:data].nil? || avatar[:content_type].nil? || avatar[:crop_x].nil? || avatar[:crop_y].nil? || avatar[:crop_l].nil?)
-		render_error :bad_request unless res
-		res
+		raise_exception ArgumentError, 'Invalid request data' unless res
 	end
 
 	def build_privileges(access_token, requested_objects)

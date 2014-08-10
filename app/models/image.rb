@@ -34,35 +34,24 @@ class Image < ActiveRecord::Base
 		prev_current = self.imageable.get_current_image
 		if !prev_current.nil? && prev_current.id == self.id
 			logger.info 'Already!'
-			return AppUtils::Response.new true
+			return
 		end
 
-		rs = prev_current.set_uncurrent unless prev_current.nil?
-		return rs if !rs.nil? && !rs.valid?
-
+		prev_current.set_uncurrent unless prev_current.nil?
 		self.current = true
-		self.save
-		rs = AppUtils::Response.new self.valid?, self.errors
-		if rs.valid?
-			to_cache("#{self.imageable_type}_#{self.imageable_id}#{@@CACHE_KEY}", self.id)
-			logger.info 'Updated!'
-		end
+		self.save!
 
-		rs
+		to_cache("#{self.imageable_type}_#{self.imageable_id}#{@@CACHE_KEY}", self.id)
+		logger.info 'Updated!'
 	end
 
 	def set_uncurrent
 		logger.info "Set image ##{self.id} uncurrent..."
 		self.current = false;
-		self.save
-		rs = AppUtils::Response.new self.valid?, self.errors
+		self.save!
 
-		if rs.valid?
-			to_cache("#{self.imageable_type}_#{self.imageable_id}#{@@CACHE_KEY}", nil)
-			logger.info 'Updated!'
-		end
-
-		rs
+		to_cache("#{self.imageable_type}_#{self.imageable_id}#{@@CACHE_KEY}", nil)
+		logger.info 'Updated!'
 	end
 
 	def build_response

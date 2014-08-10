@@ -7,36 +7,29 @@ class Api::Company::CompaniesController < Api::ApplicationController
 		id = params[:id]
 		begin
 			# TODO: refactor without fakes
-			company = Company.get_data(id, {access_token: access_token}) || get_fake_company(id)
+			company = Company.get_data(id, {access_token: @access_token}) || get_fake_company(id)
 		end
 		render_event :ok, company
 	end
 
 	def registration
-		return unless check_privileges access_token, :create, Company.new
+		check_privileges @access_token, :create, Company.new
 
-		company = Company.new company_params.merge({owner: get_user_by_access_token(access_token)})
-		if company.save(company_params)
-			render_event :created, {id: company.id}
-		else
-			render_error :bad_request, company.errors
-		end
+		company = Company.create! company_params.merge({owner: get_user_by_access_token(@access_token)})
+		render_event :created, {id: company.id}
 	end
 
 	def update
-		return unless check_privileges access_token, :update, company
+		check_privileges @access_token, :update, @company
 
-		if company.update(company_params)
-			render_event :ok
-		else
-			render_error :bad_request, company.errors
-		end
+		@company.update!(company_params)
+		render_event :ok
 	end
 
 	def delete
-		return unless check_privileges access_token, :destroy, company
+		check_privileges @access_token, :destroy, @company
 
-		company.destroy
+		@company.destroy!
 		render_event :ok
 	end
 
@@ -48,11 +41,10 @@ class Api::Company::CompaniesController < Api::ApplicationController
 
 	def check_company
 		id = params[:id]
+		logger.info "Check company ##{id}..."
 		raise ApiExceptions::NotFound::Company.new(id) unless Company.where(id: id).present?
-	end
-
-	def company
-		Company.find(params[:id])
+		@company = Company.find(params[:id])
+		logger.info 'finded!'
 	end
 
 end

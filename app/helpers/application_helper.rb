@@ -1,3 +1,5 @@
+include AppUtils
+
 module ApplicationHelper
 
 	def render_event(code, data=nil)
@@ -10,7 +12,8 @@ module ApplicationHelper
 		render json: rs, status: code
 	end
 
-	def render_error(code, errors=nil)
+	def render_error(code, errors=nil, ex=nil)
+		log_exception ex unless ex.nil?
 		if !errors.nil?
 			rs = {errors: errors}
 		else

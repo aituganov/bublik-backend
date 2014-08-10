@@ -1,6 +1,6 @@
 include ApplicationHelper
 
-class Api::TagsController < Api::ApplicationController
+class Api::Search::TagsController < Api::ApplicationController
 
 	def find
 		tags = Tag.arel_table

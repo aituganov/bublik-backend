@@ -73,13 +73,13 @@ Rails.application.routes.draw do
 			# Login
 			match 'login' => 'users#login', via: [:put]
 			get 'login/check/:login' => 'users#check_login', constraints: {login: /.*/}
-			# Info
+			# User
 			get ':id' => 'users#index'
 			post ':id' => 'users#update'
 			match ':id' => 'users#delete', via: [:delete]
+			# Created companies
 			get ':id/created_companies' => 'companies/created_companies#index'
-			# Updaters
-
+			# Avatars
 			get ':id/avatars' => 'avatars/avatars#index'
 			post ':id/avatar' => 'avatars/avatars#create'
 			post ':id/avatar/current/:avatar_id' => 'avatars/avatars#set_current'
@@ -88,7 +88,6 @@ Rails.application.routes.draw do
 			# Interests
 			match ':id/interests' => 'interests/interests#add', via: [:put]
 			match ':id/interests' => 'interests/interests#delete', via: [:delete]
-			# Delete
 
 		end
 
@@ -98,16 +97,17 @@ Rails.application.routes.draw do
 			get ':id' => 'companies#index'
 			post ':id' => 'companies#update'
 			match ':id' => 'companies#delete', via: [:delete]
+			# Tags
 			match ':id/tags' => 'tags/tags#add', via: [:put]
 			match ':id/tags' => 'tags/tags#delete', via: [:delete]
 		end
 
-		# Route tags
-		scope :path => 'tag' do
-			get ':name' => 'tags#find'
-		end
-		scope :path => 'child' do
-			get '/', to: 'child#test_yes'
+		# Route search
+		namespace :search do
+			# Tags
+			scope :path => 'tag' do
+				get ':name' => 'tags#find'
+			end
 		end
 	end
 

@@ -1,5 +1,4 @@
 class Api::LocalizationController < Api::ApplicationController
-
 	before_action :set_locale
 
 	def get
