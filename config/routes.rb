@@ -84,7 +84,6 @@ Rails.application.routes.draw do
 			post ':id/avatar' => 'avatars/avatars#create'
 			post ':id/avatar/current/:avatar_id' => 'avatars/avatars#set_current'
 			match ':id/avatar/:avatar_id' => 'avatars/avatars#delete', via: [:delete]
-
 			# Interests
 			match ':id/interests' => 'interests/interests#add', via: [:put]
 			match ':id/interests' => 'interests/interests#delete', via: [:delete]
@@ -97,6 +96,11 @@ Rails.application.routes.draw do
 			get ':id' => 'companies#index'
 			post ':id' => 'companies#update'
 			match ':id' => 'companies#delete', via: [:delete]
+			# Avatars
+			get ':id/logotypes' => 'logotypes/logotypes#index'
+			post ':id/logotype' => 'logotypes/logotypes#create'
+			post ':id/logotype/current/:logo_id' => 'logotypes/logotypes#set_current'
+			match ':id/logotype/:logo_id' => 'logotypes/logotypes#delete', via: [:delete]
 			# Tags
 			match ':id/tags' => 'tags/tags#add', via: [:put]
 			match ':id/tags' => 'tags/tags#delete', via: [:delete]

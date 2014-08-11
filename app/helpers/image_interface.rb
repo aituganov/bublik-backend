@@ -1,3 +1,5 @@
+include ApplicationHelper
+
 module ImageInterface
 	def image_index
 		check_privileges @access_token, :read, image_owner
@@ -10,7 +12,7 @@ module ImageInterface
 		check_privileges @access_token, :create, Image.new
 		avatar_params_valid? image_params
 
-		new_image = image_reference.build image_params
+		new_image = image_owner.images.build image_params
 		new_image.save! && new_image.set_current
 		render_event :ok, new_image.build_response(@access_token)
 	end
@@ -31,13 +33,21 @@ module ImageInterface
 		render_event :ok
 	end
 
+	def check_image
+		id = image_id
+		logger.info "check image ##{id}..."
+		raise ApiExceptions::NotFound::Image.new(id) unless Image.where(id: id).present?
+		@image = Image.find(id)
+		logger.info 'finded!'
+	end
+
 	protected
 
-	def rs_data
+	def image_id
 		raise NotImplementedError.new 'method not implemented'
 	end
 
-	def image_reference
+	def rs_data
 		raise NotImplementedError.new 'method not implemented'
 	end
 

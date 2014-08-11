@@ -3,6 +3,7 @@ include AppUtils
 class Company < ActiveRecord::Base
 	acts_as_paranoid
 	acts_as_taggable_on :tags
+	has_many :images, as: :imageable, :dependent => :destroy
 
 	belongs_to :owner, class_name: 'User', foreign_key: 'owner_id'
 
@@ -11,7 +12,7 @@ class Company < ActiveRecord::Base
 	validates :description, length: {maximum: 500}
 	validates :rating, inclusion: {in: 0..5}
 
-	@@RS_DATA = {FULL: 'full', PRIVILEGES: 'actions', TAGS: 'tags'}
+	@@RS_DATA = {FULL: 'full', PRIVILEGES: 'actions', TAGS: 'tags', LOGOTYPES: 'logotypes', LOGOTYPE: 'logotype'}
 
 	def self.get_data(id, options={})
 		begin
@@ -23,21 +24,29 @@ class Company < ActiveRecord::Base
 		res
 	end
 
+	def get_current_image
+		Image.get_current(self)
+	end
+
 	def self.RS_DATA
 		@@RS_DATA
 	end
 
 	def build_response(rs_data, options={})
 		rs = {}
+		token = options[:access_token]
 
 		if rs_data[@@RS_DATA[:FULL]]
 			put_main_data rs
 			put_tags_data rs
-			put_privileges_data rs, self, options[:access_token]
+			put_privileges_data rs, self, token
+			put_current_logotype_data rs, token
 		elsif rs_data[@@RS_DATA[:PRIVILEGES]]
-			put_privileges_data rs, self, options[:access_token]
+			put_privileges_data rs, self, token
 		elsif rs_data[@@RS_DATA[:TAGS]]
 			put_interests_data rs
+		elsif rs_data[@@RS_DATA[:LOGOTYPES]]
+			put_all_logotypes_data rs, token
 		end
 		rs
 	end
@@ -49,6 +58,16 @@ class Company < ActiveRecord::Base
 		rs[:rating] = self.rating
 		rs[:description] = self.description
 		rs[:is_deleted] = self.is_deleted
+	end
+
+	def put_all_logotypes_data(rs, access_token)
+		rs[@@RS_DATA[:LOGOTYPES]] = []
+		self.images.each { |i| rs[@@RS_DATA[:LOGOTYPES]].push(i.build_response access_token) }
+	end
+
+	def put_current_logotype_data(rs, access_token)
+		current = get_current_image
+		rs[@@RS_DATA[:LOGOTYPE]] = current.build_response access_token unless current.nil?
 	end
 
 	def put_tags_data(rs)

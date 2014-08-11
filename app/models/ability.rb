@@ -38,7 +38,14 @@ class Ability
 
 		can :read, [Company, Image]
 		can :rud, Company, :owner_id => user.id
-		can :rud, Image, :imageable_id => user.id, :imageable_type => user.class.name
+		can :rud, Image do |image|
+			if image.imageable_type == user.class.name
+				res = image.imageable == user
+			elsif image.imageable_type == Company.name
+				res = image.imageable.owner == user
+			end
+			res
+		end
 	end
 
 	def build_privileges(requested_objects)
