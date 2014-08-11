@@ -50,12 +50,20 @@ describe Api::User::Avatars::AvatarsController, type: :controller do
 				post :create, {id: @correct_user.id, data: @data, content_type: 'image/jpeg', crop_x: 10, crop_y: 10, crop_l: 10 }
 				response.status.should eq 200
 				@correct_user.get_current_image.file.read.should eq @file_content
-				rs_avatar_data = JSON.parse(response.body)['data']['avatar']
+				rs_avatar_data = JSON.parse(response.body)['data']
 				rs_avatar_data.should_not be_nil
 				rs_avatar_data['id'].should eq @correct_user.get_current_image.id
 				rs_avatar_data['current'].should be_true
 				rs_avatar_data['preview_url'].should eq @correct_user.get_current_image.file.preview.url
 				rs_avatar_data['fullsize_url'].should eq @correct_user.get_current_image.file.url
+
+				user_actions = rs_avatar_data['actions']
+				user_actions.should_not be_nil
+				user_actions.should have(4).item
+				user_actions['create'].should be_false
+				user_actions['read'].should be_true
+				user_actions['update'].should be_true
+				user_actions['destroy'].should be_true
 			end
 
 			it 'should 403 & for not owner' do
@@ -75,7 +83,7 @@ describe Api::User::Avatars::AvatarsController, type: :controller do
 			it 'should 200 & correct preview size' do
 				post :create, {id: @correct_user.id, data: @data, content_type: 'image/jpeg', crop_x: 10, crop_y: 10, crop_l: 10 }
 				response.status.should eq 200
-				rs_avatar_data = JSON.parse(response.body)['data']['avatar']
+				rs_avatar_data = JSON.parse(response.body)['data']
 				rs_avatar_data.should_not be_nil
 				img = Magick::Image.read( "#{AppSettings.images.dir}#{rs_avatar_data['preview_url']}" ).first
 				img.columns.should eq AppSettings.images.preview_size
@@ -86,7 +94,7 @@ describe Api::User::Avatars::AvatarsController, type: :controller do
 				@data_base64 = 'base64,' + Base64.encode64(@file_content)
 				post :create, {id: @correct_user.id, data: @data_base64, content_type: 'image/jpeg', crop_x: 10, crop_y: 10, crop_l: 10 }
 				response.status.should eq 200
-				rs_avatar_data = JSON.parse(response.body)['data']['avatar']
+				rs_avatar_data = JSON.parse(response.body)['data']
 				rs_avatar_data.should_not be_nil
 				img = Magick::Image.read( "#{AppSettings.images.dir}#{rs_avatar_data['preview_url']}" ).first
 				img.columns.should eq AppSettings.images.preview_size
@@ -97,13 +105,13 @@ describe Api::User::Avatars::AvatarsController, type: :controller do
 				post :create, {id: @correct_user.id, data: @data, content_type: 'image/jpeg', crop_x: 10, crop_y: 10, crop_l: 10 }
 				response.status.should eq 200
 				@current_first = @correct_user.get_current_image
-				rs_avatar_data = JSON.parse(response.body)['data']['avatar']
+				rs_avatar_data = JSON.parse(response.body)['data']
 				rs_avatar_data['id'].should eq @current_first.id
 
 				post :create, {id: @correct_user.id, data: @data, content_type: 'image/jpeg', crop_x: 10, crop_y: 10, crop_l: 10 }
 				response.status.should eq 200
 				@current_second = @correct_user.get_current_image
-				rs_avatar_data = JSON.parse(response.body)['data']['avatar']
+				rs_avatar_data = JSON.parse(response.body)['data']
 				rs_avatar_data['id'].should eq @current_second.id
 
 				@current_first.reload
@@ -118,7 +126,7 @@ describe Api::User::Avatars::AvatarsController, type: :controller do
 				3.times do
 					post :create, {id: @correct_user.id, data: @data, content_type: 'image/jpeg', crop_x: 10, crop_y: 10, crop_l: 10 }
 					response.status.should eq 200
-					@ids.push(JSON.parse(response.body)['data']['avatar']['id'].to_i)
+					@ids.push(JSON.parse(response.body)['data']['id'].to_i)
 				end
 				@current = @correct_user.get_current_image #last image is current
 			end
@@ -142,6 +150,13 @@ describe Api::User::Avatars::AvatarsController, type: :controller do
 						@current.should eq i;
 						a['current'].should be_true
 					end
+					user_actions = a['actions']
+					user_actions.should_not be_nil
+					user_actions.should have(4).item
+					user_actions['create'].should be_false
+					user_actions['read'].should be_true
+					user_actions['update'].should be_true
+					user_actions['destroy'].should be_true
 				end
 			end
 
@@ -151,6 +166,15 @@ describe Api::User::Avatars::AvatarsController, type: :controller do
 				response.status.should eq 200
 				rs = JSON.parse(response.body)['data']['avatars']
 				rs.should have(3).items
+				rs.each do |a|
+					user_actions = a['actions']
+					user_actions.should_not be_nil
+					user_actions.should have(4).item
+					user_actions['create'].should be_false
+					user_actions['read'].should be_true
+					user_actions['update'].should be_false
+					user_actions['destroy'].should be_false
+				end
 			end
 
 			it 'get all should 200 & correct data for anonymous' do
@@ -185,7 +209,7 @@ describe Api::User::Avatars::AvatarsController, type: :controller do
 					response.status.should eq 200
 
 					c = @correct_user.get_current_image
-					rs = JSON.parse(response.body)['data']['avatar']
+					rs = JSON.parse(response.body)['data']
 					rs['id'].should eq c.id
 					rs['current'].should be_true
 					c.should eq Image.where(imageable_id: @correct_user.id, current: true).take
@@ -197,7 +221,7 @@ describe Api::User::Avatars::AvatarsController, type: :controller do
 				response.status.should eq 200
 
 				c = @correct_user.get_current_image
-				rs = JSON.parse(response.body)['data']['avatar']
+				rs = JSON.parse(response.body)['data']
 				rs['id'].should eq c.id
 				rs['current'].should be_true
 				c.should eq Image.where(imageable_id: @correct_user.id, current: true).take

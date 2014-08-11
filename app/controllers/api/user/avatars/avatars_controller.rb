@@ -1,43 +1,41 @@
 include ApplicationHelper
 include UsersHelper
+include ImageInterface
 
 class Api::User::Avatars::AvatarsController < Api::User::UsersController
 	before_filter :check_avatar, only: [:set_current, :delete]
 
 	def index
-		check_privileges @access_token, :read, @rq_user
-		render_event :ok, @rq_user.build_response({User.RS_DATA[:AVATARS] => true})
+		image_index
 	end
 
 	def create
-		check_privileges @access_token, :update, @rq_user
-		check_privileges @access_token, :create, Image.new
-		avatar_params_valid? avatar_params
-
-		new_avatar = @rq_user.images.build avatar_params
-		new_avatar.save! && new_avatar.set_current
-		render_event :ok, @rq_user.build_response({User.RS_DATA[:AVATAR] => true})
+		image_create
 	end
 
 	def set_current
-		check_privileges @access_token, :update, @rq_user
-		check_privileges @access_token, :update, @rq_avatar
-
-		@rq_avatar.set_current
-		render_event :ok, @rq_user.build_response({User.RS_DATA[:AVATAR] => true})
+		image_set_current
 	end
 
 	def delete
-		check_privileges @access_token, :update, @rq_user
-		check_privileges @access_token, :destroy, @rq_avatar
-
-		@rq_avatar.destroy
-		render_event :ok
+		image_delete
 	end
 
 	private
 
-	def avatar_params
+	def rs_data
+		{User.RS_DATA[:AVATARS] => true}
+	end
+
+	def image_reference
+		@rq_user.images
+	end
+
+	def image_owner
+		@rq_user
+	end
+
+	def image_params
 		params.permit(:data, :content_type, :crop_x, :crop_y, :crop_l)
 	end
 
@@ -45,7 +43,7 @@ class Api::User::Avatars::AvatarsController < Api::User::UsersController
 		id = params[:avatar_id]
 		logger.info "check avatar ##{id}..."
 		raise ApiExceptions::NotFound::Image.new(id) unless Image.where(id: id).present?
-		@rq_avatar = Image.find(id)
+		@image = Image.find(id)
 		logger.info 'finded!'
 	end
 
