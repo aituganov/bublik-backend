@@ -1,7 +1,5 @@
 Rails.application.routes.draw do
 
-  resources :tags
-
 	# The priority is based upon order of creation: first created -> highest priority.
 	# See how all your routes lay out with "rake routes".
 
@@ -56,7 +54,8 @@ Rails.application.routes.draw do
 	#     # (app/controllers/admin/products_controller.rb)
 	#     resources :products
 	#   end
-	scope :path => 'api' do
+
+	namespace :api do
 		get 'localization' => 'localization#get'
 		get 'widget/:id' => 'widgets#get'
 
@@ -68,44 +67,50 @@ Rails.application.routes.draw do
 		end
 
 		# Route users
-		scope :path => 'user' do
+		namespace :user do
 			# Create
 			match 'new' => 'users#registration', via: [:put]
 			# Login
 			match 'login' => 'users#login', via: [:put]
-			get 'login/check/:login' => 'users#check_login', constraints: { login: /.*/ }
-			# Info
+			get 'login/check/:login' => 'users#check_login', constraints: {login: /.*/}
+			# User
 			get ':id' => 'users#index'
-			get ':id/created_companies' => 'users#created_companies'
-			# Updaters
 			post ':id' => 'users#update'
-			get ':id/avatars' => 'users#get_avatars'
-			post ':id/avatar' => 'users#create_avatar'
-			post ':id/avatar/current/:avatar_id' => 'users#set_current_avatar'
-			match ':id/avatar/:avatar_id' => 'users#delete_avatar' , via: [:delete]
+			match ':id' => 'users#delete', via: [:delete]
+			# Created companies
+			get ':id/created_companies' => 'companies/created_companies#index'
+			# Avatars
+			get ':id/avatars' => 'avatars/avatars#index'
+			post ':id/avatar' => 'avatars/avatars#create'
+			post ':id/avatar/current/:avatar_id' => 'avatars/avatars#set_current'
+			match ':id/avatar/:avatar_id' => 'avatars/avatars#delete', via: [:delete]
+
 			# Interests
-			match ':id/interests' => 'users#interests_add', via: [:put]
-			match ':id/interests' => 'users#interests_delete' , via: [:delete]
-			# Delete
-			match ':id' => 'users#delete' , via: [:delete]
+			match ':id/interests' => 'interests/interests#add', via: [:put]
+			match ':id/interests' => 'interests/interests#delete', via: [:delete]
+
 		end
 
 		# Route companies
-		scope :path => 'company' do
+		namespace :company do
 			match 'new' => 'companies#registration', via: [:put]
 			get ':id' => 'companies#index'
 			post ':id' => 'companies#update'
-			match ':id' => 'companies#delete' , via: [:delete]
-			match ':id/tags' => 'companies#tags_add', via: [:put]
-			match ':id/tags' => 'companies#tags_delete' , via: [:delete]
+			match ':id' => 'companies#delete', via: [:delete]
+			# Tags
+			match ':id/tags' => 'tags/tags#add', via: [:put]
+			match ':id/tags' => 'tags/tags#delete', via: [:delete]
 		end
 
-		# Route tags
-		scope :path => 'tag' do
-			get ':name' => 'tags#find'
+		# Route search
+		namespace :search do
+			# Tags
+			scope :path => 'tag' do
+				get ':name' => 'tags#find'
+			end
 		end
-
 	end
+
 
 	get '*path', :to => 'application#page_not_found'
 end

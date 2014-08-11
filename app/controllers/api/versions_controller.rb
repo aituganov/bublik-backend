@@ -1,4 +1,4 @@
-class VersionsController < ApplicationController
+class Api::VersionsController < Api::ApplicationController
 
 	before_action :load_version_file
 

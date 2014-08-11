@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe TagsController do
+describe Api::Search::TagsController, type: :controller do
 	before :each do
 		cookies['ACCESS_TOKEN'] = FactoryGirl.create(:user).access_token
 		@correct_name = 'Correct name'
@@ -8,12 +8,6 @@ describe TagsController do
 	end
 
 	context 'tag find' do
-		it 'has 404 error for empty access token' do
-			cookies['ACCESS_TOKEN'] = ''
-			get :find, name: ''
-			response.status.should eq 404
-		end
-
 		it 'has 200 & empty rs data for unexist name' do
 			get :find, name: 'Test'
 			response.status.should eq 200

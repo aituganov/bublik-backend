@@ -1,19 +1,6 @@
 require 'rack/mime'
 
 module AppUtils
-	class Response
-		attr_accessor :errors
-
-		def initialize(valid, errors={})
-			@valid = valid
-			@errors = errors
-		end
-
-		def valid?
-			@valid
-		end
-	end
-
 	def get_access_token(cookies)
 		cookies[:ACCESS_TOKEN]
 	end
@@ -26,21 +13,13 @@ module AppUtils
 		requester = get_user_by_access_token(access_token) || User.new # invalid token or new user
 		logger.info "Check privileges for #{requester.class} ##{requester.id} to #{action} #{requested.class} ##{requested.id}..."
 		ability = Ability.new requester
-		res = true
-
-		unless ability.can? action, requested
-			logger.warn 'forbidden!'
-			render_error :forbidden if render_er
-			res = false
-		end
+		raise ApiExceptions::User::NotAllowed.new(action, requester.id) unless ability.can? action, requested
 		logger.info 'accepted!'
-		res
 	end
 
 	def avatar_params_valid?(avatar)
 		res = !(avatar[:data].nil? || avatar[:content_type].nil? || avatar[:crop_x].nil? || avatar[:crop_y].nil? || avatar[:crop_l].nil?)
-		render_error :bad_request unless res
-		res
+		raise_exception ArgumentError, 'Invalid request data' unless res
 	end
 
 	def build_privileges(access_token, requested_objects)

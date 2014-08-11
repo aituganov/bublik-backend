@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe MenuController do
+describe Api::MenuController do
 	describe 'routing' do
 		it 'routes to #get' do
-			get('api/menu').should route_to('menu#get')
+			get('api/menu').should route_to('api/menu#get')
 		end
 	end
 end

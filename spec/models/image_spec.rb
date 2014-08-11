@@ -66,7 +66,7 @@ describe Image do
 		end
 
 		it 'correct current images' do
-			@created_image.set_current.valid?.should be_true
+			@created_image.set_current
 			@user.get_current_image.should eq @created_image
 		end
 
@@ -83,24 +83,24 @@ describe Image do
 		end
 
 		it 'set current && uncurrent' do
-			@created_image.set_current.valid?.should be_true
+			@created_image.set_current
 			@created_image.current.should be_true
 			@user.get_current_image.should eq @created_image
 
-			@created_image.set_uncurrent.valid?.should be_true
+			@created_image.set_uncurrent
 			@created_image.current.should be_false
 			@user.get_current_image.should be_nil
 		end
 
 		it 'set current twice' do
-			@created_image.set_current.valid?.should be_true
+			@created_image.set_current
 			@created_image.current.should be_true
 			@user.get_current_image.should eq @created_image
 
 			@second_image = @user.images.build(FactoryGirl.build(:image_hash))
 			@second_image.should be_valid
 
-			@second_image.set_current.valid?.should be_true
+			@second_image.set_current
 			@created_image.reload
 			@created_image.current.should be_false
 			@second_image.current.should be_true

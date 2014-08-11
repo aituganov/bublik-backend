@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe LocalizationController do
+describe Api::LocalizationController do
 	describe 'routing' do
 		it 'routes to #get' do
-			get('/api/localization').should route_to('localization#get')
+			get('/api/localization').should route_to('api/localization#get')
 		end
 
 	end

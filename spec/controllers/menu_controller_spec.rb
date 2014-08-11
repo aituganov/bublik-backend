@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe MenuController do
+describe Api::MenuController, type: :controller do
 
 	context 'menu get' do
 		it 'invalid access token has 404' do
