@@ -74,12 +74,52 @@ describe Image do
 			@created_image.file.preview.should have_dimensions(AppSettings.images.preview_size, AppSettings.images.preview_size)
 		end
 
-		it 'build response' do
+		it 'build response for anonymous' do
 			data = @created_image.build_response
 			data[:id].should eq @created_image.id
 			data[:current].should eq @created_image.current
 			data[:fullsize_url].should eq @created_image.file.url
 			data[:preview_url].should eq @created_image.file.preview.url
+
+			user_actions = data[:actions]
+			user_actions.should_not be_nil
+			user_actions.should have(4).item
+			user_actions[:create].should be_false
+			user_actions[:read].should be_true
+			user_actions[:update].should be_false
+			user_actions[:destroy].should be_false
+		end
+
+		it 'build response for not owner' do
+			data = @created_image.build_response 'another_user_access_token'
+			data[:id].should eq @created_image.id
+			data[:current].should eq @created_image.current
+			data[:fullsize_url].should eq @created_image.file.url
+			data[:preview_url].should eq @created_image.file.preview.url
+
+			user_actions = data[:actions]
+			user_actions.should_not be_nil
+			user_actions.should have(4).item
+			user_actions[:create].should be_false
+			user_actions[:read].should be_true
+			user_actions[:update].should be_false
+			user_actions[:destroy].should be_false
+		end
+
+		it 'build response' do
+			data = @created_image.build_response @user.access_token
+			data[:id].should eq @created_image.id
+			data[:current].should eq @created_image.current
+			data[:fullsize_url].should eq @created_image.file.url
+			data[:preview_url].should eq @created_image.file.preview.url
+
+			user_actions = data[:actions]
+			user_actions.should_not be_nil
+			user_actions.should have(4).item
+			user_actions[:create].should be_false
+			user_actions[:read].should be_true
+			user_actions[:update].should be_true
+			user_actions[:destroy].should be_true
 		end
 
 		it 'set current && uncurrent' do

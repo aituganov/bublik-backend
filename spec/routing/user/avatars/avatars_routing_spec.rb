@@ -14,7 +14,7 @@ describe Api::User::Avatars::AvatarsController do
 			post('/api/user/1/avatar/current/12').should route_to('api/user/avatars/avatars#set_current', id: '1', avatar_id: '12')
 		end
 
-		it 'routes to #set_current_avatar' do
+		it 'routes to #delete_avatar' do
 			delete('/api/user/1/avatar/12').should route_to('api/user/avatars/avatars#delete', id: '1', avatar_id: '12')
 		end
 	end

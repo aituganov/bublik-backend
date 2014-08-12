@@ -1,6 +1,6 @@
 include ImageInterface
 
-class Api::User::Avatars::AvatarsController < Api::User::UsersController
+class Api::Company::Logotypes::LogotypesController < Api::Company::CompaniesController
 	before_filter :check_image, only: [:set_current, :delete]
 
 	def index
@@ -22,15 +22,15 @@ class Api::User::Avatars::AvatarsController < Api::User::UsersController
 	private
 
 	def image_id
-		params[:avatar_id]
+		params[:logo_id]
 	end
 
 	def rs_data
-		{User.RS_DATA[:AVATARS] => true}
+		{Company.RS_DATA[:LOGOTYPES] => true}
 	end
 
 	def image_owner
-		@rq_user
+		@company
 	end
 
 	def image_params

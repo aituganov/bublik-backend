@@ -40,6 +40,10 @@ supported requests:
         /company/:id - DELETE request which marking company as deleted. Request cookies must contain owner ACCESS_TOKEN value.
         /company/:id/tags - PUT request for tags create, JSON params {tags: ['first', 'second']}. Request cookies must contain ACCESS_TOKEN value.
         /company/:id/tags - DELETE request for tags delete, JSON params {interests: ['first', 'second']}. Request cookies must contain ACCESS_TOKEN value.
+        /company/:id/logotypes - GET request for all company logotypes, rq param id - company id.
+        /company/:id/logotype - POST request for create new logo for company, JSON params {id: company id, data: base 64 image data, content_type: image content type, crop_x: x coord for crop (>=0), crop_y: y coord for crop (>=0), crop_l: cropped square side length (>=10)}.
+        /company/:id/logotype/current/:logo_id - POST request for set logo as current, rq params id - company id, logo_id - logotype id.
+        /company/:id/logotype/:logo_id - DELETE request for delete logo, rq params id - company id, logo_id - logotype id.
 
 
 * Get widget data
