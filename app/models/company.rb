@@ -14,16 +14,6 @@ class Company < ActiveRecord::Base
 
 	@@RS_DATA = {FULL: :full, PRIVILEGES: :actions, TAGS: :tags, LOGOTYPES: :logotypes, LOGOTYPE: :logotype}
 
-	def self.get_data(id, options={})
-		begin
-			company = Company.find(id)
-			res = company.build_response({@@RS_DATA[:FULL] => true}, options)
-		rescue ActiveRecord::RecordNotFound => e
-			res = nil
-		end
-		res
-	end
-
 	def get_current_image
 		Image.get_current(self)
 	end

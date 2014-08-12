@@ -1,15 +1,10 @@
 include CompaniesHelper
 
 class Api::Company::CompaniesController < Api::ApplicationController
-	before_filter :check_company, except: [:index, :registration]
+	before_filter :check_company, except: [:registration]
 
 	def index
-		id = params[:id]
-		begin
-			# TODO: refactor without fakes
-			company = Company.get_data(id, {access_token: @access_token}) || get_fake_company(id)
-		end
-		render_event :ok, company
+		render_event :ok, @company.build_response({Company.RS_DATA[:FULL] => true}, {access_token: @access_token})
 	end
 
 	def registration

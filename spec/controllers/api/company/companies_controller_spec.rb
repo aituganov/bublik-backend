@@ -139,18 +139,9 @@ describe Api::Company::CompaniesController, type: :controller do
 		end
 
 		context 'GET company info' do
-			it 'has a 200 response status code for not existed company' do
+			it 'has a 404 response status code for not existed company' do
 				get :index, {id: 1}
-				response.status.should eq 200
-			end
-
-			it 'has a fake info for unexisted company' do
-				id = 1
-				get :index, {id: id}
-				response.status.should eq 200
-				rs_data = JSON.parse(response.body)['data']
-				rs_data['id'].to_i.should eq id
-				rs_data['is_fake'].should be_true
+				response.status.should eq 404
 			end
 
 			it 'has a correct info for existed company' do

@@ -133,9 +133,9 @@ describe Api::Company::Logotypes::LogotypesController, type: :controller do
 				@current = @company.get_current_image #last image is current
 			end
 
-			it 'get all should 404 for not existed user' do
-				get :index, @id_wrong_structure #TODO: remove fake
-				response.status.should eq 200
+			it 'get all should 404 for not existed company' do
+				get :index, @id_wrong_structure
+				response.status.should eq 404
 			end
 
 			it 'get all should 200 & correct data' do

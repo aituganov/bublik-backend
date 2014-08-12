@@ -1,10 +1,11 @@
+include ApplicationHelper
+
 class Api::WidgetsController < Api::ApplicationController
-	include WidgetsHelper
 
 	before_filter :validate_params
 
 	def get
-		render json: get_fake_widget(@id, @level, @offset.to_i, @limit.to_i)
+		render_event :ok
 	end
 
 	private
