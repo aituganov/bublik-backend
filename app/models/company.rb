@@ -12,12 +12,12 @@ class Company < ActiveRecord::Base
 	validates :description, length: {maximum: 500}
 	validates :rating, inclusion: {in: 0..5}
 
-	@@RS_DATA = {FULL: 'full', PRIVILEGES: 'actions', TAGS: 'tags', LOGOTYPES: 'logotypes', LOGOTYPE: 'logotype'}
+	@@RS_DATA = {FULL: :full, PRIVILEGES: :actions, TAGS: :tags, LOGOTYPES: :logotypes, LOGOTYPE: :logotype}
 
 	def self.get_data(id, options={})
 		begin
 			company = Company.find(id)
-			res = company.build_response @@RS_DATA[:FULL], options
+			res = company.build_response({@@RS_DATA[:FULL] => true}, options)
 		rescue ActiveRecord::RecordNotFound => e
 			res = nil
 		end
@@ -44,7 +44,7 @@ class Company < ActiveRecord::Base
 		elsif rs_data[@@RS_DATA[:PRIVILEGES]]
 			put_privileges_data rs, self, token
 		elsif rs_data[@@RS_DATA[:TAGS]]
-			put_interests_data rs
+			put_tags_data rs
 		elsif rs_data[@@RS_DATA[:LOGOTYPES]]
 			put_all_logotypes_data rs, token
 		end

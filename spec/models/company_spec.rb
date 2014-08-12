@@ -80,70 +80,129 @@ describe Company do
 		end
 	end
 
-	context 'update tags' do
+	context 'existed company actions' do
 		before(:each) do
 			@created_company = FactoryGirl.create(:company, owner: @correct_user, rating: 5)
 			@created_company.should be_valid
 		end
+		context 'update tags' do
+			it 'add new tags to the company' do
+				@created_company.tag_list.add(['first', 'second'])
+				@created_company.save
+				@created_company.tag_list.should have(2).item
+				@created_company.tags.should have(2).item
+				Tag.all.should have(2).item
+			end
 
-		it 'add new tags to the company' do
-			@created_company.tag_list.add(['first', 'second'])
-			@created_company.save
-			@created_company.tag_list.should have(2).item
-			@created_company.tags.should have(2).item
-			Tag.all.should have(2).item
+			it 'check tags uniq' do
+				@created_company.tag_list.add(['first', 'first'])
+				@created_company.save
+				@created_company.tag_list.should have(1).item
+				@created_company.tags.should have(1).item
+				Tag.all.should have(1).item
+			end
+
+			it 'add existed tags to company' do
+				@created_company.tag_list.add(['first', 'second'])
+				@created_company.save
+				@created_company.tag_list.should have(2).item
+				@created_company.tags.should have(2).item
+
+				second_company = FactoryGirl.create(:company_second, owner: @correct_user)
+				second_company.should be_valid
+				second_company.tag_list.add(['second', 'third'])
+				second_company.save
+				second_company.tag_list.should have(2).item
+				second_company.tags.should have(2).item
+
+				Tag.all.should have(3).item
+			end
+
+			it 'check tags remove' do
+				@created_company.tag_list.add(['first', 'second'])
+				@created_company.save
+				@created_company.tag_list.should have(2).item
+				@created_company.tags.should have(2).item
+				Tag.all.should have(2).item
+
+				@created_company.tag_list.remove(['first', 'second'])
+				@created_company.save
+				@created_company.tag_list.should have(0).item
+				@created_company.tags.should have(0).item
+				Tag.all.should have(2).item
+			end
+
+			it 'check remove unexisted tags' do
+				@created_company.tag_list.add(['first', 'second'])
+				@created_company.save
+				@created_company.tag_list.should have(2).item
+				@created_company.tags.should have(2).item
+				Tag.all.should have(2).item
+
+				@created_company.tag_list.remove(['third', 'fourth'])
+				@created_company.save
+				@created_company.tag_list.should have(2).item
+				@created_company.tags.should have(2).item
+				Tag.all.should have(2).item
+			end
 		end
 
-		it 'check tags uniq' do
-			@created_company.tag_list.add(['first', 'first'])
-			@created_company.save
-			@created_company.tag_list.should have(1).item
-			@created_company.tags.should have(1).item
-			Tag.all.should have(1).item
-		end
+		context 'check instance methods' do
+			context 'check privileges' do
+				after(:each) do
+					@actions.should_not be_nil
+					@actions[:create].should be_false
+					@actions[:read].should be_true
+					@actions[:update].should eq !@only_read
+					@actions[:destroy].should eq !@only_read
+				end
 
-		it 'add existed tags to company' do
-			@created_company.tag_list.add(['first', 'second'])
-			@created_company.save
-			@created_company.tag_list.should have(2).item
-			@created_company.tags.should have(2).item
+				it 'build privileges response has correct data for anonymous' do
+					rs = @created_company.build_response({Company.RS_DATA[:PRIVILEGES] => true})
+					@actions = rs[:actions]
+					@only_read = true
+				end
 
-			second_company = FactoryGirl.create(:company_second, owner: @correct_user)
-			second_company.should be_valid
-			second_company.tag_list.add(['second', 'third'])
-			second_company.save
-			second_company.tag_list.should have(2).item
-			second_company.tags.should have(2).item
+				it 'build privileges response has correct data for not owner' do
+					rs = @created_company.build_response({Company.RS_DATA[:PRIVILEGES] => true}, {access_token: 'another_user'})
+					@actions = rs[:actions]
+					@only_read = true
+				end
 
-			Tag.all.should have(3).item
-		end
+				it 'build privileges response has correct data owner' do
+					rs = @created_company.build_response({Company.RS_DATA[:PRIVILEGES] => true}, {access_token: @correct_user.access_token})
+					@actions = rs[:actions]
+					@only_read = false
+				end
+			end
 
-		it 'check tags remove' do
-			@created_company.tag_list.add(['first', 'second'])
-			@created_company.save
-			@created_company.tag_list.should have(2).item
-			@created_company.tags.should have(2).item
-			Tag.all.should have(2).item
+			context 'check tags' do
+				before(:each) do
+					@created_company.tags_add %w(first second)
+				end
 
-			@created_company.tag_list.remove(['first', 'second'])
-			@created_company.save
-			@created_company.tag_list.should have(0).item
-			@created_company.tags.should have(0).item
-			Tag.all.should have(2).item
-		end
+				after(:each) do
+					@tags.should_not be_nil
+					@tags.should have(2).items
+					@tags[0].should eq 'first'
+					@tags[1].should eq 'second'
+				end
 
-		it 'check remove unexisted tags' do
-			@created_company.tag_list.add(['first', 'second'])
-			@created_company.save
-			@created_company.tag_list.should have(2).item
-			@created_company.tags.should have(2).item
-			Tag.all.should have(2).item
+				it 'build tags response has correct data for anonymous' do
+					rs = @created_company.build_response({Company.RS_DATA[:TAGS] => true})
+					@tags = rs[Company.RS_DATA[:TAGS]]
+				end
 
-			@created_company.tag_list.remove(['third', 'fourth'])
-			@created_company.save
-			@created_company.tag_list.should have(2).item
-			@created_company.tags.should have(2).item
-			Tag.all.should have(2).item
+				it 'build tags response has correct data for not owner' do
+					rs = @created_company.build_response({Company.RS_DATA[:TAGS] => true})
+					@tags = rs[Company.RS_DATA[:TAGS]]
+				end
+
+				it 'build tags response has correct data owner' do
+					rs = @created_company.build_response({Company.RS_DATA[:TAGS] => true})
+					@tags = rs[Company.RS_DATA[:TAGS]]
+				end
+			end
 		end
 	end
 end

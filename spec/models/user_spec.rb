@@ -88,86 +88,181 @@ describe User do
 			FactoryGirl.build(:user).should have(1).error_on(:login)
 		end
 	end
-
-	context 'update user' do
+	context 'existed user actions' do
 		before (:each) do
 			@user = FactoryGirl.create(:user)
 			@user.should be_valid
 		end
 
-		it 'user should be updated' do
-			last_name = 'Changed last name'
-			@user.last_name = last_name
-			@user.save
-			@user.last_name.should eq last_name
+		context 'update user' do
+			it 'user should be updated' do
+				last_name = 'Changed last name'
+				@user.last_name = last_name
+				@user.save
+				@user.last_name.should eq last_name
+			end
+
+			it 'add new interests to the user' do
+				@user.interest_list.add(['first', 'second'])
+				@user.save
+				@user.interest_list.should have(2).item
+				@user.interests.should have(2).item
+				Tag.all.should have(2).item
+			end
+
+			it 'check interests uniq' do
+				@user.interest_list.add(['first', 'first'])
+				@user.save
+				@user.interest_list.should have(1).item
+				@user.interests.should have(1).item
+				Tag.all.should have(1).item
+			end
+
+			it 'add existed interest to user' do
+				@user.interest_list.add(['first', 'second'])
+				@user.save
+				@user.interest_list.should have(2).item
+				@user.interests.should have(2).item
+
+				second_user = FactoryGirl.create(:user_second)
+				second_user.should be_valid
+				second_user.interest_list.add(['second', 'third'])
+				second_user.save
+				second_user.interest_list.should have(2).item
+				second_user.interests.should have(2).item
+
+				Tag.all.should have(3).item
+			end
+
+			it 'check interests remove' do
+				@user.interest_list.add(['first', 'second'])
+				@user.save
+				@user.interest_list.should have(2).item
+				@user.interests.should have(2).item
+				Tag.all.should have(2).item
+
+				@user.interest_list.remove(['first', 'second'])
+				@user.save
+				@user.interest_list.should have(0).item
+				@user.interests.should have(0).item
+				Tag.all.should have(2).item
+			end
+
+			it 'check remove unexisted interest' do
+				@user.interest_list.add(['first', 'second'])
+				@user.save
+				@user.interest_list.should have(2).item
+				@user.interests.should have(2).item
+				Tag.all.should have(2).item
+
+				@user.interest_list.remove(['third', 'fourth'])
+				@user.save
+				@user.interest_list.should have(2).item
+				@user.interests.should have(2).item
+				Tag.all.should have(2).item
+			end
 		end
 
-		it 'add new interests to the user' do
-			@user.interest_list.add(['first', 'second'])
-			@user.save
-			@user.interest_list.should have(2).item
-			@user.interests.should have(2).item
-			Tag.all.should have(2).item
+		context 'check instance methods' do
+			context 'check privileges' do
+				after(:each) do
+					@actions.should_not be_nil
+					@actions[:create].should be_false
+					@actions[:read].should be_true
+					@actions[:update].should eq !@only_read
+					@actions[:destroy].should eq !@only_read
+				end
+
+				it 'build privileges response has correct data for anonymous' do
+					rs = @user.build_response({User.RS_DATA[:PRIVILEGES] => true})
+					@actions = rs[:actions]
+					@only_read = true
+				end
+
+				it 'build privileges response has correct data for not owner' do
+					rs = @user.build_response({User.RS_DATA[:PRIVILEGES] => true}, {access_token: 'another_user'})
+					@actions = rs[:actions]
+					@only_read = true
+				end
+
+				it 'build privileges response has correct data for owner' do
+					rs = @user.build_response({User.RS_DATA[:PRIVILEGES] => true}, {access_token: @user.access_token})
+					@actions = rs[:actions]
+					@only_read = false
+				end
+			end
+
+			context 'check avatar' do
+				before(:each) do
+					@image = FactoryGirl.create(:image, imageable: @user, current: true)
+				end
+				after(:each) do
+					@avatar.should_not be_nil
+					@avatar[:id].should eq @image.id
+					@avatar[:current].should eq @image.current
+					@avatar[:fullsize_url].should eq @image.file.url
+					@avatar[:preview_url].should eq @image.file.preview.url
+
+					@actions = @avatar[:actions]
+					@actions.should_not be_nil
+					@actions[:create].should be_false
+					@actions[:read].should be_true
+					@actions[:update].should eq !@only_read
+					@actions[:destroy].should eq !@only_read
+				end
+
+				it 'build avatar response has correct data for anonymous' do
+					rs = @user.build_response({User.RS_DATA[:AVATAR] => true})
+					@avatar = rs[User.RS_DATA[:AVATAR]]
+					@only_read = true
+				end
+
+				it 'build avatar response has correct data for not owner' do
+					rs = @user.build_response({User.RS_DATA[:AVATAR] => true}, {access_token: 'another_user'})
+					@avatar = rs[User.RS_DATA[:AVATAR]]
+					@only_read = true
+				end
+
+				it 'build avatar response has correct data for owner' do
+					rs = @user.build_response({User.RS_DATA[:AVATAR] => true}, {access_token: @user.access_token})
+					@avatar = rs[User.RS_DATA[:AVATAR]]
+					@only_read = false
+				end
+			end
+
+			context 'check tags' do
+				before(:each) do
+					@user.interests_add %w(first second)
+				end
+
+				after(:each) do
+					@tags.should_not be_nil
+					@tags.should have(2).items
+					@tags[0].should eq 'first'
+					@tags[1].should eq 'second'
+				end
+
+				it 'build interests response has correct data for anonymous' do
+					rs = @user.build_response({User.RS_DATA[:INTERESTS] => true})
+					@tags = rs[User.RS_DATA[:INTERESTS]]
+				end
+
+				it 'build interests response has correct data for not owner' do
+					rs = @user.build_response({User.RS_DATA[:INTERESTS] => true}, {access_token: 'another_user'})
+					@tags = rs[User.RS_DATA[:INTERESTS]]
+				end
+
+				it 'build interests response has correct data for owner' do
+					rs = @user.build_response({User.RS_DATA[:INTERESTS] => true}, {access_token: @user.access_token})
+					@tags = rs[User.RS_DATA[:INTERESTS]]
+				end
+			end
 		end
-
-		it 'check interests uniq' do
-			@user.interest_list.add(['first', 'first'])
-			@user.save
-			@user.interest_list.should have(1).item
-			@user.interests.should have(1).item
-			Tag.all.should have(1).item
-		end
-
-		it 'add existed interest to user' do
-			@user.interest_list.add(['first', 'second'])
-			@user.save
-			@user.interest_list.should have(2).item
-			@user.interests.should have(2).item
-
-			second_user = FactoryGirl.create(:user_second)
-			second_user.should be_valid
-			second_user.interest_list.add(['second', 'third'])
-			second_user.save
-			second_user.interest_list.should have(2).item
-			second_user.interests.should have(2).item
-
-			Tag.all.should have(3).item
-		end
-
-		it 'check interests remove' do
-			@user.interest_list.add(['first', 'second'])
-			@user.save
-			@user.interest_list.should have(2).item
-			@user.interests.should have(2).item
-			Tag.all.should have(2).item
-
-			@user.interest_list.remove(['first', 'second'])
-			@user.save
-			@user.interest_list.should have(0).item
-			@user.interests.should have(0).item
-			Tag.all.should have(2).item
-		end
-
-		it 'check remove unexisted interest' do
-			@user.interest_list.add(['first', 'second'])
-			@user.save
-			@user.interest_list.should have(2).item
-			@user.interests.should have(2).item
-			Tag.all.should have(2).item
-
-			@user.interest_list.remove(['third', 'fourth'])
-			@user.save
-			@user.interest_list.should have(2).item
-			@user.interests.should have(2).item
-			Tag.all.should have(2).item
-		end
-	end
-
-	context 'delete user' do
-		it 'user should be deleted' do
-			FactoryGirl.create(:user).should be_valid
-			User.first.destroy
-			User.first.should be_nil
+		context 'delete user' do
+			it 'user should be deleted' do
+				@user.destroy
+				User.first.should be_nil
+			end
 		end
 	end
 

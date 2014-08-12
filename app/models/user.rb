@@ -13,7 +13,7 @@ class User < ActiveRecord::Base
 
 	before_validation :generate_access_token, on: :create
 
-	@@RS_DATA = {FULL: 'full', PRIVILEGES: 'privileges', INTERESTS: 'interests', AVATAR: 'avatar', AVATARS: 'avatars', CREATED_COMPANIES: 'created_companies'}
+	@@RS_DATA = {FULL: :full, PRIVILEGES: :privileges, INTERESTS: :interests, AVATAR: :avatar, AVATARS: :avatars, CREATED_COMPANIES: :created_companies}
 
 	def self.RS_DATA
 		@@RS_DATA
@@ -76,7 +76,7 @@ class User < ActiveRecord::Base
 	def put_created_company_data(rs, options)
 		rs[@@RS_DATA[:CREATED_COMPANIES]] = []
 		get_created_companies(options[:limit] || 6, options[:offset] || 0).each do |company|
-			rs[@@RS_DATA[:CREATED_COMPANIES]].push (company.build_response Company.RS_DATA[:FULL], options)
+			rs[@@RS_DATA[:CREATED_COMPANIES]].push (company.build_response({Company.RS_DATA[:FULL] => true}, options))
 		end
 	end
 
