@@ -32,8 +32,16 @@ class Ability
 		can :rud, User, :id => user.id
 		can :read, User
 
-		if !user.id.nil?
+		unless user.id.nil?
 			can :create, [Company, Image], :id => nil
+		end
+
+		can :follow, [User, Company] do |object|
+			!user.id.nil? && !user.follows?(object)
+		end
+
+		can :unfollow, [User, Company] do |object|
+			!user.id.nil? && user.follows?(object)
 		end
 
 		can :read, [Company, Image]

@@ -87,7 +87,15 @@ Rails.application.routes.draw do
 			# Interests
 			match ':id/interests' => 'interests/interests#add', via: [:put]
 			match ':id/interests' => 'interests/interests#delete', via: [:delete]
+			# Social
+			post ':id/social/user/follow/:user_id' => 'social/social#user_follow'
+			post ':id/social/user/unfollow/:user_id' => 'social/social#user_unfollow'
+			get ':id/social/user/followed' => 'social/social#user_followed'
+			get ':id/social/user/followers' => 'social/social#user_followers'
 
+			post ':id/social/company/follow/:company_id' => 'social/social#company_follow'
+			post ':id/social/company/unfollow/:company_id' => 'social/social#company_unfollow'
+			get ':id/social/company/followed' => 'social/social#company_followed'
 		end
 
 		# Route companies
@@ -105,7 +113,6 @@ Rails.application.routes.draw do
 			match ':id/tags' => 'tags/tags#add', via: [:put]
 			match ':id/tags' => 'tags/tags#delete', via: [:delete]
 		end
-
 		# Route search
 		namespace :search do
 			# Tags
