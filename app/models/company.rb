@@ -53,7 +53,7 @@ class Company < ActiveRecord::Base
 			put_tags_data rs
 			put_privileges_data rs, self, token
 			put_current_logotype_data rs, token
-			put_followers_data rs, options
+			rs[@@RS_DATA[:FOLLOWERS]] = get_followers_data options
 		elsif rs_data[@@RS_DATA[:PRIVILEGES]]
 			put_privileges_data rs, self, token
 		elsif rs_data[@@RS_DATA[:TAGS]]
@@ -61,7 +61,7 @@ class Company < ActiveRecord::Base
 		elsif rs_data[@@RS_DATA[:LOGOTYPES]]
 			put_all_logotypes_data rs, token
 		elsif rs_data[@@RS_DATA[:FOLLOWERS]]
-			put_followers_data rs, options
+			rs = get_followers_data options
 		end
 		rs
 	end
@@ -113,17 +113,17 @@ class Company < ActiveRecord::Base
 		{id: self.id, title: self.title, preview_url: self.get_current_image_preview_url}
 	end
 
-	def put_followers_data(rs, options)
+	def get_followers_data(options)
 		data = []
-		get_follower_users(options[:limit], options[:offset]).each do |company|
-			data.push company.get_follow_data
+		get_follower_users(options[:limit], options[:offset]).each do |user|
+			data.push user.get_follow_data
 		end
-		rs[@@RS_DATA[:FOLLOWERS]] = data
+		data
 	end
 
 	def get_follower_users(limit, offset)
 		logger.info "Finding followers for company ##{self.id}, limit = #{limit}, offset = #{offset}..."
-		res = get_followed(User, self, limit, offset)
+		res = get_followers(User, self, limit, offset)
 		logger.info "#{res.count} finded!"
 		res
 	end
