@@ -206,6 +206,25 @@ describe Api::Company::CompaniesController, type: :controller do
 				@created_company.reload
 				@created_company.is_deleted.should be_true
 			end
+
+			context 'social user info' do
+				before(:each) do
+					7.times do |i|
+						# user
+						u = FactoryGirl.create(:user, login: "user_#{i}@mail.com");
+						u.should be_valid;
+						u.follow!(@created_company).should be_true
+					end
+				end
+
+				it 'get user info has correct social data' do
+					get :index, @id_structure
+					response.status.should eq 200
+					rs = JSON.parse(response.body)['data']
+					rs['followers'].should_not be_nil
+					rs['followers'].should have(6).items
+				end
+			end
 		end
 	end
 
