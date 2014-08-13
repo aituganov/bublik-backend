@@ -198,7 +198,7 @@ describe Api::User::UsersController, type: :controller do
 			it 'registered user info has correct data for defined company limit' do
 				7.times {company = FactoryGirl.create(:company, owner: @correct_user); company.should be_valid}
 
-				get :index, @id_structure.merge({company_limit: 7})
+				get :index, @id_structure.merge({limit: 7})
 				response.status.should eq 200
 				rs_user_data = JSON.parse(response.body)['data']
 				companies_data = rs_user_data['created_companies']
@@ -228,6 +228,39 @@ describe Api::User::UsersController, type: :controller do
 				company_data['id'] = @created_company.id
 			end
 
+			context 'social user info' do
+				before(:each) do
+					@users = []
+					@companies = []
+					7.times do |i|
+						# user
+						u = FactoryGirl.create(:user, login: "user_#{i}@mail.com");
+						u.should be_valid;
+						@users.push(u)
+						@correct_user.follow!(u).should be_true
+						u.follow!(@correct_user).should be_true
+						# company
+						c = FactoryGirl.create(:company, owner: u, title: u.full_name);
+						c.should be_valid;
+						@companies.push(c)
+						@correct_user.follow!(c).should be_true
+					end
+				end
+
+				it 'get user info has correct social data' do
+					get :index, @id_structure
+					response.status.should eq 200
+					rs = JSON.parse(response.body)['data']
+					rs['followed_users'].should_not be_nil
+					rs['followed_users'].should have(6).items
+
+					rs['followed_companies'].should_not be_nil
+					rs['followed_companies'].should have(6).items
+
+					rs['followers'].should_not be_nil
+					rs['followers'].should have(6).items
+				end
+			end
 		end
 
 		context 'update' do
