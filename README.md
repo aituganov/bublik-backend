@@ -27,6 +27,13 @@ supported requests:
         /user/:id/avatar - POST request for create new avatar for user, JSON params {id: user id, data: base 64 image data, content_type: image content type, crop_x: x coord for crop (>=0), crop_y: y coord for crop (>=0), crop_l: cropped square side length (>=10)}.
         /user/:id/avatar/current/:avatar_id - POST request for set avatar as current, rq params id - user id, avatar_id - avatar id.
         /user/:id/avatar/:avatar_id - DELETE request for delete avatar, rq params id - user id, avatar_id - avatar id.
+        /user/:id/social/user/follow/:user_id - POST request for follow user. :id - followers id, :user_id - followed user id
+        /user/:id/social/user/unfollow/:user_id - POST request for unfollow user. :id - followers id, :user_id - followed user id
+        /user/:id/social/company/follow/:company_id - POST request for follow company. :id - followers id, :company_id - followed company id
+        /user/:id/social/company/unfollow/:company_id - POST request for unfollow company. :id - followers id, :company_id - followed company id
+        /user/:id/social/user/followed - GET request, which return followed users for user. Rq params: :id - user id, :offset - offset, :limit - limit
+        /user/:id/social/company/followed - GET request, which return followed companies for user. Rq params: :id - user id, :offset - offset, :limit - limit
+        /user/:id/social/user/followers - GET request, which return user followers. Rq params: :id - user id, :offset - offset, :limit - limit
 
 * Get user menu
 
@@ -44,6 +51,7 @@ supported requests:
         /company/:id/logotype - POST request for create new logo for company, JSON params {id: company id, data: base 64 image data, content_type: image content type, crop_x: x coord for crop (>=0), crop_y: y coord for crop (>=0), crop_l: cropped square side length (>=10)}.
         /company/:id/logotype/current/:logo_id - POST request for set logo as current, rq params id - company id, logo_id - logotype id.
         /company/:id/logotype/:logo_id - DELETE request for delete logo, rq params id - company id, logo_id - logotype id.
+        /company/:id/social/followers - GET request, which return company followers. Rq params: :id - company id, :offset - offset, :limit - limit
 
 
 * Get widget data
