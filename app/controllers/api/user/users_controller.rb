@@ -2,7 +2,7 @@ class Api::User::UsersController < Api::ApplicationController
 	before_filter :check_user, except: [:registration, :login, :check_login]
 
 	def index
-		render_event :ok, @rq_user.build_response({User.RS_DATA[:FULL] => true}, {access_token: @access_token, limit: user_params[:company_limit]})
+		render_event :ok, @rq_user.build_response({User.RS_DATA[:FULL] => true}, {access_token: @access_token, limit: user_params[:limit]})
 	end
 
 	def registration
@@ -53,7 +53,7 @@ class Api::User::UsersController < Api::ApplicationController
 	end
 
 	def user_params
-		params.permit(:login, :password, :last_name, :first_name, :company_limit, :company_offset)
+		params.permit(:login, :password, :last_name, :first_name, :limit, :offset)
 	end
 
 end

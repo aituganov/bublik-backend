@@ -4,6 +4,7 @@ defaults: &defaults
     default: ru
   offset_default: 0
   limit_default: 10
+  limit_preview: 6
   widgets:
     level_default: city
     limit_default: 10

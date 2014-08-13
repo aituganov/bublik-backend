@@ -10,7 +10,7 @@ module AppUtils
 	end
 
 	def check_privileges(access_token, action, requested, render_er=true)
-		requester = get_user_by_access_token(access_token) || User.new # invalid token or new user
+		requester = get_user_by_access_token(access_token) || User.new # invalid token or anonymous user
 		logger.info "Check privileges for #{requester.class} ##{requester.id} to #{action} #{requested.class} ##{requested.id}..."
 		ability = Ability.new requester
 		raise ApiExceptions::User::NotAllowed.new(action, requester.id) unless ability.can? action, requested
