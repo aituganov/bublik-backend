@@ -67,9 +67,9 @@ class User < ActiveRecord::Base
 			put_current_avatar_data rs, token
 			put_privileges_data rs, self, token
 			put_created_company_data rs, options
-			put_followed_users_data rs, options
-			put_followed_companies_data rs, options
-			put_followers_data rs, options
+			rs[@@RS_DATA[:FOLLOWED_USERS]] = put_followed_users_data options
+			rs[@@RS_DATA[:FOLLOWED_COMPANIES]] = put_followed_companies_data options
+			rs[@@RS_DATA[:FOLLOWERS]] = put_followers_data options
 		elsif rs_data[@@RS_DATA[:PRIVILEGES]]
 			put_privileges_data rs, self, token
 		elsif rs_data[@@RS_DATA[:INTERESTS]]
@@ -81,11 +81,11 @@ class User < ActiveRecord::Base
 		elsif rs_data[@@RS_DATA[:CREATED_COMPANIES]]
 			put_created_company_data rs, options
 		elsif rs_data[@@RS_DATA[:FOLLOWED_USERS]]
-			put_followed_users_data rs, options
+			rs = put_followed_users_data options
 		elsif rs_data[@@RS_DATA[:FOLLOWED_COMPANIES]]
-			put_followed_companies_data rs, options
+			rs = put_followed_companies_data options
 		elsif rs_data[@@RS_DATA[:FOLLOWERS]]
-			put_followers_data rs, options
+			rs = put_followers_data options
 		end
 		rs
 	end
@@ -134,12 +134,12 @@ class User < ActiveRecord::Base
 		{id: self.id, full_name: self.full_name, preview_url: self.get_current_image_preview_url}
 	end
 
-	def put_followed_users_data(rs, options)
+	def put_followed_users_data(options)
 		data = []
 		get_followed_users(options[:limit], options[:offset]).each do |user|
 			data.push user.get_follow_data
 		end
-		rs[@@RS_DATA[:FOLLOWED_USERS]] = data
+		data
 	end
 
 	def get_followed_users(limit, offset)
@@ -149,12 +149,12 @@ class User < ActiveRecord::Base
 		res
 	end
 
-	def put_followed_companies_data(rs, options)
+	def put_followed_companies_data(options)
 		data = []
 		get_followed_companies(options[:limit], options[:offset]).each do |company|
 			data.push company.get_follow_data
 		end
-		rs[@@RS_DATA[:FOLLOWED_COMPANIES]] = data
+		data
 	end
 
 	def get_followed_companies(limit, offset)
@@ -164,12 +164,12 @@ class User < ActiveRecord::Base
 		res
 	end
 
-	def put_followers_data(rs, options)
+	def put_followers_data(options)
 		data = []
 		get_follower_users(options[:limit], options[:offset]).each do |company|
 			data.push company.get_follow_data
 		end
-		rs[@@RS_DATA[:FOLLOWERS]] = data
+		data
 	end
 
 	def get_follower_users(limit, offset)

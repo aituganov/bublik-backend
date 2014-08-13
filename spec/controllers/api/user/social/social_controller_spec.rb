@@ -140,7 +140,7 @@ describe Api::User::Social::SocialController, type: :controller do
 
 					get :user_followed, @id_structure
 					response.status.should eq 200
-					rs_followed = JSON.parse(response.body)['data']['followed_users']
+					rs_followed = JSON.parse(response.body)['data']
 					rs_followed.should have(2).items
 					checked = 0
 					rs_followed.each do |rs_f|
@@ -158,13 +158,13 @@ describe Api::User::Social::SocialController, type: :controller do
 				it 'has correct rs for limit & offset' do
 					get :user_followed, @id_structure.merge({limit: 1, offset: 0})
 					response.status.should eq 200
-					rs_followed = JSON.parse(response.body)['data']['followed_users']
+					rs_followed = JSON.parse(response.body)['data']
 					rs_followed.should have(1).items
 					first_id = rs_followed[0]['id']
 
 					get :user_followed, @id_structure.merge({limit: 1, offset: 1})
 					response.status.should eq 200
-					rs_followed = JSON.parse(response.body)['data']['followed_users']
+					rs_followed = JSON.parse(response.body)['data']
 					rs_followed.should have(1).items
 					second_id = rs_followed[0]['id']
 
@@ -184,7 +184,7 @@ describe Api::User::Social::SocialController, type: :controller do
 
 					get :user_followers, @id_structure
 					response.status.should eq 200
-					rs_followed = JSON.parse(response.body)['data']['followers']
+					rs_followed = JSON.parse(response.body)['data']
 					rs_followed.should have(2).items
 					checked = 0
 					rs_followed.each do |rs_f|
@@ -202,13 +202,13 @@ describe Api::User::Social::SocialController, type: :controller do
 				it 'has correct rs for limit & offset' do
 					get :user_followers, @id_structure.merge({limit: 1, offset: 0})
 					response.status.should eq 200
-					rs_followed = JSON.parse(response.body)['data']['followers']
+					rs_followed = JSON.parse(response.body)['data']
 					rs_followed.should have(1).items
 					first_id = rs_followed[0]['id']
 
 					get :user_followers, @id_structure.merge({limit: 1, offset: 1})
 					response.status.should eq 200
-					rs_followed = JSON.parse(response.body)['data']['followers']
+					rs_followed = JSON.parse(response.body)['data']
 					rs_followed.should have(1).items
 					second_id = rs_followed[0]['id']
 
@@ -345,7 +345,7 @@ describe Api::User::Social::SocialController, type: :controller do
 
 					get :company_followed, @id_structure
 					response.status.should eq 200
-					rs_followed = JSON.parse(response.body)['data']['followed_companies']
+					rs_followed = JSON.parse(response.body)['data']
 					rs_followed.should have(2).items
 					checked = 0
 					rs_followed.each do |rs_f|
@@ -363,13 +363,13 @@ describe Api::User::Social::SocialController, type: :controller do
 				it 'has correct rs for limit & offset' do
 					get :company_followed, @id_structure.merge({limit: 1, offset: 0})
 					response.status.should eq 200
-					rs_followed = JSON.parse(response.body)['data']['followed_companies']
+					rs_followed = JSON.parse(response.body)['data']
 					rs_followed.should have(1).items
 					first_id = rs_followed[0]['id']
 
 					get :company_followed, @id_structure.merge({limit: 1, offset: 1})
 					response.status.should eq 200
-					rs_followed = JSON.parse(response.body)['data']['followed_companies']
+					rs_followed = JSON.parse(response.body)['data']
 					rs_followed.should have(1).items
 					second_id = rs_followed[0]['id']
 
