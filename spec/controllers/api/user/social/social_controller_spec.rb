@@ -135,6 +135,29 @@ describe Api::User::Social::SocialController, type: :controller do
 					@user.follow!(@followed_user).should be_true
 				end
 
+				it 'has 404 for not existed user' do
+					post :user_followed, @id_wrong_structure
+					response.status.should eq 404
+				end
+
+				it 'has 200 for anonymous' do
+					request.cookies[:ACCESS_TOKEN] = ''
+					post :user_followed, @id_structure
+					response.status.should eq 200
+				end
+
+				it 'has 200 for not owner token' do
+					request.cookies[:ACCESS_TOKEN] = @new_user.access_token
+					post :user_followed, @id_structure
+					response.status.should eq 200
+				end
+
+				it 'has 200 for not wrong access token' do
+					request.cookies[:ACCESS_TOKEN] = 'wrong_token'
+					post :user_followed, @id_structure
+					response.status.should eq 200
+				end
+
 				it 'has 200 & correct data for followed users' do
 					followed = [].push @new_user, @followed_user
 
@@ -177,6 +200,29 @@ describe Api::User::Social::SocialController, type: :controller do
 					@new_user.follow!(@followed_user).should be_true
 					@user.follow!(@followed_user).should be_true
 					@id_structure = {id: @followed_user.id}
+				end
+
+				it 'has 404 for not existed user' do
+					post :user_followers, @id_wrong_structure
+					response.status.should eq 404
+				end
+
+				it 'has 200 for anonymous' do
+					request.cookies[:ACCESS_TOKEN] = ''
+					post :user_followers, @id_structure
+					response.status.should eq 200
+				end
+
+				it 'has 200 for not owner token' do
+					request.cookies[:ACCESS_TOKEN] = @new_user.access_token
+					post :user_followers, @id_structure
+					response.status.should eq 200
+				end
+
+				it 'has 200 for not wrong access token' do
+					request.cookies[:ACCESS_TOKEN] = 'wrong_token'
+					post :user_followers, @id_structure
+					response.status.should eq 200
 				end
 
 				it 'has 200 & correct data for user followers' do
@@ -339,6 +385,29 @@ describe Api::User::Social::SocialController, type: :controller do
 			describe 'check followed companies rs' do
 				before(:each) do
 					@companies.each { |c| @user.follow!(c).should be_true}
+				end
+
+				it 'has 404 for not existed user' do
+					post :company_followed, @id_wrong_structure
+					response.status.should eq 404
+				end
+
+				it 'has 200 for anonymous' do
+					request.cookies[:ACCESS_TOKEN] = ''
+					post :company_followed, @id_structure
+					response.status.should eq 200
+				end
+
+				it 'has 200 for not owner token' do
+					request.cookies[:ACCESS_TOKEN] = @new_user.access_token
+					post :company_followed, @id_structure
+					response.status.should eq 200
+				end
+
+				it 'has 200 for not wrong access token' do
+					request.cookies[:ACCESS_TOKEN] = 'wrong_token'
+					post :company_followed, @id_structure
+					response.status.should eq 200
 				end
 
 				it 'has 200 & correct data for followed companies' do
