@@ -76,3 +76,6 @@ gem 'foreigner'
 
 # Use cancan for permissions check
 gem 'cancancan', '~> 1.9'
+
+# Use socialization
+gem 'socialization'

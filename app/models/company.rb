@@ -3,6 +3,8 @@ include AppUtils
 class Company < ActiveRecord::Base
 	acts_as_paranoid
 	acts_as_taggable_on :tags
+	acts_as_followable
+
 	has_many :images, as: :imageable, :dependent => :destroy
 
 	belongs_to :owner, class_name: 'User', foreign_key: 'owner_id'
@@ -12,15 +14,35 @@ class Company < ActiveRecord::Base
 	validates :description, length: {maximum: 500}
 	validates :rating, inclusion: {in: 0..5}
 
-	@@RS_DATA = {FULL: :full, PRIVILEGES: :actions, TAGS: :tags, LOGOTYPES: :logotypes, LOGOTYPE: :logotype}
+	@@RS_DATA = {
+			FULL: :full,
+			PRIVILEGES: :actions,
+			TAGS: :tags,
+			LOGOTYPES: :logotypes,
+			LOGOTYPE: :logotype,
+			FOLLOWERS: :followers
+	}
+
+	# Public methods
 
 	def get_current_image
 		Image.get_current(self)
 	end
 
+	def get_current_image_preview_url
+		current = get_current_image
+		!current.nil? ? current.file.preview.url : nil
+	end
+
+	def is_deleted
+		!self.deleted_at.nil?
+	end
+
 	def self.RS_DATA
 		@@RS_DATA
 	end
+
+	# Build response
 
 	def build_response(rs_data, options={})
 		rs = {}
@@ -31,12 +53,15 @@ class Company < ActiveRecord::Base
 			put_tags_data rs
 			put_privileges_data rs, self, token
 			put_current_logotype_data rs, token
+			rs[@@RS_DATA[:FOLLOWERS]] = get_followers_data options
 		elsif rs_data[@@RS_DATA[:PRIVILEGES]]
 			put_privileges_data rs, self, token
 		elsif rs_data[@@RS_DATA[:TAGS]]
 			put_tags_data rs
 		elsif rs_data[@@RS_DATA[:LOGOTYPES]]
 			put_all_logotypes_data rs, token
+		elsif rs_data[@@RS_DATA[:FOLLOWERS]]
+			rs = get_followers_data options
 		end
 		rs
 	end
@@ -50,6 +75,8 @@ class Company < ActiveRecord::Base
 		rs[:is_deleted] = self.is_deleted
 	end
 
+	# Logo's response block
+
 	def put_all_logotypes_data(rs, access_token)
 		rs[@@RS_DATA[:LOGOTYPES]] = []
 		self.images.each { |i| rs[@@RS_DATA[:LOGOTYPES]].push(i.build_response access_token) }
@@ -59,6 +86,8 @@ class Company < ActiveRecord::Base
 		current = get_current_image
 		rs[@@RS_DATA[:LOGOTYPE]] = current.build_response access_token unless current.nil?
 	end
+
+	# Tags response block
 
 	def put_tags_data(rs)
 		rs[@@RS_DATA[:TAGS]] = self.tag_list
@@ -78,7 +107,25 @@ class Company < ActiveRecord::Base
 		logger.info 'Deleted!'
 	end
 
-	def is_deleted
-		!self.deleted_at.nil?
+	# Socialization response block
+
+	def get_follow_data
+		{id: self.id, title: self.title, preview_url: self.get_current_image_preview_url}
 	end
+
+	def get_followers_data(options)
+		data = []
+		get_follower_users(options[:limit], options[:offset]).each do |user|
+			data.push user.get_follow_data
+		end
+		data
+	end
+
+	def get_follower_users(limit, offset)
+		logger.info "Finding followers for company ##{self.id}, limit = #{limit}, offset = #{offset}..."
+		res = get_followers(User, self, limit, offset)
+		logger.info "#{res.count} finded!"
+		res
+	end
+
 end

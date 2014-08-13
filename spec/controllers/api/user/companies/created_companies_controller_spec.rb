@@ -18,7 +18,7 @@ describe Api::User::Companies::CreatedCompaniesController, type: :controller do
 			companies = []
 			2.times {company = FactoryGirl.create(:company, owner: @correct_user); company.should be_valid; companies.push company}
 
-			get :index, @id_structure.merge({company_limit: 1})
+			get :index, @id_structure.merge({limit: 1})
 			response.status.should eq 200
 			rs_user_data = JSON.parse(response.body)['data']
 			companies_data = rs_user_data['created_companies']
@@ -26,7 +26,7 @@ describe Api::User::Companies::CreatedCompaniesController, type: :controller do
 			companies_data.should have(1).item
 			companies_data[0]['id'] = companies[0]['id']
 
-			get :index, @id_structure.merge({company_limit: 1, company_offset: 1})
+			get :index, @id_structure.merge({limit: 1, offset: 1})
 			response.status.should eq 200
 			rs_user_data = JSON.parse(response.body)['data']
 			companies_data = rs_user_data['created_companies']

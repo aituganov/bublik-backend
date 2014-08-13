@@ -15,6 +15,13 @@ FactoryGirl.define do
 		u.last_name  'Last_name'
 	end
 
+	factory :user_third, class: 'User'  do |u|
+		u.login      'third@email.ru'
+		u.password   'test_password'
+		u.first_name 'First_name'
+		u.last_name  'Last_name'
+	end
+
 	factory :wrong_user, class: 'User'  do |u|
 		u.login      'wrong_login_format'
 		u.password   'password'

@@ -164,6 +164,29 @@ describe User do
 		end
 
 		context 'check instance methods' do
+			context 'check public methods' do
+				it 'full_name has correct data' do
+					@user.full_name.should eq "#{@user.first_name} #{@user.last_name}"
+				end
+
+				it 'get_current_image has nil for unexisted avatar' do
+					@user.get_current_image.should be_nil
+				end
+
+				it 'get_current_image_preview_url has nil for unexisted avatar' do
+					@user.get_current_image_preview_url.should be_nil
+				end
+
+				it 'get_current_image has correct avatar' do
+					@image = FactoryGirl.create(:image, imageable: @user, current: true)
+					@user.get_current_image.should eq @image
+				end
+
+				it 'get_current_image_preview_url has correct url' do
+					@image = FactoryGirl.create(:image, imageable: @user, current: true)
+					@user.get_current_image_preview_url.should eq @image.file.preview.url
+				end
+			end
 			context 'check privileges' do
 				after(:each) do
 					@actions.should_not be_nil
