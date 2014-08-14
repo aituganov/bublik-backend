@@ -1,4 +1,5 @@
 class Api::LocalizationController < Api::ApplicationController
+	skip_before_action :set_requester
 	before_action :set_locale
 
 	def get

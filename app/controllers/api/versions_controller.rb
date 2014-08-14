@@ -1,5 +1,5 @@
 class Api::VersionsController < Api::ApplicationController
-
+	skip_before_action :set_requester
 	before_action :load_version_file
 
 	def current_version
