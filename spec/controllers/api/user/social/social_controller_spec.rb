@@ -152,10 +152,10 @@ describe Api::User::Social::SocialController, type: :controller do
 					response.status.should eq 200
 				end
 
-				it 'has 200 for not wrong access token' do
+				it 'has 401 for wrong access token' do
 					request.cookies[:ACCESS_TOKEN] = 'wrong_token'
 					post :user_followed, @id_structure
-					response.status.should eq 200
+					response.status.should eq 401
 				end
 
 				it 'has 200 & correct data for followed users' do
@@ -219,10 +219,10 @@ describe Api::User::Social::SocialController, type: :controller do
 					response.status.should eq 200
 				end
 
-				it 'has 200 for not wrong access token' do
+				it 'has 401 for wrong access token' do
 					request.cookies[:ACCESS_TOKEN] = 'wrong_token'
 					post :user_followers, @id_structure
-					response.status.should eq 200
+					response.status.should eq 401
 				end
 
 				it 'has 200 & correct data for user followers' do
@@ -404,10 +404,10 @@ describe Api::User::Social::SocialController, type: :controller do
 					response.status.should eq 200
 				end
 
-				it 'has 200 for not wrong access token' do
+				it 'has 401 for wrong access token' do
 					request.cookies[:ACCESS_TOKEN] = 'wrong_token'
 					post :company_followed, @id_structure
-					response.status.should eq 200
+					response.status.should eq 401
 				end
 
 				it 'has 200 & correct data for followed companies' do

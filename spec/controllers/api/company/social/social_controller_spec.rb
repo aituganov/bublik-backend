@@ -35,10 +35,10 @@ describe Api::Company::Social::SocialController, type: :controller do
 			response.status.should eq 200
 		end
 
-		it 'has 200 for not wrong access token' do
+		it 'has 401 for wrong access token' do
 			request.cookies[:ACCESS_TOKEN] = 'wrong_token'
 			post :followers, @id_structure
-			response.status.should eq 200
+			response.status.should eq 401
 		end
 
 		it 'has 200 & correct data for followers' do

@@ -91,7 +91,7 @@ describe Image do
 		end
 
 		it 'build response for not owner' do
-			data = @created_image.build_response 'another_user_access_token'
+			data = @created_image.build_response FactoryGirl.create(:user_second)
 			data[:id].should eq @created_image.id
 			data[:current].should eq @created_image.current
 			data[:fullsize_url].should eq @created_image.file.url
@@ -107,7 +107,7 @@ describe Image do
 		end
 
 		it 'build response' do
-			data = @created_image.build_response @user.access_token
+			data = @created_image.build_response @user
 			data[:id].should eq @created_image.id
 			data[:current].should eq @created_image.current
 			data[:fullsize_url].should eq @created_image.file.url

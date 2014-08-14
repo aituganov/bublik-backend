@@ -164,13 +164,14 @@ describe Company do
 				end
 
 				it 'build privileges response has correct data for not owner' do
-					rs = @created_company.build_response({Company.RS_DATA[:PRIVILEGES] => true}, {access_token: 'another_user'})
+					@not_owner = FactoryGirl.create(:user_second)
+					rs = @created_company.build_response({Company.RS_DATA[:PRIVILEGES] => true}, {requester: @not_owner})
 					@actions = rs[:actions]
 					@only_read = true
 				end
 
 				it 'build privileges response has correct data owner' do
-					rs = @created_company.build_response({Company.RS_DATA[:PRIVILEGES] => true}, {access_token: @correct_user.access_token})
+					rs = @created_company.build_response({Company.RS_DATA[:PRIVILEGES] => true}, {requester: @correct_user})
 					@actions = rs[:actions]
 					@only_read = false
 				end
