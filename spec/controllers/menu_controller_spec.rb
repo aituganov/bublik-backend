@@ -3,10 +3,10 @@ require 'spec_helper'
 describe Api::MenuController, type: :controller do
 
 	context 'menu get' do
-		it 'invalid access token has 404' do
+		it 'wrong access token has 401' do
 			cookies['ACCESS_TOKEN'] = 'illegal'
 			get :get
-			response.status.should eq 404
+			response.status.should eq 401
 		end
 
 		it 'empty access token has anonymous' do

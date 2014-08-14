@@ -3,14 +3,10 @@ include ApplicationHelper
 class Api::MenuController < Api::ApplicationController
 
 	def get
-		token = get_access_token cookies
-		user = get_user_by_access_token token
-		if get_access_token(cookies).nil?
+		if @requester.nil?
 			render_event :ok, {anonymous: true, menu: []}
-		elsif user.nil?
-			render_error :not_found
 		else
-			render_event :ok, user.get_menu
+			render_event :ok, @requester.get_menu
 		end
 	end
 

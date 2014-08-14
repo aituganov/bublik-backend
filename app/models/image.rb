@@ -54,8 +54,8 @@ class Image < ActiveRecord::Base
 		logger.info 'Updated!'
 	end
 
-	def build_response(access_token=nil)
-		{id: self.id, current: self.current, preview_url: self.file.preview.url, fullsize_url: self.file.url, actions: build_privileges(access_token, self)}
+	def build_response(requester=nil)
+		{id: self.id, current: self.current, preview_url: self.file.preview.url, fullsize_url: self.file.url, actions: build_privileges(requester, self)}
 	end
 
 	def destroy!

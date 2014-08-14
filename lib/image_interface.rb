@@ -2,32 +2,32 @@ include ApplicationHelper
 
 module ImageInterface
 	def image_index
-		check_privileges @access_token, :read, image_owner
-		rs = image_owner.build_response(rs_data, {access_token: @access_token})
+		check_privileges @requester, :read, image_owner
+		rs = image_owner.build_response(rs_data, {requester: @requester})
 		render_event :ok, rs
 	end
 
 	def image_create
-		check_privileges @access_token, :update, image_owner
-		check_privileges @access_token, :create, Image.new
+		check_privileges @requester, :update, image_owner
+		check_privileges @requester, :create, Image.new
 		avatar_params_valid? image_params
 
 		new_image = image_owner.images.build image_params
 		new_image.save! && new_image.set_current
-		render_event :ok, new_image.build_response(@access_token)
+		render_event :ok, new_image.build_response(@requester)
 	end
 
 	def image_set_current
-		check_privileges @access_token, :update, image_owner
-		check_privileges @access_token, :update, @image
+		check_privileges @requester, :update, image_owner
+		check_privileges @requester, :update, @image
 
 		@image.set_current
-		render_event :ok, @image.build_response(@access_token)
+		render_event :ok, @image.build_response(@requester)
 	end
 
 	def image_delete
-		check_privileges @access_token, :update, image_owner
-		check_privileges @access_token, :destroy, @image
+		check_privileges @requester, :update, image_owner
+		check_privileges @requester, :destroy, @image
 
 		@image.destroy!
 		render_event :ok

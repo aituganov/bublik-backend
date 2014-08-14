@@ -264,10 +264,10 @@ describe Api::User::UsersController, type: :controller do
 		end
 
 		context 'update' do
-			it 'invalid user access token has 403' do
+			it 'wrong access token has 401' do
 				request.cookies[:ACCESS_TOKEN] = @invalid_access_token
 				post :update, @id_structure
-				response.status.should eq 403
+				response.status.should eq 401
 			end
 
 			it 'invalid user id has 404' do
@@ -334,14 +334,14 @@ describe Api::User::UsersController, type: :controller do
 				@correct_user.is_deleted.should be_true
 			end
 
-			it 'second delete has 400' do
+			it 'second delete has 401' do
 				delete :delete, @id_structure
 				response.status.should eq 200
 				@correct_user.reload
 				@correct_user.is_deleted.should be_true
 
 				delete :delete, @id_structure
-				response.status.should eq 404
+				response.status.should eq 401
 			end
 		end
 	end

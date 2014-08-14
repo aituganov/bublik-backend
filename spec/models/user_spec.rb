@@ -203,13 +203,13 @@ describe User do
 				end
 
 				it 'build privileges response has correct data for not owner' do
-					rs = @user.build_response({User.RS_DATA[:PRIVILEGES] => true}, {access_token: 'another_user'})
+					rs = @user.build_response({User.RS_DATA[:PRIVILEGES] => true}, {requester: FactoryGirl.create(:user_second)})
 					@actions = rs[:actions]
 					@only_read = true
 				end
 
 				it 'build privileges response has correct data for owner' do
-					rs = @user.build_response({User.RS_DATA[:PRIVILEGES] => true}, {access_token: @user.access_token})
+					rs = @user.build_response({User.RS_DATA[:PRIVILEGES] => true}, {requester: @user})
 					@actions = rs[:actions]
 					@only_read = false
 				end
@@ -241,13 +241,13 @@ describe User do
 				end
 
 				it 'build avatar response has correct data for not owner' do
-					rs = @user.build_response({User.RS_DATA[:AVATAR] => true}, {access_token: 'another_user'})
+					rs = @user.build_response({User.RS_DATA[:AVATAR] => true}, {requester: FactoryGirl.create(:user_second)})
 					@avatar = rs[User.RS_DATA[:AVATAR]]
 					@only_read = true
 				end
 
 				it 'build avatar response has correct data for owner' do
-					rs = @user.build_response({User.RS_DATA[:AVATAR] => true}, {access_token: @user.access_token})
+					rs = @user.build_response({User.RS_DATA[:AVATAR] => true}, {requester: @user})
 					@avatar = rs[User.RS_DATA[:AVATAR]]
 					@only_read = false
 				end
