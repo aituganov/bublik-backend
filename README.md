@@ -55,4 +55,4 @@ Get widget data:
 
 Tags:
 ---------
-> - **/tag/:name?limit=:limit** - GET request for finding tag where :name - tag name, :limit - find limit
+> - **/tag/:name?limit=:limit** - GET request for finding tag where :name - tag name, :limit - find limit. Request payload: :exculde - array of excluded tags

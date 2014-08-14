@@ -63,7 +63,7 @@ Rails.application.routes.draw do
 		namespace :search do
 			# Tags
 			scope :path => 'tag' do
-				get ':name' => 'tags#find'
+				post ':name' => 'tags#find'
 			end
 		end
 	end
