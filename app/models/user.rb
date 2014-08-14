@@ -67,6 +67,7 @@ class User < ActiveRecord::Base
 			put_current_avatar_data rs, requester
 			put_privileges_data rs, self, requester
 			put_created_company_data rs, options
+			put_social_data rs, self, requester
 			rs[@@RS_DATA[:FOLLOWED_USERS]] = put_followed_users_data options
 			rs[@@RS_DATA[:FOLLOWED_COMPANIES]] = put_followed_companies_data options
 			rs[@@RS_DATA[:FOLLOWERS]] = put_followers_data options

@@ -53,6 +53,7 @@ class Company < ActiveRecord::Base
 			put_tags_data rs
 			put_privileges_data rs, self, requester
 			put_current_logotype_data rs, requester
+			put_social_data rs, self, requester
 			rs[@@RS_DATA[:FOLLOWERS]] = get_followers_data options
 		elsif rs_data[@@RS_DATA[:PRIVILEGES]]
 			put_privileges_data rs, self, requester
