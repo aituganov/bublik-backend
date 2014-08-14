@@ -6,13 +6,13 @@ class Api::User::Social::SocialController < Api::User::UsersController
 	before_action :check_read, only: [:company_followed, :user_followed, :user_followers]
 
 	def company_follow
-		check_privileges @access_token, :follow, @followed
+		check_privileges @requester, :follow, @followed
 		@rq_user.follow! @followed
 		render_event :ok
 	end
 
 	def company_unfollow
-		check_privileges @access_token, :unfollow, @followed
+		check_privileges @requester, :unfollow, @followed
 		@rq_user.unfollow! @followed
 		render_event :ok
 	end
@@ -22,13 +22,13 @@ class Api::User::Social::SocialController < Api::User::UsersController
 	end
 
 	def user_follow
-		check_privileges @access_token, :follow, @followed
+		check_privileges @requester, :follow, @followed
 		@rq_user.follow! @followed
 		render_event :ok
 	end
 
 	def user_unfollow
-		check_privileges @access_token, :unfollow, @followed
+		check_privileges @requester, :unfollow, @followed
 		@rq_user.unfollow! @followed
 		render_event :ok
 	end
@@ -64,10 +64,10 @@ class Api::User::Social::SocialController < Api::User::UsersController
 	end
 
 	def check_read
-		check_privileges @access_token, :read, @rq_user
+		check_privileges @requester, :read, @rq_user
 	end
 
 	def check_update
-		check_privileges @access_token, :update, @rq_user
+		check_privileges @requester, :update, @rq_user
 	end
 end

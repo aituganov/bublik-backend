@@ -4,25 +4,25 @@ class Api::Company::CompaniesController < Api::ApplicationController
 	before_filter :check_company, except: [:registration]
 
 	def index
-		render_event :ok, @company.build_response({Company.RS_DATA[:FULL] => true}, {access_token: @access_token})
+		render_event :ok, @company.build_response({Company.RS_DATA[:FULL] => true}, {requester: @requester})
 	end
 
 	def registration
-		check_privileges @access_token, :create, Company.new
+		check_privileges @requester, :create, Company.new
 
-		company = Company.create! company_params.merge({owner: get_user_by_access_token(@access_token)})
+		company = Company.create! company_params.merge({owner: @requester})
 		render_event :created, {id: company.id}
 	end
 
 	def update
-		check_privileges @access_token, :update, @company
+		check_privileges @requester, :update, @company
 
 		@company.update!(company_params)
 		render_event :ok
 	end
 
 	def delete
-		check_privileges @access_token, :destroy, @company
+		check_privileges @requester, :destroy, @company
 
 		@company.destroy!
 		render_event :ok

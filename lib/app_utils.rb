@@ -5,12 +5,22 @@ module AppUtils
 		cookies[:ACCESS_TOKEN]
 	end
 
-	def get_user_by_access_token(access_token)
-		User.where(access_token: access_token).take
+	def get_user_by_access_token(cookies)
+		access_token = get_access_token cookies
+		logger.info "Find user by access token #{access_token}..."
+		unless access_token.blank?
+			raise ApiExceptions::User::Unauthorized.new(access_token) if !access_token.nil? && !User.where(access_token: access_token).present?
+			res = User.where(access_token: access_token).take
+			logger.info "User #{res.id} founded!"
+		else
+			logger.info 'User is anonymous!'
+		end
+
+		res
 	end
 
-	def check_privileges(access_token, action, requested, render_er=true)
-		requester = get_user_by_access_token(access_token) || User.new # invalid token or anonymous user
+	def check_privileges(requester, action, requested, render_er=true)
+		requester ||= User.new # Anonymous user
 		logger.info "Check privileges for #{requester.class} ##{requester.id} to #{action} #{requested.class} ##{requested.id}..."
 		ability = Ability.new requester
 		raise ApiExceptions::User::NotAllowed.new(action, requester.id) unless ability.can? action, requested
@@ -22,8 +32,8 @@ module AppUtils
 		raise_exception ArgumentError, 'Invalid request data' unless res
 	end
 
-	def build_privileges(access_token, requested_objects)
-		requester = get_user_by_access_token(access_token) || User.new # invalid token or new user
+	def build_privileges(requester, requested_objects)
+		requester ||= User.new # User is anonymous
 		ability = Ability.new requester
 		logger.info "Build privileges for #{requester.class} ##{requester.id}..."
 		rs = ability.build_privileges Array(requested_objects)
@@ -31,8 +41,8 @@ module AppUtils
 		rs
 	end
 
-	def put_privileges_data(rs, object, access_token)
-		rs[:actions] = build_privileges access_token, object
+	def put_privileges_data(rs, object, requester)
+		rs[:actions] = build_privileges requester, object
 	end
 
 	def log_exception(ex)

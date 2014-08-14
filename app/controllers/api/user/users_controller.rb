@@ -2,7 +2,7 @@ class Api::User::UsersController < Api::ApplicationController
 	before_filter :check_user, except: [:registration, :login, :check_login]
 
 	def index
-		render_event :ok, @rq_user.build_response({User.RS_DATA[:FULL] => true}, {access_token: @access_token, limit: user_params[:limit]})
+		render_event :ok, @rq_user.build_response({User.RS_DATA[:FULL] => true}, {requester: @requester, limit: user_params[:limit]})
 	end
 
 	def registration
@@ -29,14 +29,14 @@ class Api::User::UsersController < Api::ApplicationController
 	end
 
 	def update
-		check_privileges @access_token, :update, @rq_user
+		check_privileges @requester, :update, @rq_user
 
 		@rq_user.update!(user_params)
 		render_event :ok
 	end
 
 	def delete
-		check_privileges @access_token, :destroy, @rq_user
+		check_privileges @requester, :destroy, @rq_user
 
 		@rq_user.destroy!
 		render_event :ok

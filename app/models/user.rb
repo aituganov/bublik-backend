@@ -59,25 +59,25 @@ class User < ActiveRecord::Base
 
 	def build_response(rs_data, options={})
 		rs = {}
-		token = options[:access_token]
+		requester = options[:requester]
 
 		if rs_data[@@RS_DATA[:FULL]]
 			put_main_data rs
 			put_interests_data rs
-			put_current_avatar_data rs, token
-			put_privileges_data rs, self, token
+			put_current_avatar_data rs, requester
+			put_privileges_data rs, self, requester
 			put_created_company_data rs, options
 			rs[@@RS_DATA[:FOLLOWED_USERS]] = put_followed_users_data options
 			rs[@@RS_DATA[:FOLLOWED_COMPANIES]] = put_followed_companies_data options
 			rs[@@RS_DATA[:FOLLOWERS]] = put_followers_data options
 		elsif rs_data[@@RS_DATA[:PRIVILEGES]]
-			put_privileges_data rs, self, token
+			put_privileges_data rs, self, requester
 		elsif rs_data[@@RS_DATA[:INTERESTS]]
 			put_interests_data rs
 		elsif rs_data[@@RS_DATA[:AVATARS]]
-			put_all_avatars_data rs, token
+			put_all_avatars_data rs, requester
 		elsif rs_data[@@RS_DATA[:AVATAR]]
-			put_current_avatar_data rs, token
+			put_current_avatar_data rs, requester
 		elsif rs_data[@@RS_DATA[:CREATED_COMPANIES]]
 			put_created_company_data rs, options
 		elsif rs_data[@@RS_DATA[:FOLLOWED_USERS]]
@@ -100,14 +100,14 @@ class User < ActiveRecord::Base
 
 	# Avatars response block
 
-	def put_all_avatars_data(rs, access_token)
+	def put_all_avatars_data(rs, requester)
 		rs[@@RS_DATA[:AVATARS]] = []
-		self.images.each { |i| rs[@@RS_DATA[:AVATARS]].push(i.build_response access_token) }
+		self.images.each { |i| rs[@@RS_DATA[:AVATARS]].push(i.build_response requester) }
 	end
 
-	def put_current_avatar_data(rs, access_token)
+	def put_current_avatar_data(rs, requester)
 		current = get_current_image
-		rs[@@RS_DATA[:AVATAR]] = current.build_response access_token unless current.nil?
+		rs[@@RS_DATA[:AVATAR]] = current.build_response requester unless current.nil?
 	end
 
 	# Created companies response block

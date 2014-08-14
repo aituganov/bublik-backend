@@ -46,20 +46,20 @@ class Company < ActiveRecord::Base
 
 	def build_response(rs_data, options={})
 		rs = {}
-		token = options[:access_token]
+		requester = options[:requester]
 
 		if rs_data[@@RS_DATA[:FULL]]
 			put_main_data rs
 			put_tags_data rs
-			put_privileges_data rs, self, token
-			put_current_logotype_data rs, token
+			put_privileges_data rs, self, requester
+			put_current_logotype_data rs, requester
 			rs[@@RS_DATA[:FOLLOWERS]] = get_followers_data options
 		elsif rs_data[@@RS_DATA[:PRIVILEGES]]
-			put_privileges_data rs, self, token
+			put_privileges_data rs, self, requester
 		elsif rs_data[@@RS_DATA[:TAGS]]
 			put_tags_data rs
 		elsif rs_data[@@RS_DATA[:LOGOTYPES]]
-			put_all_logotypes_data rs, token
+			put_all_logotypes_data rs, requester
 		elsif rs_data[@@RS_DATA[:FOLLOWERS]]
 			rs = get_followers_data options
 		end
@@ -77,14 +77,14 @@ class Company < ActiveRecord::Base
 
 	# Logo's response block
 
-	def put_all_logotypes_data(rs, access_token)
+	def put_all_logotypes_data(rs, requester)
 		rs[@@RS_DATA[:LOGOTYPES]] = []
-		self.images.each { |i| rs[@@RS_DATA[:LOGOTYPES]].push(i.build_response access_token) }
+		self.images.each { |i| rs[@@RS_DATA[:LOGOTYPES]].push(i.build_response requester) }
 	end
 
-	def put_current_logotype_data(rs, access_token)
+	def put_current_logotype_data(rs, requester)
 		current = get_current_image
-		rs[@@RS_DATA[:LOGOTYPE]] = current.build_response access_token unless current.nil?
+		rs[@@RS_DATA[:LOGOTYPE]] = current.build_response requester unless current.nil?
 	end
 
 	# Tags response block
