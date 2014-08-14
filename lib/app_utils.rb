@@ -41,8 +41,21 @@ module AppUtils
 		rs
 	end
 
+	def build_socials(requester, requested_objects)
+		requester ||= User.new # User is anonymous
+		ability = Ability.new requester
+		logger.info "Build social actions for #{requester.class} ##{requester.id}..."
+		rs = ability.build_social_actions Array(requested_objects)
+		logger.info "Builded: #{rs.to_json}"
+		rs
+	end
+
 	def put_privileges_data(rs, object, requester)
 		rs[:actions] = build_privileges requester, object
+	end
+
+	def put_social_data(rs, object, requester)
+		rs[:social] = build_socials requester, object
 	end
 
 	def log_exception(ex)

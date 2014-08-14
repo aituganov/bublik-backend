@@ -37,7 +37,11 @@ class Ability
 		end
 
 		can :follow, [User, Company] do |object|
-			!user.id.nil? && !user.follows?(object)
+			res = true
+			if object.class == User
+				res = object.id != user.id # User can't follow himself
+			end
+			res && !user.id.nil? && !user.follows?(object)
 		end
 
 		can :unfollow, [User, Company] do |object|
@@ -60,7 +64,18 @@ class Ability
 		privileges = {}
 
 		requested_objects.each do |requested|
-			get_actions.each do |action|
+			crud_actions.each do |action|
+				privileges[action] = can? action, requested
+			end
+		end
+		privileges
+	end
+
+	def build_social_actions(requested_objects)
+		privileges = {}
+
+		requested_objects.each do |requested|
+			social_actions.each do |action|
 				privileges[action] = can? action, requested
 			end
 		end
@@ -69,7 +84,11 @@ class Ability
 
 	private
 
-	def get_actions
+	def crud_actions
 		[:create, :read, :update, :destroy]
+	end
+
+	def social_actions
+		[:follow, :unfollow]
 	end
 end

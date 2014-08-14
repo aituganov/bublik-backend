@@ -2,7 +2,6 @@ require 'spec_helper'
 
 describe Api::User::UsersController, type: :controller do
 	before :each do
-		request.env['HTTP_ACCEPT'] = 'application/json'
 		@wrong_user = FactoryGirl.build(:wrong_user)
 		@correct_user = FactoryGirl.build(:user)
 		@invalid_access_token = 'unexist_access_token'
@@ -228,7 +227,7 @@ describe Api::User::UsersController, type: :controller do
 				company_data['id'] = @created_company.id
 			end
 
-			context 'social user info' do
+			context 'social preview user info' do
 				before(:each) do
 					@users = []
 					@companies = []
@@ -259,6 +258,42 @@ describe Api::User::UsersController, type: :controller do
 
 					rs['followers'].should_not be_nil
 					rs['followers'].should have(6).items
+				end
+			end
+
+			context 'correct social actions' do
+				after(:each) do
+					@social_data.should have(2).items
+					@social_data['follow'].should eq @can_follow || false
+					@social_data['unfollow'].should eq @can_unfollow || false
+				end
+
+				it 'anonymous has correct actions' do
+					request.cookies[:ACCESS_TOKEN] = ''
+					get :index, @id_structure
+					response.status.should eq 200
+					@social_data = JSON.parse(response.body)['data']['social']
+				end
+
+				it 'himself has correct actions' do
+					get :index, @id_structure
+					response.status.should eq 200
+					@social_data = JSON.parse(response.body)['data']['social']
+				end
+
+				it 'another user info has correct actions' do
+					get :index, @id_new_user_structure
+					response.status.should eq 200
+					@social_data = JSON.parse(response.body)['data']['social']
+					@can_follow = true
+				end
+
+				it 'already followes info has correct actions' do
+					@correct_user.follow!(@new_user).should be_true
+					get :index, @id_new_user_structure
+					response.status.should eq 200
+					@social_data = JSON.parse(response.body)['data']['social']
+					@can_unfollow = true
 				end
 			end
 		end

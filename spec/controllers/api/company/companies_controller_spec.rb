@@ -225,6 +225,46 @@ describe Api::Company::CompaniesController, type: :controller do
 					rs['followers'].should have(6).items
 				end
 			end
+
+			context 'correct social actions' do
+				after(:each) do
+					@social_data.should have(2).items
+					@social_data['follow'].should eq @can_follow || false
+					@social_data['unfollow'].should eq @can_unfollow || false
+				end
+
+				it 'anonymous has correct actions' do
+					request.cookies[:ACCESS_TOKEN] = ''
+					get :index, @id_structure
+					response.status.should eq 200
+					@social_data = JSON.parse(response.body)['data']['social']
+				end
+
+				it 'owner has correct actions' do
+					get :index, @id_structure
+					response.status.should eq 200
+					@social_data = JSON.parse(response.body)['data']['social']
+					@can_follow = true
+				end
+
+				it 'another user info has correct actions' do
+					cookies['ACCESS_TOKEN'] = FactoryGirl.create(:user_second).access_token
+					get :index, @id_structure
+					response.status.should eq 200
+					@social_data = JSON.parse(response.body)['data']['social']
+					@can_follow = true
+				end
+
+				it 'already followes info has correct actions' do
+					@new_user = FactoryGirl.create(:user_second)
+					@new_user.follow!(@created_company).should be_true
+					cookies['ACCESS_TOKEN'] = @new_user.access_token
+					get :index, @id_structure
+					response.status.should eq 200
+					@social_data = JSON.parse(response.body)['data']['social']
+					@can_unfollow = true
+				end
+			end
 		end
 	end
 
