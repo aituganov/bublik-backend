@@ -64,6 +64,9 @@ widget:
       submitButton:
         label: Войти
   userInfo:
+    interestsHeader: "Интересы пользователя"
+    emptyInterestsCaption: "У пользователя нет ни одного интереса"
+    addInterestCaption: "Добавить интересы"
     alert:
       firstNameChange:
         success: "Имя успешно изменено"
@@ -71,6 +74,8 @@ widget:
       secondNameChange:
         success: "Фамилия успешно изменена"
         error: "Произошла ошибка. Пожалуйста, попробуйте позже"
+      addInterests:
+        error: "Не удалось добавить интерес. Пожалуйста, попробуйте позже."
   userAvatar:
     windowHeader: "Выберите ваш аватар"
     alert:

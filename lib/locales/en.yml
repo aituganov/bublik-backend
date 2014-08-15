@@ -64,6 +64,9 @@ widget:
       submitButton:
         label: Login
   userInfo:
+      interestsHeader: "User Interests"
+      emptyInterestsCaption: "User has not any interests"
+      addInterestCaption: "Add interets"
       alert:
         firstNameChange:
           success: "Name has been successfully changed"
@@ -71,6 +74,8 @@ widget:
         secondNameChange:
           success: "Second name has been successfully changed"
           error: "Error. Please, try again latter"
+        addInterests:
+          error: "Can't to add a new interest. Please, try again later"
   userAvatar:
       windowHeader: "Choose your avatar"
       alert:
