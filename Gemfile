@@ -79,3 +79,6 @@ gem 'cancancan', '~> 1.9'
 
 # Use socialization
 gem 'socialization'
+
+# Use lograge
+gem 'lograge'

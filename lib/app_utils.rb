@@ -28,8 +28,8 @@ module AppUtils
 	end
 
 	def avatar_params_valid?(avatar)
-		res = !(avatar[:data].nil? || avatar[:content_type].nil? || avatar[:crop_x].nil? || avatar[:crop_y].nil? || avatar[:crop_l].nil?)
-		raise_exception ArgumentError, 'Invalid request data' unless res
+		res = !(avatar[:image_data].blank? || avatar[:content_type].blank? || avatar[:crop_x].blank? || avatar[:crop_y].blank? || avatar[:crop_l].blank?)
+		raise_exception ArgumentError, 'Invalid image request data' unless res
 	end
 
 	def build_privileges(requester, requested_objects)

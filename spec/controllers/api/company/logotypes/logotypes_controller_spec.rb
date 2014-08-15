@@ -30,26 +30,26 @@ describe Api::Company::Logotypes::LogotypesController, type: :controller do
 			end
 
 			it 'should 400 for particial company logotype data' do
-				post :create, {id: @company.id, data: @file_content}
+				post :create, {id: @company.id, image_data: @file_content}
 				response.status.should eq 400
 
-				post :create, {id: @company.id, data: @file_content, content_type: 'js'}
+				post :create, {id: @company.id, image_data: @file_content, content_type: 'js'}
 				response.status.should eq 400
 
-				post :create, {id: @company.id, data: @file_content, content_type: 'js', crop_x: 0}
+				post :create, {id: @company.id, image_data: @file_content, content_type: 'js', crop_x: 0}
 				response.status.should eq 400
 
-				post :create, {id: @company.id, data: @file_content, content_type: 'js', crop_x: 0, crop_y: 0}
+				post :create, {id: @company.id, image_data: @file_content, content_type: 'js', crop_x: 0, crop_y: 0}
 				response.status.should eq 400
 			end
 
 			it 'should 400 for illegal logotype content type' do
-				post :create, {id: @company.id, data: @file_content, content_type: 'js', crop_x: 0, crop_y: 0, crop_l: 0}
+				post :create, {id: @company.id, image_data: @file_content, content_type: 'js', crop_x: 0, crop_y: 0, crop_l: 0}
 				response.status.should eq 400
 			end
 
 			it 'should 200 & coorect urls for legal company logotype data' do
-				post :create, {id: @company.id, data: @data, content_type: 'image/jpeg', crop_x: 10, crop_y: 10, crop_l: 10 }
+				post :create, {id: @company.id, image_data: @data, content_type: 'image/jpeg', crop_x: 10, crop_y: 10, crop_l: 10 }
 				response.status.should eq 200
 				@company.get_current_image.file.read.should eq @file_content
 				rs_logotype_data = JSON.parse(response.body)['data']
@@ -70,20 +70,20 @@ describe Api::Company::Logotypes::LogotypesController, type: :controller do
 
 			it 'should 403 & for not owner' do
 				cookies['ACCESS_TOKEN'] = @new_user.access_token
-				post :create, {id: @company.id, data: @data, content_type: 'image/jpeg', crop_x: 10, crop_y: 10, crop_l: 10 }
+				post :create, {id: @company.id, image_data: @data, content_type: 'image/jpeg', crop_x: 10, crop_y: 10, crop_l: 10 }
 				response.status.should eq 403
 				@company.get_current_image.should be_nil
 			end
 
 			it 'should 403 & for anonymous' do
 				cookies['ACCESS_TOKEN'] = ''
-				post :create, {id: @company.id, data: @data, content_type: 'image/jpeg', crop_x: 10, crop_y: 10, crop_l: 10 }
+				post :create, {id: @company.id, image_data: @data, content_type: 'image/jpeg', crop_x: 10, crop_y: 10, crop_l: 10 }
 				response.status.should eq 403
 				@company.get_current_image.should be_nil
 			end
 
 			it 'should 200 & correct preview size' do
-				post :create, {id: @company.id, data: @data, content_type: 'image/jpeg', crop_x: 10, crop_y: 10, crop_l: 10 }
+				post :create, {id: @company.id, image_data: @data, content_type: 'image/jpeg', crop_x: 10, crop_y: 10, crop_l: 10 }
 				response.status.should eq 200
 				rs_logotype_data = JSON.parse(response.body)['data']
 				rs_logotype_data.should_not be_nil
@@ -94,7 +94,7 @@ describe Api::Company::Logotypes::LogotypesController, type: :controller do
 
 			it 'should 200 & correct preview size' do
 				@data_base64 = 'base64,' + Base64.encode64(@file_content)
-				post :create, {id: @company.id, data: @data_base64, content_type: 'image/jpeg', crop_x: 10, crop_y: 10, crop_l: 10 }
+				post :create, {id: @company.id, image_data: @data_base64, content_type: 'image/jpeg', crop_x: 10, crop_y: 10, crop_l: 10 }
 				response.status.should eq 200
 				rs_logotype_data = JSON.parse(response.body)['data']
 				rs_logotype_data.should_not be_nil
@@ -104,13 +104,13 @@ describe Api::Company::Logotypes::LogotypesController, type: :controller do
 			end
 
 			it 'should 200 & correct current' do
-				post :create, {id: @company.id, data: @data, content_type: 'image/jpeg', crop_x: 10, crop_y: 10, crop_l: 10 }
+				post :create, {id: @company.id, image_data: @data, content_type: 'image/jpeg', crop_x: 10, crop_y: 10, crop_l: 10 }
 				response.status.should eq 200
 				@current_first = @company.get_current_image
 				rs_logotype_data = JSON.parse(response.body)['data']
 				rs_logotype_data['id'].should eq @current_first.id
 
-				post :create, {id: @company.id, data: @data, content_type: 'image/jpeg', crop_x: 10, crop_y: 10, crop_l: 10 }
+				post :create, {id: @company.id, image_data: @data, content_type: 'image/jpeg', crop_x: 10, crop_y: 10, crop_l: 10 }
 				response.status.should eq 200
 				@current_second = @company.get_current_image
 				rs_logotype_data = JSON.parse(response.body)['data']
@@ -126,7 +126,7 @@ describe Api::Company::Logotypes::LogotypesController, type: :controller do
 			before do
 				@ids = []
 				3.times do
-					post :create, {id: @company.id, data: @data, content_type: 'image/jpeg', crop_x: 10, crop_y: 10, crop_l: 10 }
+					post :create, {id: @company.id, image_data: @data, content_type: 'image/jpeg', crop_x: 10, crop_y: 10, crop_l: 10 }
 					response.status.should eq 200
 					@ids.push(JSON.parse(response.body)['data']['id'].to_i)
 				end
