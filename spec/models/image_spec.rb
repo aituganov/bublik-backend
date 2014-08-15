@@ -4,12 +4,12 @@ include CarrierWave::Test::Matchers
 describe Image do
 	context 'check model validators' do
 		it 'data not nil' do
-			expect { FactoryGirl.create(:image, data: nil) }.to raise_error(ArgumentError)
+			expect { FactoryGirl.create(:image, image_data: nil) }.to raise_error(ArgumentError)
 			FactoryGirl.create(:image).should be_valid
 		end
 
 		it 'data not blank' do
-			expect { FactoryGirl.create(:image, data: '') }.to raise_error(ArgumentError)
+			expect { FactoryGirl.create(:image, image_data: '') }.to raise_error(ArgumentError)
 			FactoryGirl.create(:image).should be_valid
 		end
 

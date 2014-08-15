@@ -34,7 +34,7 @@ class Api::Company::Logotypes::LogotypesController < Api::Company::CompaniesCont
 	end
 
 	def image_params
-		params.permit(:data, :content_type, :crop_x, :crop_y, :crop_l)
+		params.permit(:image_data, :content_type, :crop_x, :crop_y, :crop_l)
 	end
 
 end

@@ -10,7 +10,7 @@ class Image < ActiveRecord::Base
 	validates_integrity_of :file
 	validates_processing_of :file
 
-	attr_accessor :data, :content_type, :crop_x, :crop_y, :crop_l
+	attr_accessor :image_data, :content_type, :crop_x, :crop_y, :crop_l
 
 	@@CACHE_KEY = '_current_avatar';
 
@@ -77,15 +77,15 @@ class Image < ActiveRecord::Base
 		begin
 			logger.info "Create image with content_type #{content_type}"
 			extension = Rack::Mime::MIME_TYPES.invert[content_type]  #=> ".jpg"
-			if data.nil? || data.blank?
+			if image_data.blank?
 				raise_exception ArgumentError, 'image: data is blank'
 			elsif extension.nil?
 				raise_exception ArgumentError, 'image: invalid content type'
 			end
 			logger.info "File extension #{extension}"
 
-			prepared_data = data.index('base64,').nil? ? data :
-				data[(data.index('base64,') + 7)..-1] # cut content_type
+			prepared_data = image_data.index('base64,').nil? ? image_data :
+				image_data[(image_data.index('base64,') + 7)..-1] # cut content_type
 			tmpfile = Tempfile.new([Time.now.to_time.to_i, extension], Rails.root.join('tmp'), encoding: 'BINARY')
 			tmpfile.write(Base64.decode64(prepared_data))
 			file = CarrierWave::SanitizedFile.new(tmpfile)
