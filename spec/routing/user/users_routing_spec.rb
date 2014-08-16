@@ -16,7 +16,7 @@ describe Api::User::UsersController do
 		end
 
 		it 'check empty login route to #page_not_found' do
-			get('/api/user/login/check').should route_to('application#page_not_found', path: 'api/user/login/check')
+			get('/api/user/login/check').should route_to('api/application#page_not_found', path: 'user/login/check')
 		end
 
 		it 'routes to #check_login' do
