@@ -47,7 +47,7 @@ class Api::User::UsersController < Api::ApplicationController
 	def check_user
 		id = params[:id]
 		logger.info "check user ##{id}..."
-		if !@requester.nil? && @requester.id == id
+		if !@requester.nil? && @requester.id.to_s == id
 			logger.info 'Request user is requester!'
 			@rq_user = @requester
 		else
