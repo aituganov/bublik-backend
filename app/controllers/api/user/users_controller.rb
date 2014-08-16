@@ -47,8 +47,13 @@ class Api::User::UsersController < Api::ApplicationController
 	def check_user
 		id = params[:id]
 		logger.info "check user ##{id}..."
-		raise ApiExceptions::NotFound::User.new(id) unless User.where(id: id).present?
-		@rq_user = User.find(params[:id])
+		if !@requester.nil? && @requester.id.to_s == id
+			logger.info 'Request user is requester!'
+			@rq_user = @requester
+		else
+			raise ApiExceptions::NotFound::User.new(id) unless User.where(id: id).present?
+			@rq_user = User.find(params[:id])
+		end
 		logger.info 'finded!'
 	end
 
