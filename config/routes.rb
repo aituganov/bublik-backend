@@ -66,7 +66,8 @@ Rails.application.routes.draw do
 				post ':name' => 'tags#find'
 			end
 		end
+		match '*path', :to => 'application#page_not_found', via: [:get, :post, :put, :delete]
 	end
 
-	get '*path', :to => 'application#page_not_found'
+	match '*path', :to => 'application#page_not_found', via: [:get, :post, :put, :delete]
 end
