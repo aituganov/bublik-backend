@@ -30,7 +30,7 @@ Rails.application.routes.draw do
 			match ':id/avatar/:avatar_id' => 'avatars/avatars#delete', via: [:delete]
 			# Interests
 			match ':id/interests' => 'interests/interests#add', via: [:put]
-			match ':id/interests' => 'interests/interests#delete', via: [:delete]
+			post ':id/interests' => 'interests/interests#delete'
 			# Social
 			post ':id/social/user/follow/:user_id' => 'social/social#user_follow'
 			post ':id/social/user/unfollow/:user_id' => 'social/social#user_unfollow'
@@ -55,7 +55,7 @@ Rails.application.routes.draw do
 			match ':id/logotype/:logo_id' => 'logotypes/logotypes#delete', via: [:delete]
 			# Tags
 			match ':id/tags' => 'tags/tags#add', via: [:put]
-			match ':id/tags' => 'tags/tags#delete', via: [:delete]
+			post ':id/tags' => 'tags/tags#delete'
 			# Social
 			get ':id/social/followers' => 'social/social#followers'
 		end

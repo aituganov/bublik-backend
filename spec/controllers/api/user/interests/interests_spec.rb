@@ -44,24 +44,24 @@ describe Api::User::Interests::InterestsController, type: :controller do
 		end
 
 		it 'should 400 for delete with empty interests' do
-			delete :delete, @id_structure
+			post :delete, @id_structure
 			response.status.should eq 400
 		end
 
 		it 'should 404 for delete with empty interests & invalid user id' do
-			delete :delete, @id_wrong_structure
+			post :delete, @id_wrong_structure
 			response.status.should eq 404
 		end
 
 		it 'should 403 for delete with another user' do
-			delete :delete, {id: @new_user.id, interests: ['first tag', 'second_tag']}
+			post :delete, {id: @new_user.id, interests: ['first tag', 'second_tag']}
 			response.status.should eq 403
 			@correct_user.reload
 			@correct_user.interests.should have(0).item
 		end
 
 		it 'should 201 for delete with unexisted interests' do
-			delete :delete, {id: @correct_user.id, interests: ['first tag', 'second_tag']}
+			post :delete, {id: @correct_user.id, interests: ['first tag', 'second_tag']}
 			response.status.should eq 200
 			@correct_user.reload
 			@correct_user.interests.should have(0).item
@@ -71,7 +71,7 @@ describe Api::User::Interests::InterestsController, type: :controller do
 			@correct_user.interests_add ['first', 'second', 'third']
 			@correct_user.interests.should have(3).item
 
-			delete :delete, {id: @correct_user.id, interests: ['first', 'second']}
+			post :delete, {id: @correct_user.id, interests: ['first', 'second']}
 			response.status.should eq 200
 			@correct_user.interests.should have(1).item
 		end
@@ -80,7 +80,7 @@ describe Api::User::Interests::InterestsController, type: :controller do
 			@correct_user.interests_add ['first']
 			@correct_user.interests.should have(1).item
 
-			delete :delete, {id: @correct_user.id, interests: ['first', 'first']}
+			post :delete, {id: @correct_user.id, interests: ['first', 'first']}
 			response.status.should eq 200
 			@correct_user.interests.should have(0).item
 		end

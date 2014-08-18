@@ -39,7 +39,7 @@ describe Api::Company::Tags::TagsController, type: :controller do
 		end
 
 		it 'should 400 for delete with empty tags' do
-			delete :delete, @id_structure
+			post :delete, @id_structure
 			response.status.should eq 400
 		end
 
@@ -50,7 +50,7 @@ describe Api::Company::Tags::TagsController, type: :controller do
 		end
 
 		it 'should 201 for delete with unexisted tags' do
-			delete :delete, @id_structure.merge({tags: ['first tag', 'second_tag']})
+			post :delete, @id_structure.merge({tags: ['first tag', 'second_tag']})
 			response.status.should eq 200
 			@created_company.tags.should have(0).item
 		end
@@ -59,7 +59,7 @@ describe Api::Company::Tags::TagsController, type: :controller do
 			@created_company.tags_add ['first', 'second', 'third']
 			@created_company.tags.should have(3).item
 
-			delete :delete, @id_structure.merge({tags: ['first', 'second']})
+			post :delete, @id_structure.merge({tags: ['first', 'second']})
 			response.status.should eq 200
 			@created_company.tags.should have(1).item
 		end
@@ -68,7 +68,7 @@ describe Api::Company::Tags::TagsController, type: :controller do
 			@created_company.tags_add ['first']
 			@created_company.tags.should have(1).item
 
-			delete :delete, @id_structure.merge({tags: ['first', 'first']})
+			post :delete, @id_structure.merge({tags: ['first', 'first']})
 			response.status.should eq 200
 			@created_company.tags.should have(0).item
 		end

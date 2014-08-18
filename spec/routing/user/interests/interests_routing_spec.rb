@@ -7,7 +7,7 @@ describe Api::User::Interests::InterestsController do
 		end
 
 		it 'routes to #interests_delete' do
-			delete('/api/user/1/interests').should route_to('api/user/interests/interests#delete', id: '1')
+			post('/api/user/1/interests').should route_to('api/user/interests/interests#delete', id: '1')
 		end
 	end
 end

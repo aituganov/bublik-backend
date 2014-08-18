@@ -7,7 +7,7 @@ describe Api::Company::Tags::TagsController do
 		end
 
 		it 'routes to #interests_delete' do
-			delete('/api/company/1/tags').should route_to('api/company/tags/tags#delete', id: '1')
+			post('/api/company/1/tags').should route_to('api/company/tags/tags#delete', id: '1')
 		end
 	end
 end
