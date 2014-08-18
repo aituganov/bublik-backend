@@ -3,6 +3,7 @@ mainpage:
     aboutUs: About Us
     registration: Registration
     login: Login
+    logout: Logout
 user:
   pages:
     main:

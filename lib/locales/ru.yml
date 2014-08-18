@@ -3,6 +3,7 @@ mainpage:
     aboutUs: О нас
     registration: Регистрация
     login: Войти
+    logout: Выйти
 user:
   pages:
     main:
