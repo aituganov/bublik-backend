@@ -35,7 +35,7 @@ class User < ActiveRecord::Base
 	end
 
 	def get_menu
-		{user_id: self.id, menu: %w(companies)}
+		{user: {id: self.id, full_name: self.full_name, avatar_preview_url: self.get_current_image_preview_url }, menu_items: %w(companies)}
 	end
 
 	def get_current_image
