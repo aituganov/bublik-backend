@@ -15,6 +15,10 @@ describe Api::User::UsersController do
 			put('/api/user/login').should route_to('api/user/users#login')
 		end
 
+		it 'routes to #logout' do
+			put('/api/user/logout').should route_to('api/user/users#logout')
+		end
+
 		it 'check empty login route to #page_not_found' do
 			get('/api/user/login/check').should route_to('api/application#page_not_found', path: 'user/login/check')
 		end

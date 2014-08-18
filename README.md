@@ -23,6 +23,7 @@ User actions:
 > - **/:id/created_company?company_limit=:limit&company_offset=:offset** - **GET** user created companies. For registered users request cookies must contain ACCESS_TOKEN value. **Params: :id** - *see above,* **:limit** - *see above*, **:offset** - *user created companies offset.*
 > - **/new** - **PUT** request for user registration. **Request payload: login, password, first_name, last_name.** Response contain access_token for created user
 > - **/login** - **PUT** request for user login. **Request payload: login, password.** Response contain access_token for created user
+> - **/logout** - **PUT** request for user logout.  Request cookies must contain ACCESS_TOKEN value for logged user.
 > - **/login/check/:login** - **GET** request for login available checking. **Params: :login** - *user login for check.* Response code 200 for available login and 201 if login already existed
 > - **/:id** - **POST** request for user update. **Request payload: first_name, last_name, city, e.t.c..** Request cookies must contain ACCESS_TOKEN value.
 > - **/:id** - **DELETE** request for marked user as deleted. Request cookies must contain ACCESS_TOKEN value.

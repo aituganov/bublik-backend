@@ -16,6 +16,7 @@ Rails.application.routes.draw do
 			match 'new' => 'users#registration', via: [:put]
 			# Login
 			match 'login' => 'users#login', via: [:put]
+			match 'logout' => 'users#logout', via: [:put]
 			get 'login/check/:login' => 'users#check_login', constraints: {login: /.*/}
 			# User
 			get ':id' => 'users#index'

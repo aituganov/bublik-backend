@@ -70,6 +70,26 @@ describe Api::User::UsersController, type: :controller do
 		end
 	end
 
+	context 'user logout' do
+		it 'empty access token has 401' do
+			put :logout
+			response.status.should eq 405
+		end
+
+		it 'wrong access token has 401' do
+			request.cookies[:ACCESS_TOKEN] = 'wrong_access_token'
+			put :logout
+			response.status.should eq 401
+		end
+
+		it 'correct access token has 200' do
+			@correct_user.save
+			request.cookies[:ACCESS_TOKEN] = @correct_user.access_token
+			put :logout
+			response.status.should eq 200
+		end
+	end
+
 	context 'actions with user' do
 		before :each do
 			@correct_user.save

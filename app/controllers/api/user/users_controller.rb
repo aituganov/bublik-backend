@@ -1,5 +1,5 @@
 class Api::User::UsersController < Api::ApplicationController
-	before_filter :check_user, except: [:registration, :login, :check_login]
+	before_filter :check_user, except: [:registration, :login, :check_login, :logout]
 
 	def index
 		render_event :ok, @rq_user.build_response({User.RS_DATA[:FULL] => true}, {requester: @requester, limit: user_params[:limit]})
@@ -16,6 +16,15 @@ class Api::User::UsersController < Api::ApplicationController
 			render_error :unauthorized
 		else
 			render_event :ok, {id: user.id, access_token: user.access_token}
+		end
+	end
+
+	def logout
+		# TODO: Add session close
+		if @requester.nil?
+			render_error :method_not_allowed, {error: 'Access token already cleared'}
+		else
+			render_event :ok
 		end
 	end
 
