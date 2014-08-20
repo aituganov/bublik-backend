@@ -79,8 +79,8 @@ widget:
       addInterests:
         error: "Не удалось добавить интерес. Пожалуйста, попробуйте позже."
     social:
-      followers: "Последователи"
-      followed_users: "Следует за"
+      followers: "Подписчики"
+      followed_users: "Подписан на"
       followed_companies: "Состоит в"
       actions:
         follow: "Подписаться"
