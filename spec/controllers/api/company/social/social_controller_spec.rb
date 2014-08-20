@@ -52,7 +52,7 @@ describe Api::Company::Social::SocialController, type: :controller do
 			rs_followers.each do |rs_f|
 				followers.each do |f|
 					if f.id == rs_f['id']
-						rs_f['full_name'].should eq f.full_name
+						rs_f['title'].should eq f.full_name
 						rs_f['preview_url'].should eq f.get_current_image_preview_url
 						checked += 1
 					end

@@ -140,7 +140,7 @@ class User < ActiveRecord::Base
 	# Socialization response block
 
 	def get_follow_data
-		{id: self.id, full_name: self.full_name, preview_url: self.get_current_image_preview_url}
+		{id: self.id, title: self.full_name, preview_url: self.get_current_image_preview_url}
 	end
 
 	def put_followed_users_data(options)

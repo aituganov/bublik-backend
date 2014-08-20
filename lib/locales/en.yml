@@ -65,23 +65,26 @@ widget:
       submitButton:
         label: Login
   userInfo:
-      interestsHeader: "User Interests"
-      emptyInterestsCaption: "User has not any interests"
-      addInterestCaption: "Add interets"
-      backenderror: "Error. Please, try again latter"
-      alert: "Error. Please, try again latter"
-        firstNameChange:
-          success: "Name has been successfully changed"
-          error: "Error. Please, try again latter"
-        secondNameChange:
-          success: "Second name has been successfully changed"
-          error: "Error. Please, try again latter"
-        addInterests:
-          error: "Can't to add a new interest. Please, try again later"
-      social:
-        actions:
-          follow: "Follow"
-          unfollow: "Unfollow"
+    interestsHeader: "User Interests"
+    emptyInterestsCaption: "User has not any interests"
+    addInterestCaption: "Add interets"
+    backenderror: "Error. Please, try again latter"
+    alert:
+      firstNameChange:
+        success: "Name has been successfully changed"
+        error: "Error. Please, try again latter"
+      secondNameChange:
+        success: "Second name has been successfully changed"
+        error: "Error. Please, try again latter"
+      addInterests:
+        error: "Can't to add a new interest. Please, try again later"
+    social:
+      followers: "Followers"
+      followed_users: "Follow for"
+      followed_companies: "Consist in"
+      actions:
+        follow: "Follow"
+        unfollow: "Unfollow"
   userAvatar:
       windowHeader: "Choose your avatar"
       alert:
