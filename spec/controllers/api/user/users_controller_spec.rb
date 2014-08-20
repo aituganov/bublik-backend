@@ -165,6 +165,7 @@ describe Api::User::UsersController, type: :controller do
 				response.status.should eq 200
 				rs_user_data = JSON.parse(response.body)['data']
 				rs_user_data['id'].should eq @correct_user.id
+				rs_user_data['full_name'].should eq @correct_user.full_name
 				rs_user_data['first_name'].should eq @correct_user.first_name
 				rs_user_data['last_name'].should eq @correct_user.last_name
 				rs_user_data['is_deleted'].should eq @correct_user.is_deleted
