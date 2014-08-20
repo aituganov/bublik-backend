@@ -270,41 +270,46 @@ describe Api::User::UsersController, type: :controller do
 					get :index, @id_structure
 					response.status.should eq 200
 					rs = JSON.parse(response.body)['data']
-					rs['followed_users'].should_not be_nil
-					rs['followed_users'].should have(6).items
+					social = rs['social']
+					social.should_not be_nil
+					social['actions'].should_not be_nil
+					social['actions'].should have(2).items
 
-					rs['followed_companies'].should_not be_nil
-					rs['followed_companies'].should have(6).items
+					social['followed_users'].should_not be_nil
+					social['followed_users'].should have(6).items
 
-					rs['followers'].should_not be_nil
-					rs['followers'].should have(6).items
+					social['followed_companies'].should_not be_nil
+					social['followed_companies'].should have(6).items
+
+					social['followers'].should_not be_nil
+					social['followers'].should have(6).items
 				end
 			end
 
 			context 'correct social actions' do
 				after(:each) do
-					@social_data.should have(2).items
-					@social_data['follow'].should eq @can_follow || false
-					@social_data['unfollow'].should eq @can_unfollow || false
+					@social_actions.should have(2).items
+					@social_actions['follow'].should eq @can_follow || false
+					@social_actions['unfollow'].should eq @can_unfollow || false
 				end
 
 				it 'anonymous has correct actions' do
 					request.cookies[:ACCESS_TOKEN] = ''
 					get :index, @id_structure
 					response.status.should eq 200
-					@social_data = JSON.parse(response.body)['data']['social']
+					@social_actions = JSON.parse(response.body)['data']['social']['actions']
 				end
 
 				it 'himself has correct actions' do
 					get :index, @id_structure
 					response.status.should eq 200
-					@social_data = JSON.parse(response.body)['data']['social']
+					@social_actions = JSON.parse(response.body)['data']['social']['actions']
 				end
 
 				it 'another user info has correct actions' do
 					get :index, @id_new_user_structure
 					response.status.should eq 200
-					@social_data = JSON.parse(response.body)['data']['social']
+					@social_actions = JSON.parse(response.body)['data']['social']['actions']
 					@can_follow = true
 				end
 
@@ -312,7 +317,7 @@ describe Api::User::UsersController, type: :controller do
 					@correct_user.follow!(@new_user).should be_true
 					get :index, @id_new_user_structure
 					response.status.should eq 200
-					@social_data = JSON.parse(response.body)['data']['social']
+					@social_actions = JSON.parse(response.body)['data']['social']['actions']
 					@can_unfollow = true
 				end
 			end

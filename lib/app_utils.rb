@@ -54,8 +54,8 @@ module AppUtils
 		rs[:actions] = build_privileges requester, object
 	end
 
-	def put_social_data(rs, object, requester)
-		rs[:social] = build_socials requester, object
+	def put_social_actions(rs, object, requester)
+		rs[:actions] = build_socials requester, object
 	end
 
 	def log_exception(ex)

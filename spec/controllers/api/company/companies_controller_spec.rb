@@ -221,29 +221,34 @@ describe Api::Company::CompaniesController, type: :controller do
 					get :index, @id_structure
 					response.status.should eq 200
 					rs = JSON.parse(response.body)['data']
-					rs['followers'].should_not be_nil
-					rs['followers'].should have(6).items
+					social = rs['social']
+					social.should_not be_nil
+					social['actions'].should_not be_nil
+					social['actions'].should have(2).items
+
+					social['followers'].should_not be_nil
+					social['followers'].should have(6).items
 				end
 			end
 
 			context 'correct social actions' do
 				after(:each) do
-					@social_data.should have(2).items
-					@social_data['follow'].should eq @can_follow || false
-					@social_data['unfollow'].should eq @can_unfollow || false
+					@social_actions.should have(2).items
+					@social_actions['follow'].should eq @can_follow || false
+					@social_actions['unfollow'].should eq @can_unfollow || false
 				end
 
 				it 'anonymous has correct actions' do
 					request.cookies[:ACCESS_TOKEN] = ''
 					get :index, @id_structure
 					response.status.should eq 200
-					@social_data = JSON.parse(response.body)['data']['social']
+					@social_actions = JSON.parse(response.body)['data']['social']['actions']
 				end
 
 				it 'owner has correct actions' do
 					get :index, @id_structure
 					response.status.should eq 200
-					@social_data = JSON.parse(response.body)['data']['social']
+					@social_actions = JSON.parse(response.body)['data']['social']['actions']
 					@can_follow = true
 				end
 
@@ -251,7 +256,7 @@ describe Api::Company::CompaniesController, type: :controller do
 					cookies['ACCESS_TOKEN'] = FactoryGirl.create(:user_second).access_token
 					get :index, @id_structure
 					response.status.should eq 200
-					@social_data = JSON.parse(response.body)['data']['social']
+					@social_actions = JSON.parse(response.body)['data']['social']['actions']
 					@can_follow = true
 				end
 
@@ -261,7 +266,7 @@ describe Api::Company::CompaniesController, type: :controller do
 					cookies['ACCESS_TOKEN'] = @new_user.access_token
 					get :index, @id_structure
 					response.status.should eq 200
-					@social_data = JSON.parse(response.body)['data']['social']
+					@social_actions = JSON.parse(response.body)['data']['social']['actions']
 					@can_unfollow = true
 				end
 			end

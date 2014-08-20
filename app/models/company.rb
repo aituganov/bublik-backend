@@ -20,6 +20,7 @@ class Company < ActiveRecord::Base
 			TAGS: :tags,
 			LOGOTYPES: :logotypes,
 			LOGOTYPE: :logotype,
+			SOCIAL: :social,
 			FOLLOWERS: :followers
 	}
 
@@ -53,8 +54,7 @@ class Company < ActiveRecord::Base
 			put_tags_data rs
 			put_privileges_data rs, self, requester
 			put_current_logotype_data rs, requester
-			put_social_data rs, self, requester
-			rs[@@RS_DATA[:FOLLOWERS]] = get_followers_data options
+			put_social_data rs, requester, options
 		elsif rs_data[@@RS_DATA[:PRIVILEGES]]
 			put_privileges_data rs, self, requester
 		elsif rs_data[@@RS_DATA[:TAGS]]
@@ -109,6 +109,13 @@ class Company < ActiveRecord::Base
 	end
 
 	# Socialization response block
+
+	def put_social_data(rs, requester, options)
+		rs[@@RS_DATA[:SOCIAL]] = {}
+
+		put_social_actions rs[@@RS_DATA[:SOCIAL]], self, requester
+		rs[@@RS_DATA[:SOCIAL]][@@RS_DATA[:FOLLOWERS]] = get_followers_data options
+	end
 
 	def get_follow_data
 		{id: self.id, title: self.title, preview_url: self.get_current_image_preview_url}

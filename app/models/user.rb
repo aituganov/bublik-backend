@@ -23,6 +23,7 @@ class User < ActiveRecord::Base
 			AVATAR: :avatar,
 			AVATARS: :avatars,
 			CREATED_COMPANIES: :created_companies,
+			SOCIAL: :social,
 			FOLLOWED_USERS: :followed_users,
 			FOLLOWED_COMPANIES: :followed_companies,
 			FOLLOWERS: :followers
@@ -67,10 +68,7 @@ class User < ActiveRecord::Base
 			put_current_avatar_data rs, requester
 			put_privileges_data rs, self, requester
 			put_created_company_data rs, options
-			put_social_data rs, self, requester
-			rs[@@RS_DATA[:FOLLOWED_USERS]] = put_followed_users_data options
-			rs[@@RS_DATA[:FOLLOWED_COMPANIES]] = put_followed_companies_data options
-			rs[@@RS_DATA[:FOLLOWERS]] = put_followers_data options
+			put_social_data rs, requester, options
 		elsif rs_data[@@RS_DATA[:PRIVILEGES]]
 			put_privileges_data rs, self, requester
 		elsif rs_data[@@RS_DATA[:INTERESTS]]
@@ -109,6 +107,16 @@ class User < ActiveRecord::Base
 	def put_current_avatar_data(rs, requester)
 		current = get_current_image
 		rs[@@RS_DATA[:AVATAR]] = current.build_response requester unless current.nil?
+	end
+
+	# Social block
+	def put_social_data(rs, requester, options)
+		rs[@@RS_DATA[:SOCIAL]] = {}
+
+		put_social_actions rs[@@RS_DATA[:SOCIAL]], self, requester
+		rs[@@RS_DATA[:SOCIAL]][@@RS_DATA[:FOLLOWED_USERS]] = put_followed_users_data options
+		rs[@@RS_DATA[:SOCIAL]][@@RS_DATA[:FOLLOWED_COMPANIES]] = put_followed_companies_data options
+		rs[@@RS_DATA[:SOCIAL]][@@RS_DATA[:FOLLOWERS]] = put_followers_data options
 	end
 
 	# Created companies response block
