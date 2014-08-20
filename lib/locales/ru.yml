@@ -68,6 +68,7 @@ widget:
     interestsHeader: "Интересы пользователя"
     emptyInterestsCaption: "У пользователя нет ни одного интереса"
     addInterestCaption: "Добавить интересы"
+    backenderror: "Произошла ошибка. Пожалуйста, попробуйте позже"
     alert:
       firstNameChange:
         success: "Имя успешно изменено"
@@ -77,6 +78,10 @@ widget:
         error: "Произошла ошибка. Пожалуйста, попробуйте позже"
       addInterests:
         error: "Не удалось добавить интерес. Пожалуйста, попробуйте позже."
+    social:
+      actions:
+        follow: "Подписаться"
+        unfollow: "Отписаться"
   userAvatar:
     windowHeader: "Выберите ваш аватар"
     alert:

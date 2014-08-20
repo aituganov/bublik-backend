@@ -68,7 +68,8 @@ widget:
       interestsHeader: "User Interests"
       emptyInterestsCaption: "User has not any interests"
       addInterestCaption: "Add interets"
-      alert:
+      backenderror: "Error. Please, try again latter"
+      alert: "Error. Please, try again latter"
         firstNameChange:
           success: "Name has been successfully changed"
           error: "Error. Please, try again latter"
@@ -77,6 +78,10 @@ widget:
           error: "Error. Please, try again latter"
         addInterests:
           error: "Can't to add a new interest. Please, try again later"
+      social:
+        actions:
+          follow: "Follow"
+          unfollow: "Unfollow"
   userAvatar:
       windowHeader: "Choose your avatar"
       alert:
