@@ -14,10 +14,10 @@ Rails.application.routes.draw do
 			match 'logout' => 'users#logout', via: [:put]
 			get 'login/check/:login' => 'users#check_login', constraints: {login: /.*/}
 			# User
-			get ':id' => 'users#index', constraints: {id: /\d/}
+			get ':id' => 'users#index'
 			post ':id' => 'users#update'
 			match ':id' => 'users#delete', via: [:delete]
-			get 'current' => 'users#current'
+			get 'current/info' => 'users#current'
 			# Created companies
 			get ':id/created_companies' => 'companies/created_companies#index'
 			# Avatars

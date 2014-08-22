@@ -28,7 +28,7 @@ describe Api::User::UsersController do
 		end
 
 		it 'routes to #current' do
-			get('/api/user/current').should route_to('api/user/users#current')
+			get('/api/user/current/info').should route_to('api/user/users#current')
 		end
 
 		it 'routes to #update' do
