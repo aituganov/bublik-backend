@@ -5,11 +5,6 @@ Rails.application.routes.draw do
 
 		get 'version' => 'versions#current_version'
 
-		# Route menu
-		scope :path => 'menu' do
-			get '/' => 'menu#get'
-		end
-
 		# Route users
 		namespace :user do
 			# Create
@@ -19,9 +14,10 @@ Rails.application.routes.draw do
 			match 'logout' => 'users#logout', via: [:put]
 			get 'login/check/:login' => 'users#check_login', constraints: {login: /.*/}
 			# User
-			get ':id' => 'users#index'
+			get ':id' => 'users#index', constraints: {id: /\d/}
 			post ':id' => 'users#update'
 			match ':id' => 'users#delete', via: [:delete]
+			get 'current' => 'users#current'
 			# Created companies
 			get ':id/created_companies' => 'companies/created_companies#index'
 			# Avatars

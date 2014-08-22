@@ -1,5 +1,5 @@
 class Api::User::UsersController < Api::ApplicationController
-	before_filter :check_user, except: [:registration, :login, :check_login, :logout]
+	before_filter :check_user, except: [:registration, :login, :check_login, :logout, :current]
 
 	def index
 		render_event :ok, @rq_user.build_response({User.RS_DATA[:FULL] => true}, {requester: @requester, limit: user_params[:limit]})
@@ -34,6 +34,14 @@ class Api::User::UsersController < Api::ApplicationController
 			render_event :ok
 		else
 			render_event :created
+		end
+	end
+
+	def current
+		if @requester.nil?
+			render_event :ok, {info: {anonymous: true}, menu_items: []}
+		else
+			render_event :ok, @requester.build_response({User.RS_DATA[:CURRENT_USER] => true})
 		end
 	end
 

@@ -18,6 +18,7 @@ class User < ActiveRecord::Base
 
 	@@RS_DATA = {
 			FULL: :full,
+			CURRENT_USER: :current,
 			PRIVILEGES: :privileges,
 			INTERESTS: :interests,
 			AVATAR: :avatar,
@@ -35,7 +36,7 @@ class User < ActiveRecord::Base
 		"#{self.first_name} #{self.last_name}"
 	end
 
-	def get_menu
+	def current_user
 		{user: {id: self.id, full_name: self.full_name, avatar_preview_url: self.get_current_image_preview_url }, menu_items: %w(companies)}
 	end
 
@@ -85,6 +86,8 @@ class User < ActiveRecord::Base
 			rs = put_followed_companies_data options
 		elsif rs_data[@@RS_DATA[:FOLLOWERS]]
 			rs = put_followers_data options
+		elsif rs_data[@@RS_DATA[:CURRENT_USER]]
+			rs = get_current_info;
 		end
 		rs
 	end
@@ -96,6 +99,10 @@ class User < ActiveRecord::Base
 		rs[:last_name] = self.last_name
 		rs[:is_deleted] = self.is_deleted
 		rs[:anonymous] = false
+	end
+
+	def get_current_info
+		{info: {id: self.id, full_name: self.full_name, avatar_preview_url: self.get_current_image_preview_url}, menu_items: %w(selfpage, companies)}
 	end
 
 	# Avatars response block

@@ -322,6 +322,35 @@ describe Api::User::UsersController, type: :controller do
 					@can_unfollow = true
 				end
 			end
+
+			it 'wrong access token has 401' do
+				cookies['ACCESS_TOKEN'] = 'illegal'
+				get :current
+				response.status.should eq 401
+			end
+
+			it 'empty access token has anonymous' do
+				cookies['ACCESS_TOKEN'] = ''
+				get :current
+				response.status.should eq 200
+
+				rs = JSON.parse(response.body)['data']
+				rs['info']['anonymous'].should be_true
+				rs['menu_items'].should have(0).items
+			end
+
+			it 'valid access token has data' do
+				get :current
+				response.status.should eq 200
+
+				rs = JSON.parse(response.body)['data']
+				rs_user = rs['info']
+				rs_user['anonymous'].should be_nil
+				rs_user['id'].should eq @correct_user.id
+				rs_user['full_name'].should eq @correct_user.full_name
+				rs_user['avatar_preview_url'].should eq @correct_user.get_current_image_preview_url
+				rs['menu_items'].should_not have(0).items
+			end
 		end
 
 		context 'update' do

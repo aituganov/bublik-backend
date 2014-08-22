@@ -27,6 +27,10 @@ describe Api::User::UsersController do
 			get('/api/user/login/check/new@login.ru').should route_to('api/user/users#check_login', login: 'new@login.ru')
 		end
 
+		it 'routes to #current' do
+			get('/api/user/current').should route_to('api/user/users#current')
+		end
+
 		it 'routes to #update' do
 			post('/api/user/1').should route_to('api/user/users#update', id: '1')
 		end
