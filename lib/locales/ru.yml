@@ -4,6 +4,10 @@ mainpage:
     registration: Регистрация
     login: Войти
     logout: Выйти
+  sideMenu:
+    item:
+      selfpage: "Моя страница"
+      companies: "Компании"
 user:
   pages:
     main:

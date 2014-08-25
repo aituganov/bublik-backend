@@ -4,6 +4,10 @@ mainpage:
     registration: Registration
     login: Login
     logout: Logout
+  sideMenu:
+    item:
+      selfpage: "My page"
+      companies: "Companies"
 user:
   pages:
     main:
