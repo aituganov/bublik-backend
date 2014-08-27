@@ -8,6 +8,8 @@ mainpage:
     item:
       selfpage: "Моя страница"
       companies: "Компании"
+      followers: "Подписчики"
+      followed: "Подписан на"
 user:
   pages:
     main:

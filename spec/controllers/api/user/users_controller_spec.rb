@@ -349,7 +349,7 @@ describe Api::User::UsersController, type: :controller do
 				rs_user['id'].should eq @correct_user.id
 				rs_user['full_name'].should eq @correct_user.full_name
 				rs_user['avatar_preview_url'].should eq @correct_user.get_current_image_preview_url
-				rs['menu_items'].should_not have(0).items
+				rs['menu_items'].should have(4).items
 			end
 		end
 

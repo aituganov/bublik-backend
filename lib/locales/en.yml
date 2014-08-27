@@ -8,6 +8,8 @@ mainpage:
     item:
       selfpage: "My page"
       companies: "Companies"
+      followers: "Followers"
+      followed: "Followed"
 user:
   pages:
     main:

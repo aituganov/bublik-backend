@@ -102,7 +102,7 @@ class User < ActiveRecord::Base
 	end
 
 	def get_current_info
-		{info: {id: self.id, full_name: self.full_name, avatar_preview_url: self.get_current_image_preview_url}, menu_items: %w(selfpage companies)}
+		{info: {id: self.id, full_name: self.full_name, avatar_preview_url: self.get_current_image_preview_url}, menu_items: %w(selfpage companies followers followed)}
 	end
 
 	# Avatars response block
