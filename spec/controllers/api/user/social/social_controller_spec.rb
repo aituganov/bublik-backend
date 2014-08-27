@@ -131,6 +131,7 @@ describe Api::User::Social::SocialController, type: :controller do
 
 			describe 'check followed users rs' do
 				before(:each) do
+					@followed = [].push @new_user, @followed_user
 					@user.follow!(@new_user).should be_true
 					@user.follow!(@followed_user).should be_true
 				end
@@ -144,12 +145,44 @@ describe Api::User::Social::SocialController, type: :controller do
 					request.cookies[:ACCESS_TOKEN] = ''
 					post :user_followed, @id_structure
 					response.status.should eq 200
+
+					rs_followed = JSON.parse(response.body)['data']
+					rs_followed.should have(2).items
+					checked = 0
+					rs_followed.each do |rs_f|
+						@followed.each do |f|
+							if f.id == rs_f['id']
+								rs_f['title'].should eq f.full_name
+								rs_f['preview_url'].should eq f.get_current_image_preview_url
+								rs_f['actions']['follow'].should be_false
+								rs_f['actions']['unfollow'].should be_false
+								checked += 1
+							end
+						end
+					end
+					checked.should eq 2
 				end
 
 				it 'has 200 for not owner token' do
 					request.cookies[:ACCESS_TOKEN] = @new_user.access_token
 					post :user_followed, @id_structure
 					response.status.should eq 200
+
+					rs_followed = JSON.parse(response.body)['data']
+					rs_followed.should have(2).items
+					checked = 0
+					rs_followed.each do |rs_f|
+						@followed.each do |f|
+							if f.id == rs_f['id']
+								rs_f['title'].should eq f.full_name
+								rs_f['preview_url'].should eq f.get_current_image_preview_url
+								rs_f['actions']['follow'].should eq (f.id != @new_user.id )
+								rs_f['actions']['unfollow'].should be_false
+								checked += 1
+							end
+						end
+					end
+					checked.should eq 2
 				end
 
 				it 'has 401 for wrong access token' do
@@ -159,18 +192,18 @@ describe Api::User::Social::SocialController, type: :controller do
 				end
 
 				it 'has 200 & correct data for followed users' do
-					followed = [].push @new_user, @followed_user
-
 					get :user_followed, @id_structure
 					response.status.should eq 200
 					rs_followed = JSON.parse(response.body)['data']
 					rs_followed.should have(2).items
 					checked = 0
 					rs_followed.each do |rs_f|
-						followed.each do |f|
+						@followed.each do |f|
 							if f.id == rs_f['id']
 								rs_f['title'].should eq f.full_name
 								rs_f['preview_url'].should eq f.get_current_image_preview_url
+								rs_f['actions']['follow'].should be_false
+								rs_f['actions']['unfollow'].should be_true
 								checked += 1
 							end
 						end
@@ -197,6 +230,8 @@ describe Api::User::Social::SocialController, type: :controller do
 
 			describe 'check followers rs' do
 				before(:each) do
+					request.cookies[:ACCESS_TOKEN] = @followed_user.access_token
+					@followers = [].push @new_user, @user
 					@new_user.follow!(@followed_user).should be_true
 					@user.follow!(@followed_user).should be_true
 					@id_structure = {id: @followed_user.id}
@@ -211,12 +246,44 @@ describe Api::User::Social::SocialController, type: :controller do
 					request.cookies[:ACCESS_TOKEN] = ''
 					post :user_followers, @id_structure
 					response.status.should eq 200
+
+					rs_followed = JSON.parse(response.body)['data']
+					rs_followed.should have(2).items
+					checked = 0
+					rs_followed.each do |rs_f|
+						@followers.each do |f|
+							if f.id == rs_f['id']
+								rs_f['title'].should eq f.full_name
+								rs_f['preview_url'].should eq f.get_current_image_preview_url
+								rs_f['actions']['follow'].should be_false
+								rs_f['actions']['unfollow'].should be_false
+								checked += 1
+							end
+						end
+					end
+					checked.should eq 2
 				end
 
 				it 'has 200 for not owner token' do
 					request.cookies[:ACCESS_TOKEN] = @new_user.access_token
 					post :user_followers, @id_structure
 					response.status.should eq 200
+
+					rs_followed = JSON.parse(response.body)['data']
+					rs_followed.should have(2).items
+					checked = 0
+					rs_followed.each do |rs_f|
+						@followers.each do |f|
+							if f.id == rs_f['id']
+								rs_f['title'].should eq f.full_name
+								rs_f['preview_url'].should eq f.get_current_image_preview_url
+								rs_f['actions']['follow'].should eq (f.id != @new_user.id )
+								rs_f['actions']['unfollow'].should be_false
+								checked += 1
+							end
+						end
+					end
+					checked.should eq 2
 				end
 
 				it 'has 401 for wrong access token' do
@@ -226,18 +293,18 @@ describe Api::User::Social::SocialController, type: :controller do
 				end
 
 				it 'has 200 & correct data for user followers' do
-					followed = [].push @new_user, @user
-
 					get :user_followers, @id_structure
 					response.status.should eq 200
-					rs_followed = JSON.parse(response.body)['data']
-					rs_followed.should have(2).items
+					rs_followers = JSON.parse(response.body)['data']
+					rs_followers.should have(2).items
 					checked = 0
-					rs_followed.each do |rs_f|
-						followed.each do |f|
+					rs_followers.each do |rs_f|
+						@followers.each do |f|
 							if f.id == rs_f['id']
 								rs_f['title'].should eq f.full_name
 								rs_f['preview_url'].should eq f.get_current_image_preview_url
+								rs_f['actions']['follow'].should be_true
+								rs_f['actions']['unfollow'].should be_false
 								checked += 1
 							end
 						end
@@ -396,12 +463,44 @@ describe Api::User::Social::SocialController, type: :controller do
 					request.cookies[:ACCESS_TOKEN] = ''
 					post :company_followed, @id_structure
 					response.status.should eq 200
+
+					rs_followed = JSON.parse(response.body)['data']
+					rs_followed.should have(2).items
+					checked = 0
+					rs_followed.each do |rs_f|
+						@companies.each do |f|
+							if f.id == rs_f['id']
+								rs_f['title'].should eq f.title
+								rs_f['preview_url'].should eq f.get_current_image_preview_url
+								rs_f['actions']['follow'].should be_false
+								rs_f['actions']['unfollow'].should be_false
+								checked += 1
+							end
+						end
+					end
+					checked.should eq 2
 				end
 
 				it 'has 200 for not owner token' do
 					request.cookies[:ACCESS_TOKEN] = @new_user.access_token
 					post :company_followed, @id_structure
 					response.status.should eq 200
+
+					rs_followed = JSON.parse(response.body)['data']
+					rs_followed.should have(2).items
+					checked = 0
+					rs_followed.each do |rs_f|
+						@companies.each do |f|
+							if f.id == rs_f['id']
+								rs_f['title'].should eq f.title
+								rs_f['preview_url'].should eq f.get_current_image_preview_url
+								rs_f['actions']['follow'].should eq (f.id != @new_user.id )
+								rs_f['actions']['unfollow'].should eq (f.id == @new_user.id )
+								checked += 1
+							end
+						end
+					end
+					checked.should eq 2
 				end
 
 				it 'has 401 for wrong access token' do
@@ -422,6 +521,8 @@ describe Api::User::Social::SocialController, type: :controller do
 							if f.id == rs_f['id']
 								rs_f['title'].should eq f.title
 								rs_f['preview_url'].should eq f.get_current_image_preview_url
+								rs_f['actions']['follow'].should be_false
+								rs_f['actions']['unfollow'].should be_true
 								checked += 1
 							end
 						end

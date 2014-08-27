@@ -81,11 +81,11 @@ class User < ActiveRecord::Base
 		elsif rs_data[@@RS_DATA[:CREATED_COMPANIES]]
 			put_created_company_data rs, options
 		elsif rs_data[@@RS_DATA[:FOLLOWED_USERS]]
-			rs = put_followed_users_data options
+			rs = put_followed_users_data options, requester
 		elsif rs_data[@@RS_DATA[:FOLLOWED_COMPANIES]]
-			rs = put_followed_companies_data options
+			rs = put_followed_companies_data options, requester
 		elsif rs_data[@@RS_DATA[:FOLLOWERS]]
-			rs = put_followers_data options
+			rs = put_followers_data options, requester
 		elsif rs_data[@@RS_DATA[:CURRENT_USER]]
 			rs = get_current_info;
 		end
@@ -122,9 +122,9 @@ class User < ActiveRecord::Base
 		rs[@@RS_DATA[:SOCIAL]] = {}
 
 		put_social_actions rs[@@RS_DATA[:SOCIAL]], self, requester
-		rs[@@RS_DATA[:SOCIAL]][@@RS_DATA[:FOLLOWED_USERS]] = put_followed_users_data options
-		rs[@@RS_DATA[:SOCIAL]][@@RS_DATA[:FOLLOWED_COMPANIES]] = put_followed_companies_data options
-		rs[@@RS_DATA[:SOCIAL]][@@RS_DATA[:FOLLOWERS]] = put_followers_data options
+		rs[@@RS_DATA[:SOCIAL]][@@RS_DATA[:FOLLOWED_USERS]] = put_followed_users_data options, requester
+		rs[@@RS_DATA[:SOCIAL]][@@RS_DATA[:FOLLOWED_COMPANIES]] = put_followed_companies_data options, requester
+		rs[@@RS_DATA[:SOCIAL]][@@RS_DATA[:FOLLOWERS]] = put_followers_data options, requester
 	end
 
 	# Created companies response block
@@ -147,14 +147,16 @@ class User < ActiveRecord::Base
 
 	# Socialization response block
 
-	def get_follow_data
-		{id: self.id, title: self.full_name, preview_url: self.get_current_image_preview_url}
+	def get_follow_data requester
+		rs = {id: self.id, title: self.full_name, preview_url: self.get_current_image_preview_url}
+		put_social_actions rs, self, requester
+		rs
 	end
 
-	def put_followed_users_data(options)
+	def put_followed_users_data(options, requester)
 		data = []
 		get_followed_users(options[:limit], options[:offset]).each do |user|
-			data.push user.get_follow_data
+			data.push user.get_follow_data requester
 		end
 		data
 	end
@@ -166,10 +168,10 @@ class User < ActiveRecord::Base
 		res
 	end
 
-	def put_followed_companies_data(options)
+	def put_followed_companies_data(options, requester)
 		data = []
 		get_followed_companies(options[:limit], options[:offset]).each do |company|
-			data.push company.get_follow_data
+			data.push company.get_follow_data requester
 		end
 		data
 	end
@@ -181,10 +183,10 @@ class User < ActiveRecord::Base
 		res
 	end
 
-	def put_followers_data(options)
+	def put_followers_data(options, requester)
 		data = []
-		get_follower_users(options[:limit], options[:offset]).each do |company|
-			data.push company.get_follow_data
+		get_follower_users(options[:limit], options[:offset]).each do |user|
+			data.push user.get_follow_data requester
 		end
 		data
 	end

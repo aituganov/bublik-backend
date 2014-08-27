@@ -18,7 +18,7 @@ class Api::User::Social::SocialController < Api::User::UsersController
 	end
 
 	def company_followed
-		render_event :ok, @rq_user.build_response({User.RS_DATA[:FOLLOWED_COMPANIES] => true}, socialization_params)
+		render_event :ok, @rq_user.build_response({User.RS_DATA[:FOLLOWED_COMPANIES] => true}, socialization_params.merge({requester: @requester}))
 	end
 
 	def user_follow
@@ -34,11 +34,11 @@ class Api::User::Social::SocialController < Api::User::UsersController
 	end
 
 	def user_followed
-		render_event :ok, @rq_user.build_response({User.RS_DATA[:FOLLOWED_USERS] => true}, socialization_params)
+		render_event :ok, @rq_user.build_response({User.RS_DATA[:FOLLOWED_USERS] => true}, socialization_params.merge({requester: @requester}))
 	end
 
 	def user_followers
-		render_event :ok, @rq_user.build_response({User.RS_DATA[:FOLLOWERS] => true}, socialization_params)
+		render_event :ok, @rq_user.build_response({User.RS_DATA[:FOLLOWERS] => true}, socialization_params.merge({requester: @requester}))
 	end
 
 	private

@@ -16,6 +16,8 @@ describe Api::Company::Social::SocialController, type: :controller do
 			@new_user.should be_valid
 			@new_user.follow!(@company).should be_true
 			@user.follow!(@company).should be_true
+
+			@followers = [].push @new_user, @user
 		end
 
 		it 'has 404 for not existed company' do
@@ -27,12 +29,45 @@ describe Api::Company::Social::SocialController, type: :controller do
 			request.cookies[:ACCESS_TOKEN] = ''
 			post :followers, @id_structure
 			response.status.should eq 200
+
+			rs_followers = JSON.parse(response.body)['data']
+			rs_followers.should have(2).items
+			checked = 0
+			rs_followers.each do |rs_f|
+				@followers.each do |f|
+					if f.id == rs_f['id']
+						rs_f['title'].should eq f.full_name
+						rs_f['preview_url'].should eq f.get_current_image_preview_url
+						rs_f['actions']['follow'].should be_false
+						rs_f['actions']['unfollow'].should be_false
+						checked += 1
+					end
+				end
+			end
+			checked.should eq 2
 		end
 
 		it 'has 200 for not owner token' do
 			request.cookies[:ACCESS_TOKEN] = @new_user.access_token
 			post :followers, @id_structure
 			response.status.should eq 200
+
+			rs_followers = JSON.parse(response.body)['data']
+			puts rs_followers
+			rs_followers.should have(2).items
+			checked = 0
+			rs_followers.each do |rs_f|
+				@followers.each do |f|
+					if f.id == rs_f['id']
+						rs_f['title'].should eq f.full_name
+						rs_f['preview_url'].should eq f.get_current_image_preview_url
+						rs_f['actions']['follow'].should eq (f.id != @new_user.id )
+						rs_f['actions']['unfollow'].should be_false
+						checked += 1
+					end
+				end
+			end
+			checked.should eq 2
 		end
 
 		it 'has 401 for wrong access token' do
@@ -42,18 +77,19 @@ describe Api::Company::Social::SocialController, type: :controller do
 		end
 
 		it 'has 200 & correct data for followers' do
-			followers = [].push @new_user, @user
-
 			get :followers, @id_structure
 			response.status.should eq 200
 			rs_followers = JSON.parse(response.body)['data']
+			puts rs_followers
 			rs_followers.should have(2).items
 			checked = 0
 			rs_followers.each do |rs_f|
-				followers.each do |f|
+				@followers.each do |f|
 					if f.id == rs_f['id']
 						rs_f['title'].should eq f.full_name
 						rs_f['preview_url'].should eq f.get_current_image_preview_url
+						rs_f['actions']['follow'].should eq (f.id != @user.id )
+						rs_f['actions']['unfollow'].should be_false
 						checked += 1
 					end
 				end

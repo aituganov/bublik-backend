@@ -62,7 +62,7 @@ class Company < ActiveRecord::Base
 		elsif rs_data[@@RS_DATA[:LOGOTYPES]]
 			put_all_logotypes_data rs, requester
 		elsif rs_data[@@RS_DATA[:FOLLOWERS]]
-			rs = get_followers_data options
+			rs = get_followers_data options, requester
 		end
 		rs
 	end
@@ -114,17 +114,19 @@ class Company < ActiveRecord::Base
 		rs[@@RS_DATA[:SOCIAL]] = {}
 
 		put_social_actions rs[@@RS_DATA[:SOCIAL]], self, requester
-		rs[@@RS_DATA[:SOCIAL]][@@RS_DATA[:FOLLOWERS]] = get_followers_data options
+		rs[@@RS_DATA[:SOCIAL]][@@RS_DATA[:FOLLOWERS]] = get_followers_data options, requester
 	end
 
-	def get_follow_data
-		{id: self.id, title: self.title, preview_url: self.get_current_image_preview_url}
+	def get_follow_data requester
+		rs = {id: self.id, title: self.title, preview_url: self.get_current_image_preview_url}
+		put_social_actions rs, self, requester
+		rs
 	end
 
-	def get_followers_data(options)
+	def get_followers_data(options, requester)
 		data = []
 		get_follower_users(options[:limit], options[:offset]).each do |user|
-			data.push user.get_follow_data
+			data.push user.get_follow_data(requester)
 		end
 		data
 	end
