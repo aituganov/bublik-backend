@@ -4,6 +4,7 @@ mainpage:
     registration: Регистрация
     login: Войти
     logout: Выйти
+    companyCreate: "Создать компанию"
   sideMenu:
     item:
       selfpage: "Моя страница"
