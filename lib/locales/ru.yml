@@ -97,3 +97,7 @@ widget:
     alert:
       successAvatarChanged: "Аватар успешно изменён"
       errorAvatarChanged: "Произошла ошибка. Пожалуйста, попробуйте позже"
+  createCompany:
+    mainHeader: "Создай  свою компанию"
+    companyNamePlaceholder: "Название компании"
+    submitButtonCaption: "Создать"

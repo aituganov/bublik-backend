@@ -97,3 +97,7 @@ widget:
       alert:
         successAvatarChanged: "Avatar has been successfully changed"
         errorAvatarChanged: "Error. Please, try again letter"
+  createCompany:
+      mainHeader: "Create your company"
+      companyNamePlaceholder: "Company name"
+      submitButtonCaption: "Create"
