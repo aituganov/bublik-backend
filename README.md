@@ -13,7 +13,7 @@ Get backend version:
 
 Get localization:
 ---------
-> - **/version** - **GET** localization by header language.
+> - **/localization** - **GET** localization by header language.
 
 User actions:
 ---------
